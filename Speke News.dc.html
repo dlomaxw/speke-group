@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>News &amp; Updates | Speke Group of Hotels</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./speke-ui.css">
+  <script src="./image-slot.js"></script>
+  <script src="./speke-ui.js"></script>
+</helmet>
+
+<div class="page-shell" style="margin:0 auto;background:#f7f2e9">
+
+  <!-- ================= HEADER ================= -->
+  <header class="sg-header">
+    <a href="Speke Group Homepage.dc.html"><img class="logo" src="assets/speke-logo.png" alt="Speke Group"></a>
+    <nav class="sg-nav">
+      <div class="item"><a href="Speke Group Homepage.dc.html">Our Group</a></div>
+      <div class="item">
+        <a href="Speke Group Homepage.dc.html">Find &amp; Book</a>
+        <div class="sg-drop">
+          <div class="grp">Hotels</div>
+          <a href="https://www.spekehotel.com/">Speke Hotel</a>
+          <a href="https://kabiracountryclub.com/">Kabira Country Club</a>
+          <a href="https://forest-cottages.com/">Forest Cottages Hotel</a>
+          <a href="https://dolphinsuites.co.ug/">Dolphin Suites Hotel</a>
+          <div class="grp">Resorts</div>
+          <a href="https://www.spekeresort.com/">Speke Resort Munyonyo</a>
+          <a href="https://www.spekeresort.com/indoor-meetings/">Speke Resort Convention Centre</a>
+          <a href="https://munyonyocommonwealth.com/">Munyonyo Commonwealth Resort</a>
+          <div class="grp">Apartments</div>
+          <a href="https://www.spekeapartments.com/wampewo/">Speke Apartments Wampewo</a>
+          <a href="https://www.spekeapartments.com/kitante/">Speke Apartments Kitante</a>
+          <a href="https://www.boulevardsuites.co.ug/">Boulevard Suites</a>
+          <a href="https://bukotoheights.com/">Bukoto Heights</a>
+          <a href="https://www.tagoreapartments.com/">Tagore Apartments</a>
+          <a href="https://spekegroup.com/naguru-apartments/">Naguru Apartments</a>
+        </div>
+      </div>
+      <div class="item"><a href="Speke Meetings and Events.dc.html">Events &amp; Meetings</a></div>
+      <div class="item"><a href="Speke Dining and Leisure.dc.html">Experiences</a></div>
+      <div class="item"><a href="Speke News.dc.html" class="active">News</a></div>
+      <div class="item"><a href="Speke Contact.dc.html">Contact</a></div>
+    </nav>
+    <a class="btn btn-ghost" href="Speke Contact.dc.html"><span>PRESS ENQUIRIES</span></a>
+  </header>
+
+  <!-- ================= PAGE HEAD ================= -->
+  <div style="padding:46px var(--gut) 26px" data-reveal>
+    <div class="eyebrow-line">Newsroom</div>
+    <h1 class="serif" style="font-size:42px;font-weight:600;margin:0 0 12px;color:#3a2020;letter-spacing:-0.015em">Group News &amp; Updates</h1>
+    <p style="font-size:14.5px;color:#5a4a3a;margin:0;max-width:640px;line-height:1.7">Announcements, achievements and stories from across our thirteen resorts, hotels and apartments.</p>
+  </div>
+
+  <!-- ================= FEATURED STORY ================= -->
+  <div style="padding:0 var(--gut) 40px" data-reveal>
+    <div class="card g-split-b" style="align-items:stretch">
+      <div class="media" style="height:330px">
+        <div class="badge">Featured</div>
+        <image-slot id="n-1" shape="rect" placeholder="Drop featured news photo" style="width:100%;height:330px"></image-slot>
+      </div>
+      <div style="padding:38px 40px;display:flex;flex-direction:column;justify-content:center">
+        <div class="eyebrow" style="font-size:10px;letter-spacing:.14em;color:#b8935a;font-weight:700;text-transform:uppercase;margin-bottom:10px">August 2026 &nbsp;&middot;&nbsp; Speke Resort Munyonyo</div>
+        <h2 class="serif" style="font-size:30px;font-weight:600;color:#3a2020;margin:0 0 14px;line-height:1.18">Speke Resort Munyonyo Completes Room Renovation</h2>
+        <p style="font-size:14px;line-height:1.72;color:#5a4a3a;margin:0 0 20px">All lakeside rooms have been refreshed with new furnishings ahead of the conference season, continuing the Group's programme of investment across its 900-plus modern rooms.</p>
+        <a class="link-arrow" href="#stories">READ THE FULL STORY <i>&rarr;</i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STORY GRID ================= -->
+  <div id="stories" style="padding:0 var(--gut) 48px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap" data-reveal>
+      <h2 class="h-sec" style="font-size:26px">Latest Stories</h2>
+      <div data-filter-group="news" style="display:flex;gap:9px">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="group">Group</button>
+        <button class="chip" data-filter="property">Properties</button>
+        <button class="chip" data-filter="events">Events</button>
+      </div>
+    </div>
+
+    <div style="gap:24px" data-stagger="0.07" class="g-3">
+      <sc-for list="{{ news }}" as="n" hint-placeholder-count="6">
+        <a class="card" href="#" data-reveal data-filter-item="news" data-tags="{{ n.tag }}">
+          <div class="media" style="height:190px">
+            <div class="badge">{{ n.property }}</div>
+            <image-slot id="{{ n.slotId }}" shape="rect" placeholder="{{ n.placeholder }}" style="width:100%;height:190px"></image-slot>
+          </div>
+          <div class="body">
+            <div class="eyebrow">{{ n.date }} &nbsp;&middot;&nbsp; {{ n.property }}</div>
+            <div class="title" style="font-size:18px;line-height:1.3">{{ n.title }}</div>
+            <div class="desc">{{ n.excerpt }}</div>
+            <span class="link-arrow">READ MORE <i>&rarr;</i></span>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= HERITAGE STRIP ================= -->
+  <div style="background:#efe6d6;padding:50px var(--gut)">
+    <div style="text-align:center;margin-bottom:32px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">Our History</div>
+      <h2 class="h-sec">Milestones in the Speke Story</h2>
+    </div>
+    <div style="gap:22px" data-stagger="0.08" class="g-4">
+      <sc-for list="{{ milestones }}" as="m" hint-placeholder-count="4">
+        <div class="tile" data-reveal>
+          <div class="serif" style="font-size:32px;font-weight:700;color:#c9a227;margin-bottom:8px">{{ m.year }}</div>
+          <div class="serif" style="font-size:18px;font-weight:600;color:#3a2020;margin-bottom:8px">{{ m.title }}</div>
+          <div style="font-size:12.8px;line-height:1.7;color:#5a4a3a">{{ m.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= PRESS CTA ================= -->
+  <div style="background:#5c1728;padding:var(--gut);text-align:center" data-reveal>
+    <div class="eyebrow-line" style="justify-content:center;color:#d4af6a">Media</div>
+    <h2 class="serif" style="color:#fff;font-size:28px;font-weight:600;margin:0 0 14px">Press &amp; Media Enquiries</h2>
+    <div style="font-size:14px;color:#f2e2c8;line-height:2;margin-bottom:22px">
+      <div>info@spekegroup.com</div>
+      <div>+256 707 711 750 &nbsp;&middot;&nbsp; +256 702 711 142</div>
+    </div>
+    <a class="btn btn-light" href="Speke Contact.dc.html"><span>CONTACT OUR TEAM</span></a>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="sg-footer">
+    <div style="gap:30px;padding-bottom:34px" class="g-footer">
+      <div>
+        <div style="margin-bottom:16px;background:#f2e2c8;display:inline-block;padding:9px 13px;border-radius:8px">
+          <img src="assets/speke-logo.png" alt="Speke Group" style="height:48px;width:auto;display:block">
+        </div>
+        <div style="font-size:12px;line-height:1.8;color:#c8a888;max-width:230px">Unparalleled luxurious experiences in the Pearl of Africa.</div>
+      </div>
+      <div>
+        <div class="col-title">Address</div>
+        <div style="font-size:12.5px;line-height:2;color:#dcc0a8">
+          <div>4th Floor, Crane Chambers,</div>
+          <div>Kampala Road, Uganda</div>
+        </div>
+        <div class="col-title" style="margin-top:20px">Reservations</div>
+        <div style="font-size:12.5px;line-height:2;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="tel:+256707711750">(+256) 707 711 750</a>
+          <a href="tel:+256702711142">(+256) 702 711 142</a>
+          <a href="tel:+256752711016">(+256) 752 711 016</a>
+          <a href="mailto:info@spekegroup.com">info@spekegroup.com</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Hotels &amp; Resorts</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://www.spekehotel.com/">Speke Hotel</a>
+          <a href="https://kabiracountryclub.com/">Kabira Country Club</a>
+          <a href="https://forest-cottages.com/">Forest Cottages Hotel</a>
+          <a href="https://dolphinsuites.co.ug/">Dolphin Suites Hotel</a>
+          <a href="https://www.spekeresort.com/">Speke Resort Munyonyo</a>
+          <a href="https://munyonyocommonwealth.com/">Munyonyo Commonwealth Resort</a>
+          <a href="https://www.spekeresort.com/indoor-meetings/">Speke Resort Convention Centre</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Apartments</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://www.spekeapartments.com/wampewo/">Speke Apartments Wampewo</a>
+          <a href="https://www.spekeapartments.com/kitante/">Speke Apartments Kitante</a>
+          <a href="https://www.boulevardsuites.co.ug/">Boulevard Suites</a>
+          <a href="https://bukotoheights.com/">Bukoto Heights</a>
+          <a href="https://www.tagoreapartments.com/">Tagore Apartments</a>
+          <a href="https://spekegroup.com/naguru-apartments/">Naguru Apartments</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Information</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://spekegroup.com/about-us/">About Us</a>
+          <a href="https://spekegroup.com/contact/">Careers</a>
+          <a href="https://spekegroup.com/contact/">SOPs</a>
+          <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
+          <a href="Speke Meetings and Events.dc.html">Events &amp; Meetings</a>
+          <a href="Speke Dining and Leisure.dc.html">Experiences</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Socials</div>
+        <div style="display:flex;gap:10px">
+          <a class="social" href="https://web.facebook.com/spekegroup">f</a>
+          <a class="social" href="https://twitter.com/speke_group">X</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(242,226,200,0.2);padding-top:20px;font-size:11.5px;color:#c8a888;text-align:center">Copyright &copy; 2026. All Rights Reserved to Speke Group of Hotels.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const news = [
+      { date: "JUL 2026", property: "Group", tag: "group",
+        title: "Speke Group Named Uganda's Leading Hospitality Employer",
+        excerpt: "Recognised for staff development and training programmes across all thirteen properties.",
+        slotId: "n-2", placeholder: "Drop staff team photo" },
+      { date: "JUN 2026", property: "Kabira Country Club", tag: "events",
+        title: "Kabira Country Club Hosts National Golf Open",
+        excerpt: "The course welcomed players from across East Africa for a weekend of competition.",
+        slotId: "n-3", placeholder: "Drop golf course photo" },
+      { date: "MAY 2026", property: "Convention Centre", tag: "property",
+        title: "New Wing Opens at Speke Resort Convention Centre",
+        excerpt: "Additional breakout rooms expand capacity for mid-sized conferences alongside the Victoria and Speke ballrooms.",
+        slotId: "n-4", placeholder: "Drop convention centre photo" },
+      { date: "APR 2026", property: "Dolphin Suites", tag: "property",
+        title: "Dolphin Suites Launches Long-Stay Packages",
+        excerpt: "Extended-stay rates introduced for corporate and diplomatic guests in Kampala.",
+        slotId: "n-5", placeholder: "Drop Dolphin Suites photo" },
+      { date: "MAR 2026", property: "Group", tag: "group",
+        title: "Speke Group Marks 25 Years of Ugandan Hospitality",
+        excerpt: "A look back at the Group's journey from the acquisition of Speke Hotel in 1996 to a collection of thirteen properties.",
+        slotId: "n-6", placeholder: "Drop heritage photo" },
+      { date: "FEB 2026", property: "Group", tag: "group",
+        title: "Spa Treatment Menu Refreshed Across the Group",
+        excerpt: "New massage, facial and steam treatments drawing on original active ingredients and memorable fragrances.",
+        slotId: "n-7", placeholder: "Drop spa photo" }
+    ];
+
+    const milestones = [
+      { year: "1920s", title: "Speke Hotel Is Built",
+        desc: "Uganda's only centurial hotel takes shape in the heart of Kampala, draped in the colonial ambiance preserved to this day." },
+      { year: "1996", title: "The Group Begins",
+        desc: "Speke Hotel becomes the first hotel acquired as a member of the Ruparelia Group by Dr. Sudhir Ruparelia." },
+      { year: "2006", title: "Munyonyo Commonwealth Resort",
+        desc: "Completed in a record eleven months, marking the next stage in the Group's expansion." },
+      { year: "Today", title: "Thirteen Properties",
+        desc: "Over 900 modern rooms, 45 state-of-the-art conference rooms, award-winning restaurants, health clubs, spas and leisure facilities." }
+    ];
+
+    return { news, milestones };
+  }
+}
+
+</script>
+</body>
+</html>

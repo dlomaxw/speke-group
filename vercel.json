@@ -1,0 +1,25 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/", "destination": "/Speke Group Homepage.dc.html" },
+    { "source": "/home", "destination": "/Speke Group Homepage.dc.html" },
+    { "source": "/events", "destination": "/Speke Meetings and Events.dc.html" },
+    { "source": "/experiences", "destination": "/Speke Dining and Leisure.dc.html" },
+    { "source": "/news", "destination": "/Speke News.dc.html" },
+    { "source": "/contact", "destination": "/Speke Contact.dc.html" }
+  ],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*).dc.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ]
+}

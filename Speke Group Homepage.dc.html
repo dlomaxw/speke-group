@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speke Group Hotels, Resorts &amp; Apartments in Kampala, Uganda</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./speke-ui.css">
+  <script src="./image-slot.js"></script>
+  <script src="./speke-ui.js"></script>
+</helmet>
+
+<div class="page-shell" style="margin:0 auto;background:#f7f2e9">
+
+  <!-- ================= HEADER ================= -->
+  <header class="sg-header">
+    <a href="Speke Group Homepage.dc.html"><img class="logo" src="assets/speke-logo.png" alt="Speke Group"></a>
+    <nav class="sg-nav">
+      <div class="item"><a href="#our-group" class="active">Our Group</a></div>
+      <div class="item">
+        <a href="#portfolio">Find &amp; Book</a>
+        <div class="sg-drop">
+          <div class="grp">Hotels</div>
+          <a href="https://www.spekehotel.com/">Speke Hotel</a>
+          <a href="https://kabiracountryclub.com/">Kabira Country Club</a>
+          <a href="https://forest-cottages.com/">Forest Cottages Hotel</a>
+          <a href="https://dolphinsuites.co.ug/">Dolphin Suites Hotel</a>
+          <div class="grp">Resorts</div>
+          <a href="https://www.spekeresort.com/">Speke Resort Munyonyo</a>
+          <a href="https://www.spekeresort.com/indoor-meetings/">Speke Resort Convention Centre</a>
+          <a href="https://munyonyocommonwealth.com/">Munyonyo Commonwealth Resort</a>
+          <div class="grp">Apartments</div>
+          <a href="https://www.spekeapartments.com/wampewo/">Speke Apartments Wampewo</a>
+          <a href="https://www.spekeapartments.com/kitante/">Speke Apartments Kitante</a>
+          <a href="https://www.boulevardsuites.co.ug/">Boulevard Suites</a>
+          <a href="https://bukotoheights.com/">Bukoto Heights</a>
+          <a href="https://www.tagoreapartments.com/">Tagore Apartments</a>
+          <a href="https://spekegroup.com/naguru-apartments/">Naguru Apartments</a>
+        </div>
+      </div>
+      <div class="item">
+        <a href="Speke Meetings and Events.dc.html">Events &amp; Meetings</a>
+        <div class="sg-drop">
+          <a href="Speke Meetings and Events.dc.html">Conferences</a>
+          <a href="Speke Meetings and Events.dc.html">Weddings</a>
+          <a href="Speke Meetings and Events.dc.html">Meeting Venues</a>
+        </div>
+      </div>
+      <div class="item">
+        <a href="Speke Dining and Leisure.dc.html">Experiences</a>
+        <div class="sg-drop">
+          <a href="Speke Dining and Leisure.dc.html">Dining</a>
+          <a href="Speke Dining and Leisure.dc.html">Spas &amp; Salons</a>
+          <a href="Speke Dining and Leisure.dc.html">Gyms</a>
+          <a href="Speke Dining and Leisure.dc.html">Marina Experience</a>
+          <a href="Speke Dining and Leisure.dc.html">Equestrian</a>
+          <a href="Speke Dining and Leisure.dc.html">Lakeside</a>
+        </div>
+      </div>
+      <div class="item"><a href="Speke News.dc.html">News</a></div>
+      <div class="item"><a href="Speke Contact.dc.html">Contact</a></div>
+    </nav>
+    <a class="btn btn-ghost" href="#portfolio"><span>EXPLORE OUR PROPERTIES</span></a>
+  </header>
+
+  <!-- ================= HERO (video) ================= -->
+  <div class="hero-video">
+    <video class="hero-media" poster="assets/hero-poster.webp"
+           autoplay muted loop playsinline preload="metadata"
+           aria-hidden="true" tabindex="-1">
+      <source src="assets/hero.mp4" type="video/mp4">
+    </video>
+    <div class="scrim"></div>
+    <div class="hero-copy">
+      <div class="eyebrow-line" style="color:#d4af6a">Speke Group of Hotels</div>
+      <h1 class="serif" style="color:#fff;font-size:56px;line-height:1.06;font-weight:600;margin:0 0 18px;letter-spacing:-0.015em">Unparalleled Luxurious Experiences<br><span style="color:#d4af6a">in the Pearl of Africa</span></h1>
+      <p style="color:#f2e9db;font-size:16px;line-height:1.62;max-width:540px;margin:0 0 26px">A collection of award-winning resorts, hotels and apartments offering Uganda's most exquisite accommodation, built to an international standard over more than 25 years.</p>
+      <div style="display:flex;gap:12px;pointer-events:auto">
+        <a class="btn btn-solid" href="#our-group"><span>DISCOVER SPEKE GROUP</span></a>
+        <a class="btn btn-light" href="#portfolio"><span>VIEW OUR PORTFOLIO</span></a>
+      </div>
+    </div>
+    <button class="video-toggle" type="button" aria-label="Pause background video" aria-pressed="false">
+      <span class="bars"></span>
+    </button>
+    <a class="scroll-cue" href="#our-group" aria-label="Scroll to content"><span></span></a>
+  </div>
+
+  <!-- ================= OUR STORY + STATS ================= -->
+  <div id="our-group" class="row-split" style="display:flex;align-items:center;justify-content:space-between;padding:46px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12);gap:50px">
+    <div style="max-width:560px" data-reveal>
+      <div class="eyebrow-line">Our Story</div>
+      <h2 class="h-sec" style="margin-bottom:12px">A Legacy of Ugandan Hospitality</h2>
+      <p style="font-size:14px;line-height:1.72;color:#5a4a3a;margin:0 0 14px">As one of the pioneers of the hospitality industry in Uganda, we began our journey by acquiring the most historic hotel in the country, Speke Hotel. Over the years we have passionately built a collection of resorts, hotels and apartments to an international standard.</p>
+      <a class="link-arrow" href="https://spekegroup.com/about-us/">READ OUR FULL STORY <i>&rarr;</i></a>
+    </div>
+    <div style="display:flex;align-items:center;gap:30px;flex:none" data-reveal data-reveal-delay="0.12">
+      <div class="stat" style="text-align:center"><div class="num"><span data-count="13">0</span></div><div class="lbl">Properties</div></div>
+      <div class="rule-v"></div>
+      <div class="stat" style="text-align:center"><div class="num"><span data-count="900" data-suffix="+">0</span></div><div class="lbl">Modern Rooms</div></div>
+      <div class="rule-v"></div>
+      <div class="stat" style="text-align:center"><div class="num"><span data-count="45">0</span></div><div class="lbl">Conference Rooms</div></div>
+      <div class="rule-v"></div>
+      <div class="stat" style="text-align:center"><div class="num"><span data-count="25" data-suffix="+">0</span></div><div class="lbl">Years of Service</div></div>
+    </div>
+  </div>
+
+  <!-- ================= PORTFOLIO ================= -->
+  <div id="portfolio" style="padding:48px var(--gut) 54px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px" data-reveal>
+      <div>
+        <div class="eyebrow-line">Find &amp; Book</div>
+        <h2 class="h-sec">Our Portfolio</h2>
+      </div>
+      <div data-filter-group="portfolio" style="display:flex;gap:9px">
+        <button class="chip active" data-filter="all">All</button>
+        <button class="chip" data-filter="hotel">Hotels</button>
+        <button class="chip" data-filter="resort">Resorts</button>
+        <button class="chip" data-filter="convention">Convention Centre</button>
+        <button class="chip" data-filter="apartment">Apartments</button>
+      </div>
+    </div>
+
+    <div style="gap:22px" data-stagger="0.06" class="g-4">
+      <sc-for list="{{ properties }}" as="p" hint-placeholder-count="13">
+        <a class="card" href="{{ p.url }}" data-reveal data-filter-item="portfolio" data-tags="{{ p.tag }}">
+          <div class="media" style="height:168px">
+            <div class="badge">{{ p.category }}</div>
+            <image-slot id="{{ p.slotId }}" shape="rect" placeholder="{{ p.placeholder }}" style="width:100%;height:168px"></image-slot>
+          </div>
+          <div class="body">
+            <div class="eyebrow">{{ p.category }}</div>
+            <div class="title">{{ p.name }}</div>
+            <div class="desc">{{ p.desc }}</div>
+            <span class="link-arrow">VIEW PROPERTY <i>&rarr;</i></span>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= WHY STAY WITH US ================= -->
+  <div style="background:#efe6d6;padding:50px var(--gut)">
+    <div style="text-align:center;margin-bottom:32px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">Why Stay With Us</div>
+      <h2 class="h-sec">Where Simple Luxury &amp; Tranquility Meet</h2>
+      <p style="font-size:14px;color:#5a4a3a;max-width:620px;margin:12px auto 0;line-height:1.7">Start your day or cool off your busy week with our five-star leisure facilities.</p>
+    </div>
+    <div style="gap:20px" data-stagger="0.09" class="g-4">
+      <sc-for list="{{ pillars }}" as="w" hint-placeholder-count="4">
+        <a class="tile" href="{{ w.url }}" data-reveal style="text-align:center">
+          <div class="serif" style="font-size:32px;color:#c9a227;margin-bottom:10px">{{ w.icon }}</div>
+          <div class="serif" style="font-size:19px;font-weight:600;color:#3a2020;margin-bottom:8px">{{ w.name }}</div>
+          <div style="font-size:12.8px;line-height:1.65;color:#5a4a3a">{{ w.desc }}</div>
+        </a>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= MEETINGS BANNER ================= -->
+  <div class="hero-tile band" style="height:260px">
+    <image-slot id="meetings-bg" shape="rect" placeholder="Drop conference hall photo" style="width:100%;height:100%"></image-slot>
+    <div class="scrim-side"></div>
+    <div style="position:absolute;left:var(--gut);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;pointer-events:none" data-reveal>
+      <div class="eyebrow-line" style="color:#d4af6a">Events &amp; Meetings</div>
+      <h2 class="serif" style="color:#fff;font-size:34px;font-weight:600;margin:0 0 12px">Redefining Meeting Spaces for Your Events</h2>
+      <p style="color:#efe4d2;font-size:14px;max-width:470px;line-height:1.65;margin:0 0 20px">Our facilities welcome thousands of visitors attending major national and international conventions, meetings, concerts and competitions, making them the premier conferencing venues in Uganda.</p>
+      <a class="btn btn-solid" href="Speke Meetings and Events.dc.html" style="pointer-events:auto;width:max-content"><span>EXPLORE MEETINGS &amp; EVENTS</span></a>
+    </div>
+  </div>
+
+  <!-- ================= PACKAGES & OFFERS ================= -->
+  <div style="padding:50px var(--gut)">
+    <div style="text-align:center;margin-bottom:28px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">Our Specials</div>
+      <h2 class="h-sec">Enjoy Packages &amp; Offers</h2>
+    </div>
+    <div data-tabs="offers" style="display:flex;justify-content:center;gap:9px;margin-bottom:28px" data-reveal>
+      <button class="chip active" data-tab="accommodation">Accommodation</button>
+      <button class="chip" data-tab="dining">Dining</button>
+      <button class="chip" data-tab="events">Events</button>
+      <button class="chip" data-tab="spa">Spa</button>
+    </div>
+
+    <div data-tab-panel="offers" data-tab-key="accommodation">
+      <div style="gap:20px" data-stagger="0.06" class="g-4">
+        <sc-for list="{{ offersStay }}" as="o" hint-placeholder-count="4">
+          <div class="tile" data-reveal>
+            <div class="eyebrow" style="font-size:10px;letter-spacing:.14em;color:#b8935a;font-weight:700;text-transform:uppercase;margin-bottom:7px">{{ o.property }}</div>
+            <div class="serif" style="font-size:18px;font-weight:600;color:#3a2020;margin-bottom:8px">{{ o.name }}</div>
+            <div style="font-size:12.8px;line-height:1.6;color:#5a4a3a">{{ o.desc }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div data-tab-panel="offers" data-tab-key="dining" hidden>
+      <div style="gap:20px" class="g-4">
+        <sc-for list="{{ offersDine }}" as="o" hint-placeholder-count="4">
+          <div class="tile">
+            <div class="eyebrow" style="font-size:10px;letter-spacing:.14em;color:#b8935a;font-weight:700;text-transform:uppercase;margin-bottom:7px">{{ o.property }}</div>
+            <div class="serif" style="font-size:18px;font-weight:600;color:#3a2020;margin-bottom:8px">{{ o.name }}</div>
+            <div style="font-size:12.8px;line-height:1.6;color:#5a4a3a">{{ o.desc }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div data-tab-panel="offers" data-tab-key="events" hidden>
+      <div style="gap:20px" class="g-3">
+        <sc-for list="{{ offersEvents }}" as="o" hint-placeholder-count="3">
+          <div class="tile">
+            <div class="eyebrow" style="font-size:10px;letter-spacing:.14em;color:#b8935a;font-weight:700;text-transform:uppercase;margin-bottom:7px">{{ o.property }}</div>
+            <div class="serif" style="font-size:18px;font-weight:600;color:#3a2020;margin-bottom:8px">{{ o.name }}</div>
+            <div style="font-size:12.8px;line-height:1.6;color:#5a4a3a">{{ o.desc }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div data-tab-panel="offers" data-tab-key="spa" hidden>
+      <div style="gap:20px" class="g-3">
+        <sc-for list="{{ offersSpa }}" as="o" hint-placeholder-count="3">
+          <div class="tile">
+            <div class="eyebrow" style="font-size:10px;letter-spacing:.14em;color:#b8935a;font-weight:700;text-transform:uppercase;margin-bottom:7px">{{ o.property }}</div>
+            <div class="serif" style="font-size:18px;font-weight:600;color:#3a2020;margin-bottom:8px">{{ o.name }}</div>
+            <div style="font-size:12.8px;line-height:1.6;color:#5a4a3a">{{ o.desc }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CAREERS + NEWS ================= -->
+  <div style="border-top:1px solid rgba(111,32,51,0.12);border-bottom:1px solid rgba(111,32,51,0.12)" class="g-2">
+    <div style="align-items:center" data-reveal class="g-split-a">
+      <div style="padding:34px 42px">
+        <h3 class="serif" style="font-size:23px;font-weight:600;margin:0 0 10px;color:#3a2020">Careers at Speke Group</h3>
+        <p style="font-size:13.5px;line-height:1.62;color:#5a4a3a;margin:0 0 16px">A place to grow your career while creating exceptional experiences. Join our team and be part of our legacy.</p>
+        <a class="link-arrow" href="https://spekegroup.com/contact/">VIEW CAREERS <i>&rarr;</i></a>
+      </div>
+      <div class="hero-tile" style="height:200px"><image-slot id="careers-photo" shape="rect" placeholder="Drop staff team photo" style="width:100%;height:200px"></image-slot></div>
+    </div>
+    <div style="align-items:center;border-left:1px solid rgba(111,32,51,0.12)" data-reveal data-reveal-delay="0.1" class="g-split-a">
+      <div style="padding:34px 42px">
+        <h3 class="serif" style="font-size:23px;font-weight:600;margin:0 0 10px;color:#3a2020">Group News &amp; Updates</h3>
+        <p style="font-size:13.5px;line-height:1.62;color:#5a4a3a;margin:0 0 16px">Stay informed with the latest announcements, achievements and stories from across Speke Group.</p>
+        <a class="link-arrow" href="Speke News.dc.html">READ LATEST NEWS <i>&rarr;</i></a>
+      </div>
+      <div class="hero-tile" style="height:200px"><image-slot id="news-photo" shape="rect" placeholder="Drop sunset resort photo" style="width:100%;height:200px"></image-slot></div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="sg-footer">
+    <div style="gap:30px;padding-bottom:34px" class="g-footer">
+      <div>
+        <div style="margin-bottom:16px;background:#f2e2c8;display:inline-block;padding:9px 13px;border-radius:8px">
+          <img src="assets/speke-logo.png" alt="Speke Group" style="height:48px;width:auto;display:block">
+        </div>
+        <div style="font-size:12px;line-height:1.8;color:#c8a888;max-width:230px">Unparalleled luxurious experiences in the Pearl of Africa.</div>
+      </div>
+      <div>
+        <div class="col-title">Address</div>
+        <div style="font-size:12.5px;line-height:2;color:#dcc0a8">
+          <div>4th Floor, Crane Chambers,</div>
+          <div>Kampala Road, Uganda</div>
+        </div>
+        <div class="col-title" style="margin-top:20px">Reservations</div>
+        <div style="font-size:12.5px;line-height:2;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="tel:+256707711750">(+256) 707 711 750</a>
+          <a href="tel:+256702711142">(+256) 702 711 142</a>
+          <a href="tel:+256752711016">(+256) 752 711 016</a>
+          <a href="mailto:info@spekegroup.com">info@spekegroup.com</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Hotels &amp; Resorts</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://www.spekehotel.com/">Speke Hotel</a>
+          <a href="https://kabiracountryclub.com/">Kabira Country Club</a>
+          <a href="https://forest-cottages.com/">Forest Cottages Hotel</a>
+          <a href="https://dolphinsuites.co.ug/">Dolphin Suites Hotel</a>
+          <a href="https://www.spekeresort.com/">Speke Resort Munyonyo</a>
+          <a href="https://munyonyocommonwealth.com/">Munyonyo Commonwealth Resort</a>
+          <a href="https://www.spekeresort.com/indoor-meetings/">Speke Resort Convention Centre</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Apartments</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://www.spekeapartments.com/wampewo/">Speke Apartments Wampewo</a>
+          <a href="https://www.spekeapartments.com/kitante/">Speke Apartments Kitante</a>
+          <a href="https://www.boulevardsuites.co.ug/">Boulevard Suites</a>
+          <a href="https://bukotoheights.com/">Bukoto Heights</a>
+          <a href="https://www.tagoreapartments.com/">Tagore Apartments</a>
+          <a href="https://spekegroup.com/naguru-apartments/">Naguru Apartments</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Information</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://spekegroup.com/about-us/">About Us</a>
+          <a href="https://spekegroup.com/contact/">Careers</a>
+          <a href="https://spekegroup.com/contact/">SOPs</a>
+          <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
+          <a href="Speke Meetings and Events.dc.html">Events &amp; Meetings</a>
+          <a href="Speke Dining and Leisure.dc.html">Experiences</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Socials</div>
+        <div style="display:flex;gap:10px">
+          <a class="social" href="https://web.facebook.com/spekegroup">f</a>
+          <a class="social" href="https://twitter.com/speke_group">X</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(242,226,200,0.2);padding-top:20px;font-size:11.5px;color:#c8a888;text-align:center">Copyright &copy; 2026. All Rights Reserved to Speke Group of Hotels.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const properties = [
+      { name: "Speke Hotel", category: "Hotel", tag: "hotel", slotId: "p-speke-hotel",
+        url: "https://www.spekehotel.com/",
+        desc: "Uganda's only centurial hotel, with fifty en-suite rooms on Nile Avenue. Built in the 1920s and acquired by the Group in 1996.",
+        placeholder: "Drop Speke Hotel Kampala photo" },
+      { name: "Kabira Country Club", category: "Hotel", tag: "hotel", slotId: "p-kabira",
+        url: "https://kabiracountryclub.com/",
+        desc: "A world-class abode for guests and travellers, added to the Group shortly after Munyonyo.",
+        placeholder: "Drop Kabira Country Club photo" },
+      { name: "Forest Cottages Hotel", category: "Hotel", tag: "hotel", slotId: "p-forest-cottages",
+        url: "https://forest-cottages.com/",
+        desc: "A 27-room eco-friendly boutique hotel in Bukoto, built in harmony with its surroundings, with monkeys and over twenty bird species in the grounds.",
+        placeholder: "Drop Forest Cottages Hotel photo" },
+      { name: "Dolphin Suites Hotel", category: "Hotel", tag: "hotel", slotId: "p-dolphin-suites",
+        url: "https://dolphinsuites.co.ug/",
+        desc: "A boutique hotel of 27 rooms with private balconies over the Bugolobi hillside and the city. Part of the Group since May 2010.",
+        placeholder: "Drop Dolphin Suites photo" },
+      { name: "Speke Resort Munyonyo", category: "Resort", tag: "resort", slotId: "p-munyonyo-resort",
+        url: "https://www.spekeresort.com/",
+        desc: "Home to the largest privately owned marina in Uganda, on the shores of Lake Victoria.",
+        placeholder: "Drop Speke Resort Munyonyo photo" },
+      { name: "Munyonyo Commonwealth Resort", category: "Resort", tag: "resort", slotId: "p-commonwealth-resort",
+        url: "https://munyonyocommonwealth.com/",
+        desc: "Completed in a record eleven months in 2006, marking the Group's next stage of expansion.",
+        placeholder: "Drop Munyonyo Commonwealth Resort photo" },
+      { name: "Speke Resort Convention Centre", category: "Convention Centre", tag: "convention", slotId: "p-convention-centre",
+        url: "https://www.spekeresort.com/indoor-meetings/",
+        desc: "Ballrooms plus indoor and outdoor conference venues, hosting national and international conventions.",
+        placeholder: "Drop Convention Centre photo" },
+      { name: "Speke Apartments Wampewo", category: "Apartment", tag: "apartment", slotId: "p-wampewo",
+        url: "https://www.spekeapartments.com/wampewo/",
+        desc: "Luxury apartments in Kololo overlooking the city, five minutes from the central business district, with pools, a fitness centre and a spa.",
+        placeholder: "Drop Speke Apartments Wampewo photo" },
+      { name: "Speke Apartments Kitante", category: "Apartment", tag: "apartment", slotId: "p-kitante",
+        url: "https://www.spekeapartments.com/kitante/",
+        desc: "Eighty-three fully furnished one and two bedroom serviced apartments on Kitante Close, with high-end appliances throughout.",
+        placeholder: "Drop Speke Apartments Kitante photo" },
+      { name: "Boulevard Suites", category: "Apartment", tag: "apartment", slotId: "p-boulevard-suites",
+        url: "https://www.boulevardsuites.co.ug/",
+        desc: "One, two and three bedroom apartments on the upper floors of Boulevard building, across the road from the Bank of Uganda.",
+        placeholder: "Drop Boulevard Suites photo" },
+      { name: "Bukoto Heights", category: "Apartment", tag: "apartment", slotId: "p-bukoto-heights",
+        url: "https://bukotoheights.com/",
+        desc: "A luxury serviced apartment block in Bukoto for long and short stays, with its own leisure facilities and the Heights Bar & Cafe.",
+        placeholder: "Drop Bukoto Heights photo" },
+      { name: "Tagore Apartments", category: "Apartment", tag: "apartment", slotId: "p-tagore",
+        url: "https://www.tagoreapartments.com/",
+        desc: "Fourteen spacious serviced units on Mawanda Road opposite Acacia Mall, each with a balcony, kitchen and two bathrooms.",
+        placeholder: "Drop Tagore Apartments photo" },
+      { name: "Naguru Apartments", category: "Apartment", tag: "apartment", slotId: "p-naguru",
+        url: "https://spekegroup.com/naguru-apartments/",
+        desc: "Eighteen furnished two and three bedroom apartments in quiet Naguru, with complimentary access to Kabira Country Club five minutes away.",
+        placeholder: "Drop Naguru Apartments photo" }
+    ];
+
+    const pillars = [
+      { name: "Conferences", icon: "◇", url: "Speke Meetings and Events.dc.html",
+        desc: "Forty-five state-of-the-art conference rooms across the Group, from boardrooms to ballrooms." },
+      { name: "Spas & Salons", icon: "❀", url: "Speke Dining and Leisure.dc.html",
+        desc: "Massages, facials and steam baths that combine original active ingredients with memorable fragrances." },
+      { name: "Restaurants", icon: "◆", url: "Speke Dining and Leisure.dc.html",
+        desc: "Authentic Asian and Continental specialities with a modern twist, plus classic cocktails." },
+      { name: "Fitness Centres", icon: "✱", url: "Speke Dining and Leisure.dc.html",
+        desc: "Aerobics, body building and personal training with state-of-the-art equipment and dedicated trainers." }
+    ];
+
+    const offersStay = [
+      { property: "Speke Resort", name: "Getaway at Speke Resort", desc: "A lakeside escape package at Speke Resort Munyonyo." },
+      { property: "Kabira Country Club", name: "Your Home, Refined", desc: "Extended-stay comfort at Kabira Country Club." },
+      { property: "Bukoto Heights", name: "Kumi na Tani — 15 Days", desc: "A fifteen-day residence package at Bukoto Heights." },
+      { property: "Group Wide", name: "Midweek Getaway", desc: "Reduced midweek rates across selected properties." },
+      { property: "Speke Apartments Kitante", name: "Kitante Apartment Offer", desc: "Serviced apartment rates for longer stays." },
+      { property: "Group Wide", name: "Monthly Staycation", desc: "Month-long staycation rates for residents and visitors." },
+      { property: "Kabira Country Club", name: "Weekly Bonanza", desc: "A weekly package at Kabira Country Club." },
+      { property: "Bukoto Heights", name: "Where Every Stay Is a Memory", desc: "Signature stay package at Bukoto Heights." }
+    ];
+
+    const offersDine = [
+      { property: "Speke Resort", name: "Cocktail Culture", desc: "Classic and signature cocktails at Speke Resort Munyonyo." },
+      { property: "Speke Resort", name: "Flavour Fest", desc: "A rotating showcase of the resort's kitchens." },
+      { property: "Speke Resort", name: "Soulful Sunday Feast", desc: "Sunday dining on the shores of Lake Victoria." },
+      { property: "Speke Resort", name: "Thirsty Thursday", desc: "Midweek drinks offer at the resort bars." },
+      { property: "Kabira Country Club", name: "Mongolian Fridays", desc: "Mongolian grill night at Kabira Country Club." },
+      { property: "Kabira Country Club", name: "Sip & Chill", desc: "Relaxed evening drinks at Kabira Country Club." },
+      { property: "Kabira Country Club", name: "Little Chefs", desc: "A cooking experience for younger guests." },
+      { property: "Dolphin Suites", name: "Business Lunch", desc: "A set business lunch at Dolphin Suites Hotel." }
+    ];
+
+    const offersEvents = [
+      { property: "Group Wide", name: "Weddings & Celebrations", desc: "From intimate affairs created just for two to grand extravaganzas, we have the perfect venue for you." },
+      { property: "Group Wide", name: "Meetings & Conferences", desc: "Each venue is unique and can be set up to suit your particular needs and requirements." },
+      { property: "Group Wide", name: "World-Class Catering", desc: "Buffet menus or bespoke requirements, catering birthday parties, corporate events, receptions and christenings." }
+    ];
+
+    const offersSpa = [
+      { property: "Calabash Spa", name: "Body Massage", desc: "Deeply relaxing massages that harmonise and balance your energy flow, de-stress the body and stimulate blood flow." },
+      { property: "Calabash Spa", name: "Facials", desc: "Inspired by the riches of nature, combining original active ingredients and memorable fragrances." },
+      { property: "Calabash Spa", name: "Steam Baths", desc: "Sauna sessions to burn calories, ease pain, boost mood, improve sleep and support immune function." }
+    ];
+
+    return { properties, pillars, offersStay, offersDine, offersEvents, offersSpa };
+  }
+}
+
+</script>
+</body>
+</html>

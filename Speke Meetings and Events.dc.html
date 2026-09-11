@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Events &amp; Meeting Venues | Speke Group of Hotels</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./speke-ui.css">
+  <script src="./image-slot.js"></script>
+  <script src="./speke-ui.js"></script>
+</helmet>
+
+<div class="page-shell" style="margin:0 auto;background:#f7f2e9">
+
+  <!-- ================= HEADER ================= -->
+  <header class="sg-header">
+    <a href="Speke Group Homepage.dc.html"><img class="logo" src="assets/speke-logo.png" alt="Speke Group"></a>
+    <nav class="sg-nav">
+      <div class="item"><a href="Speke Group Homepage.dc.html">Our Group</a></div>
+      <div class="item">
+        <a href="Speke Group Homepage.dc.html">Find &amp; Book</a>
+        <div class="sg-drop">
+          <div class="grp">Hotels</div>
+          <a href="https://www.spekehotel.com/">Speke Hotel</a>
+          <a href="https://kabiracountryclub.com/">Kabira Country Club</a>
+          <a href="https://forest-cottages.com/">Forest Cottages Hotel</a>
+          <a href="https://dolphinsuites.co.ug/">Dolphin Suites Hotel</a>
+          <div class="grp">Resorts</div>
+          <a href="https://www.spekeresort.com/">Speke Resort Munyonyo</a>
+          <a href="https://www.spekeresort.com/indoor-meetings/">Speke Resort Convention Centre</a>
+          <a href="https://munyonyocommonwealth.com/">Munyonyo Commonwealth Resort</a>
+          <div class="grp">Apartments</div>
+          <a href="https://www.spekeapartments.com/wampewo/">Speke Apartments Wampewo</a>
+          <a href="https://www.spekeapartments.com/kitante/">Speke Apartments Kitante</a>
+          <a href="https://www.boulevardsuites.co.ug/">Boulevard Suites</a>
+          <a href="https://bukotoheights.com/">Bukoto Heights</a>
+          <a href="https://www.tagoreapartments.com/">Tagore Apartments</a>
+          <a href="https://spekegroup.com/naguru-apartments/">Naguru Apartments</a>
+        </div>
+      </div>
+      <div class="item"><a href="Speke Meetings and Events.dc.html" class="active">Events &amp; Meetings</a></div>
+      <div class="item">
+        <a href="Speke Dining and Leisure.dc.html">Experiences</a>
+        <div class="sg-drop">
+          <a href="Speke Dining and Leisure.dc.html">Dining</a>
+          <a href="Speke Dining and Leisure.dc.html">Spas &amp; Salons</a>
+          <a href="Speke Dining and Leisure.dc.html">Gyms</a>
+          <a href="Speke Dining and Leisure.dc.html">Marina Experience</a>
+          <a href="Speke Dining and Leisure.dc.html">Equestrian</a>
+          <a href="Speke Dining and Leisure.dc.html">Lakeside</a>
+        </div>
+      </div>
+      <div class="item"><a href="Speke News.dc.html">News</a></div>
+      <div class="item"><a href="Speke Contact.dc.html">Contact</a></div>
+    </nav>
+    <a class="btn btn-ghost" href="Speke Contact.dc.html"><span>ENQUIRE NOW</span></a>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <div class="hero-tile band" style="height:400px">
+    <image-slot id="meet-hero" shape="rect" placeholder="Drop convention hall photo" style="width:100%;height:100%"></image-slot>
+    <div class="scrim-side"></div>
+    <div class="hero-copy" style="position:absolute;left:var(--gut);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;max-width:640px;pointer-events:none">
+      <div class="eyebrow-line" style="color:#d4af6a">Events &amp; Meetings</div>
+      <h1 class="serif" style="color:#fff;font-size:44px;font-weight:600;margin:0 0 14px;line-height:1.1">Redefining Meeting Spaces for Your Events</h1>
+      <p style="color:#efe4d2;font-size:15px;line-height:1.68;margin:0 0 22px">Our facilities welcome thousands of visitors attending major national and international conventions, meetings, concerts and competitions. Ballrooms as well as indoor and outdoor conference venues make them the premier conferencing venues in Uganda.</p>
+      <div style="display:flex;gap:12px;pointer-events:auto">
+        <a class="btn btn-solid" href="#venues"><span>BROWSE VENUES</span></a>
+        <a class="btn btn-light" href="Speke Contact.dc.html"><span>REQUEST A PROPOSAL</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= STATS ================= -->
+  <div class="row-stats" style="display:flex;align-items:center;justify-content:center;gap:56px;padding:38px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12)" data-reveal>
+    <div class="stat" style="text-align:center"><div class="num"><span data-count="45">0</span></div><div class="lbl">Event Spaces</div></div>
+    <div class="rule-v"></div>
+    <div class="stat" style="text-align:center"><div class="num"><span data-count="1400" data-suffix="">0</span></div><div class="lbl">Largest Space Capacity</div></div>
+    <div class="rule-v"></div>
+    <div class="stat" style="text-align:center"><div class="num"><span data-count="13">0</span></div><div class="lbl">Host Properties</div></div>
+    <div class="rule-v"></div>
+    <div class="stat" style="text-align:center"><div class="num"><span data-count="900" data-suffix="+">0</span></div><div class="lbl">Guest Rooms On Site</div></div>
+  </div>
+
+  <!-- ================= VENUES ================= -->
+  <div id="venues" style="padding:48px var(--gut) 20px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:16px" data-reveal>
+      <div>
+        <div class="eyebrow-line">Explore</div>
+        <h2 class="h-sec">Meeting Venues</h2>
+        <p style="font-size:13.5px;color:#5a4a3a;margin:10px 0 0;max-width:560px;line-height:1.65">Each of our venues is unique in its own way and can be set up to suit your particular needs and requirements.</p>
+      </div>
+      <div data-filter-group="venues" style="display:flex;gap:9px;flex-wrap:wrap;max-width:560px;justify-content:flex-end">
+        <button class="chip active" data-filter="all">All Venues</button>
+        <button class="chip" data-filter="s10">10 &ndash; 35 Guests</button>
+        <button class="chip" data-filter="s50">50 &ndash; 100 Guests</button>
+        <button class="chip" data-filter="s120">120 &ndash; 400 Guests</button>
+        <button class="chip" data-filter="s1000">1000 &ndash; 1400 Guests</button>
+      </div>
+    </div>
+
+    <div style="gap:22px" data-stagger="0.06" class="g-3">
+      <sc-for list="{{ venues }}" as="v" hint-placeholder-count="9">
+        <div class="card" data-reveal data-filter-item="venues" data-tags="{{ v.tag }}">
+          <div class="media" style="height:178px">
+            <div class="badge">{{ v.location }}</div>
+            <image-slot id="{{ v.slotId }}" shape="rect" placeholder="{{ v.placeholder }}" style="width:100%;height:178px"></image-slot>
+          </div>
+          <div class="body">
+            <div class="eyebrow">{{ v.location }}</div>
+            <div class="title">{{ v.name }}</div>
+            <div style="display:flex;gap:18px;font-size:12.5px;color:#5a4a3a;margin-bottom:12px">
+              <div><span style="color:#b8935a;font-weight:700">Capacity</span><br>{{ v.capacity }}</div>
+              <div><span style="color:#b8935a;font-weight:700">Venue Size</span><br>{{ v.size }}</div>
+            </div>
+            <span class="link-arrow">VIEW VENUE <i>&rarr;</i></span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= FULL VENUE INDEX ================= -->
+  <div style="padding:14px var(--gut) 48px">
+    <div class="tile" data-reveal style="padding:28px 30px">
+      <div class="serif" style="font-size:20px;font-weight:600;color:#3a2020;margin-bottom:6px">The Complete Venue Index</div>
+      <p style="font-size:13px;color:#5a4a3a;margin:0 0 20px;line-height:1.6">Forty-five state-of-the-art conference and banqueting spaces across the Group, from intimate boardrooms to ballrooms, gardens, poolsides and sports grounds.</p>
+      <div style="gap:24px" class="g-4">
+        <sc-for list="{{ venueIndex }}" as="g" hint-placeholder-count="4">
+          <div>
+            <div class="eyebrow" style="font-size:10px;letter-spacing:.14em;color:#b8935a;font-weight:700;text-transform:uppercase;margin-bottom:10px">{{ g.group }}</div>
+            <div style="font-size:12.8px;line-height:2.05;color:#5a4a3a">{{ g.list }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:22px">
+        <a class="link-arrow" href="https://spekegroup.com/meeting-venues/">SEE ALL VENUES ON SPEKEGROUP.COM <i>&rarr;</i></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OCCASIONS ================= -->
+  <div style="background:#efe6d6;padding:50px var(--gut)">
+    <div style="text-align:center;margin-bottom:30px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">What We Host</div>
+      <h2 class="h-sec">Occasions We Host</h2>
+    </div>
+    <div style="gap:22px" data-stagger="0.09" class="g-3">
+      <sc-for list="{{ occasions }}" as="o" hint-placeholder-count="3">
+        <div class="tile" data-reveal>
+          <div class="serif" style="font-size:30px;color:#c9a227;margin-bottom:10px">{{ o.icon }}</div>
+          <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:10px">{{ o.name }}</div>
+          <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a">{{ o.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= CTA ================= -->
+  <div class="hero-tile band" style="height:280px">
+    <image-slot id="meet-cta-bg" shape="rect" placeholder="Drop banquet setup photo" style="width:100%;height:100%"></image-slot>
+    <div class="scrim-side"></div>
+    <div style="position:absolute;left:var(--gut);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;max-width:560px;pointer-events:none" data-reveal>
+      <h2 class="serif" style="color:#fff;font-size:30px;font-weight:600;margin:0 0 12px">Plan Your Event with Speke Group</h2>
+      <p style="color:#efe4d2;font-size:14px;line-height:1.7;margin:0 0 20px">Talk to our events team about venue selection, catering and accommodation for your delegates.</p>
+      <div style="font-size:13.5px;color:#f2e2c8;line-height:2;margin-bottom:20px">
+        <div>info@spekegroup.com</div>
+        <div>+256 707 711 750 &nbsp;&middot;&nbsp; +256 702 711 142 &nbsp;&middot;&nbsp; +256 752 711 016</div>
+      </div>
+      <a class="btn btn-light" href="Speke Contact.dc.html" style="pointer-events:auto;width:max-content"><span>CONTACT THE EVENTS TEAM</span></a>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="sg-footer">
+    <div style="gap:30px;padding-bottom:34px" class="g-footer">
+      <div>
+        <div style="margin-bottom:16px;background:#f2e2c8;display:inline-block;padding:9px 13px;border-radius:8px">
+          <img src="assets/speke-logo.png" alt="Speke Group" style="height:48px;width:auto;display:block">
+        </div>
+        <div style="font-size:12px;line-height:1.8;color:#c8a888;max-width:230px">Unparalleled luxurious experiences in the Pearl of Africa.</div>
+      </div>
+      <div>
+        <div class="col-title">Address</div>
+        <div style="font-size:12.5px;line-height:2;color:#dcc0a8">
+          <div>4th Floor, Crane Chambers,</div>
+          <div>Kampala Road, Uganda</div>
+        </div>
+        <div class="col-title" style="margin-top:20px">Reservations</div>
+        <div style="font-size:12.5px;line-height:2;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="tel:+256707711750">(+256) 707 711 750</a>
+          <a href="tel:+256702711142">(+256) 702 711 142</a>
+          <a href="tel:+256752711016">(+256) 752 711 016</a>
+          <a href="mailto:info@spekegroup.com">info@spekegroup.com</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Hotels &amp; Resorts</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://www.spekehotel.com/">Speke Hotel</a>
+          <a href="https://kabiracountryclub.com/">Kabira Country Club</a>
+          <a href="https://forest-cottages.com/">Forest Cottages Hotel</a>
+          <a href="https://dolphinsuites.co.ug/">Dolphin Suites Hotel</a>
+          <a href="https://www.spekeresort.com/">Speke Resort Munyonyo</a>
+          <a href="https://munyonyocommonwealth.com/">Munyonyo Commonwealth Resort</a>
+          <a href="https://www.spekeresort.com/indoor-meetings/">Speke Resort Convention Centre</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Apartments</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://www.spekeapartments.com/wampewo/">Speke Apartments Wampewo</a>
+          <a href="https://www.spekeapartments.com/kitante/">Speke Apartments Kitante</a>
+          <a href="https://www.boulevardsuites.co.ug/">Boulevard Suites</a>
+          <a href="https://bukotoheights.com/">Bukoto Heights</a>
+          <a href="https://www.tagoreapartments.com/">Tagore Apartments</a>
+          <a href="https://spekegroup.com/naguru-apartments/">Naguru Apartments</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Information</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://spekegroup.com/about-us/">About Us</a>
+          <a href="https://spekegroup.com/contact/">Careers</a>
+          <a href="https://spekegroup.com/contact/">SOPs</a>
+          <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
+          <a href="Speke Meetings and Events.dc.html">Events &amp; Meetings</a>
+          <a href="Speke Dining and Leisure.dc.html">Experiences</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Socials</div>
+        <div style="display:flex;gap:10px">
+          <a class="social" href="https://web.facebook.com/spekegroup">f</a>
+          <a class="social" href="https://twitter.com/speke_group">X</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(242,226,200,0.2);padding-top:20px;font-size:11.5px;color:#c8a888;text-align:center">Copyright &copy; 2026. All Rights Reserved to Speke Group of Hotels.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const venues = [
+      { name: "Kabira Ballroom", location: "Kabira Country Club", capacity: "400 guests", size: "Ballroom",
+        tag: "s120", slotId: "v-kabira-ballroom", placeholder: "Drop Kabira Ballroom photo" },
+      { name: "Palm", location: "Kabira Country Club", capacity: "120 guests", size: "Conference",
+        tag: "s120", slotId: "v-palm", placeholder: "Drop Palm venue photo" },
+      { name: "Pine", location: "Kabira Country Club", capacity: "80 guests", size: "Conference",
+        tag: "s50", slotId: "v-pine", placeholder: "Drop Pine venue photo" },
+      { name: "Acacia", location: "Kabira Country Club", capacity: "50 guests", size: "Conference",
+        tag: "s50", slotId: "v-acacia", placeholder: "Drop Acacia venue photo" },
+      { name: "Oak", location: "Kabira Country Club", capacity: "35 guests", size: "Boardroom",
+        tag: "s10", slotId: "v-oak", placeholder: "Drop Oak boardroom photo" },
+      { name: "Jacaranda", location: "Kabira Country Club", capacity: "35 guests", size: "Boardroom",
+        tag: "s10", slotId: "v-jacaranda", placeholder: "Drop Jacaranda boardroom photo" },
+      { name: "Sapphire", location: "Speke Resort", capacity: "15 to 35 guests", size: "62 sq m",
+        tag: "s10", slotId: "v-sapphire", placeholder: "Drop Sapphire meeting room photo" },
+      { name: "Amethyst", location: "Speke Resort", capacity: "10 to 25 guests", size: "58 sq m",
+        tag: "s10", slotId: "v-amethyst", placeholder: "Drop Amethyst meeting room photo" },
+      { name: "Sanga", location: "Speke Resort", capacity: "10 to 24 guests", size: "34 sq m",
+        tag: "s10", slotId: "v-sanga", placeholder: "Drop Sanga meeting room photo" },
+      { name: "Victoria Ballroom", location: "Speke Resort Convention Centre", capacity: "1000 to 1400 guests", size: "Grand ballroom",
+        tag: "s1000", slotId: "v-victoria", placeholder: "Drop Victoria Ballroom photo" },
+      { name: "Speke Ballroom", location: "Speke Resort Convention Centre", capacity: "1000 to 1400 guests", size: "Grand ballroom",
+        tag: "s1000", slotId: "v-speke-ballroom", placeholder: "Drop Speke Ballroom photo" },
+      { name: "Commonwealth Banquet Hall", location: "Munyonyo Commonwealth Resort", capacity: "120 to 400 guests", size: "Banquet hall",
+        tag: "s120", slotId: "v-commonwealth-hall", placeholder: "Drop Commonwealth Banquet Hall photo" }
+    ];
+
+    const venueIndex = [
+      { group: "Speke Resort Convention Centre",
+        list: "Victoria Ballroom · Speke Ballroom · Royal Hall · Royal Palm Hall · Majestic Hall · Mahogany Hall · Ebony Hall · Meera Hall · Sheena Hall · Kalangala Hall · Albert Hall" },
+      { group: "Speke Resort Munyonyo",
+        list: "Sanga · Amethyst · Sapphire · Speke Poolside · Flagmast Garden · Mango Garden · Lakeside Garden · Marina Restaurant · Royal Club" },
+      { group: "Munyonyo Commonwealth Resort",
+        list: "Commonwealth Banquet Hall · Commonwealth Poolside · Peace Hub · Lower Peace Hub" },
+      { group: "Kabira Country Club",
+        list: "Kabira Ballroom · Palm · Pine · Acacia · Oak · Jacaranda · Kabira Poolside · Kabira Sports Grounds" }
+    ];
+
+    const occasions = [
+      { name: "Weddings", icon: "❦",
+        desc: "Whether your wedding celebration is an intimate affair created just for two, or a grand extravaganza guaranteed to grace the society pages, we have the perfect venues for you to pick from." },
+      { name: "Meetings", icon: "◇",
+        desc: "Each of our venues is unique in its own way and can be set up to suit your particular needs and requirements, from boardroom sessions to full international conventions." },
+      { name: "World-Class Catering", icon: "✦",
+        desc: "Pick from our various menu options available for buffets or have us cater to your own select requirements. We cater for birthday parties, corporate events, wedding receptions and christenings." }
+    ];
+
+    return { venues, venueIndex, occasions };
+  }
+}
+
+</script>
+</body>
+</html>

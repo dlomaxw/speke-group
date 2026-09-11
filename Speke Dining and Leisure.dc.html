@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dining &amp; Experiences | Speke Group of Hotels</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./speke-ui.css">
+  <script src="./image-slot.js"></script>
+  <script src="./speke-ui.js"></script>
+</helmet>
+
+<div class="page-shell" style="margin:0 auto;background:#f7f2e9">
+
+  <!-- ================= HEADER ================= -->
+  <header class="sg-header">
+    <a href="Speke Group Homepage.dc.html"><img class="logo" src="assets/speke-logo.png" alt="Speke Group"></a>
+    <nav class="sg-nav">
+      <div class="item"><a href="Speke Group Homepage.dc.html">Our Group</a></div>
+      <div class="item">
+        <a href="Speke Group Homepage.dc.html">Find &amp; Book</a>
+        <div class="sg-drop">
+          <div class="grp">Hotels</div>
+          <a href="https://www.spekehotel.com/">Speke Hotel</a>
+          <a href="https://kabiracountryclub.com/">Kabira Country Club</a>
+          <a href="https://forest-cottages.com/">Forest Cottages Hotel</a>
+          <a href="https://dolphinsuites.co.ug/">Dolphin Suites Hotel</a>
+          <div class="grp">Resorts</div>
+          <a href="https://www.spekeresort.com/">Speke Resort Munyonyo</a>
+          <a href="https://www.spekeresort.com/indoor-meetings/">Speke Resort Convention Centre</a>
+          <a href="https://munyonyocommonwealth.com/">Munyonyo Commonwealth Resort</a>
+          <div class="grp">Apartments</div>
+          <a href="https://www.spekeapartments.com/wampewo/">Speke Apartments Wampewo</a>
+          <a href="https://www.spekeapartments.com/kitante/">Speke Apartments Kitante</a>
+          <a href="https://www.boulevardsuites.co.ug/">Boulevard Suites</a>
+          <a href="https://bukotoheights.com/">Bukoto Heights</a>
+          <a href="https://www.tagoreapartments.com/">Tagore Apartments</a>
+          <a href="https://spekegroup.com/naguru-apartments/">Naguru Apartments</a>
+        </div>
+      </div>
+      <div class="item"><a href="Speke Meetings and Events.dc.html">Events &amp; Meetings</a></div>
+      <div class="item">
+        <a href="Speke Dining and Leisure.dc.html" class="active">Experiences</a>
+        <div class="sg-drop">
+          <a href="#restaurants">Dining</a>
+          <a href="#spas">Spas &amp; Salons</a>
+          <a href="#gyms">Gyms</a>
+          <a href="#marina">Marina Experience</a>
+          <a href="#equestrian">Equestrian</a>
+          <a href="#lakeside">Lakeside</a>
+        </div>
+      </div>
+      <div class="item"><a href="Speke News.dc.html">News</a></div>
+      <div class="item"><a href="Speke Contact.dc.html">Contact</a></div>
+    </nav>
+    <a class="btn btn-ghost" href="#reservations"><span>MAKE A RESERVATION</span></a>
+  </header>
+
+  <!-- ================= HERO ================= -->
+  <div class="hero-tile band" style="height:400px">
+    <image-slot id="dine-hero" shape="rect" placeholder="Drop fine dining photo" style="width:100%;height:100%"></image-slot>
+    <div class="scrim-side"></div>
+    <div class="hero-copy" style="position:absolute;left:var(--gut);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;max-width:620px;pointer-events:none">
+      <div class="eyebrow-line" style="color:#d4af6a">Experiences</div>
+      <h1 class="serif" style="color:#fff;font-size:46px;font-weight:600;margin:0 0 14px;line-height:1.08">Exquisite Culinary Experiences</h1>
+      <p style="color:#efe4d2;font-size:15px;line-height:1.68;margin:0 0 22px">Our restaurants focus on a contemporary yet authentic approach to traditional Continental and Asian cuisines. Rich cuisines and classic cocktails to kindle your taste buds.</p>
+      <div style="display:flex;gap:12px;pointer-events:auto">
+        <a class="btn btn-solid" href="#restaurants"><span>EXPLORE RESTAURANTS</span></a>
+        <a class="btn btn-light" href="#bars"><span>EXPLORE BARS</span></a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= THREE PILLARS ================= -->
+  <div style="gap:22px;padding:var(--gut) var(--gut) 10px" data-stagger="0.08" class="g-3">
+    <a class="tile" href="#restaurants" data-reveal>
+      <div class="serif" style="font-size:30px;color:#c9a227;margin-bottom:10px">◆</div>
+      <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:9px">Restaurants</div>
+      <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a;margin-bottom:12px">Explore specially curated menus featuring authentic Asian and Continental specialities with a modern twist. Indulge in seasonal creations that make for an exceptional culinary experience.</div>
+      <span class="link-arrow">EXPLORE RESTAURANTS <i>&rarr;</i></span>
+    </a>
+    <a class="tile" href="#bars" data-reveal>
+      <div class="serif" style="font-size:30px;color:#c9a227;margin-bottom:10px">❖</div>
+      <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:9px">Bars</div>
+      <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a;margin-bottom:12px">From trendy nightlife hot spots to cool and refined high-class menu-focused bars, you will find one that suits your style. Let our well-trained staff take charge of your palate.</div>
+      <span class="link-arrow">EXPLORE BARS <i>&rarr;</i></span>
+    </a>
+    <a class="tile" href="Speke Meetings and Events.dc.html" data-reveal>
+      <div class="serif" style="font-size:30px;color:#c9a227;margin-bottom:10px">◈</div>
+      <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:9px">Private Event Spaces</div>
+      <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a;margin-bottom:12px">Lounges, decks, pools or unique client setups. Book unique spaces for meetings, events, film and professional photo shoots.</div>
+      <span class="link-arrow">EXPLORE SPACES <i>&rarr;</i></span>
+    </a>
+  </div>
+
+  <!-- ================= RESTAURANTS ================= -->
+  <div id="restaurants" style="padding:38px var(--gut) 12px">
+    <div style="margin-bottom:24px" data-reveal>
+      <div class="eyebrow-line">Speke Group Restaurants</div>
+      <h2 class="h-sec">Unique Cuisines to Choose From</h2>
+    </div>
+    <div style="gap:22px" data-stagger="0.06" class="g-4">
+      <sc-for list="{{ restaurants }}" as="d" hint-placeholder-count="7">
+        <div class="card" data-reveal>
+          <div class="media" style="height:168px">
+            <div class="badge">{{ d.cuisine }}</div>
+            <image-slot id="{{ d.slotId }}" shape="rect" placeholder="{{ d.placeholder }}" style="width:100%;height:168px"></image-slot>
+          </div>
+          <div class="body">
+            <div class="eyebrow">{{ d.cuisine }}</div>
+            <div class="title">{{ d.name }}</div>
+            <div class="desc">{{ d.desc }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= BARS ================= -->
+  <div id="bars" style="padding:34px var(--gut) 12px">
+    <div style="margin-bottom:24px" data-reveal>
+      <div class="eyebrow-line">Speke Group Bars</div>
+      <h2 class="h-sec">Relax at Unique Hotspots</h2>
+    </div>
+    <div style="gap:22px" data-stagger="0.07" class="g-4">
+      <sc-for list="{{ bars }}" as="b" hint-placeholder-count="4">
+        <div class="card" data-reveal>
+          <div class="media" style="height:150px">
+            <div class="badge">Bar</div>
+            <image-slot id="{{ b.slotId }}" shape="rect" placeholder="{{ b.placeholder }}" style="width:100%;height:150px"></image-slot>
+          </div>
+          <div class="body">
+            <div class="title">{{ b.name }}</div>
+            <div class="desc" style="margin-bottom:0">{{ b.desc }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= LEISURE & WELLNESS ================= -->
+  <div style="background:#efe6d6;padding:50px var(--gut);margin-top:34px">
+    <div style="text-align:center;margin-bottom:30px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">Experiences</div>
+      <h2 class="h-sec">Relax or Enjoy Memorable Breathtaking Thrills</h2>
+      <p style="font-size:14px;color:#5a4a3a;max-width:720px;margin:12px auto 0;line-height:1.7">Our guests indulge in unique experiences and memorable moments that live with them long after they have returned home, whether a love for the outdoors, engaging with the locals, or making emotional connections with the places they visit.</p>
+    </div>
+    <div style="gap:22px" data-stagger="0.07" class="g-3">
+      <sc-for list="{{ leisure }}" as="l" hint-placeholder-count="6">
+        <div class="card" id="{{ l.anchor }}" data-reveal>
+          <div class="media" style="height:160px">
+            <image-slot id="{{ l.slotId }}" shape="rect" placeholder="{{ l.placeholder }}" style="width:100%;height:160px"></image-slot>
+          </div>
+          <div class="body">
+            <div class="title">{{ l.name }}</div>
+            <div class="desc">{{ l.desc }}</div>
+            <div style="font-size:12.2px;line-height:1.9;color:#7a6a5a">{{ l.points }}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= LAKESIDE DETAIL ================= -->
+  <div id="lakeside" style="padding:48px var(--gut)">
+    <div style="gap:40px;align-items:center" data-reveal class="g-2">
+      <div>
+        <div class="eyebrow-line">Lakeside</div>
+        <h2 class="h-sec" style="margin-bottom:14px">Lake Grill, Under the African Sky</h2>
+        <p style="font-size:14px;line-height:1.72;color:#5a4a3a;margin:0 0 18px">Situated in the vast expanse of a neatly manicured lawn on the shores of Lake Victoria, Lake Grill offers a family-friendly cuisine under the African sky. With themed Sundays that include a market fair, acrobats, children's activities and a jazz band, Lake Grill is the perfect way to spend a Sunday afternoon. Main attractions include fresh whole Tilapia fish and hog on the spit.</p>
+        <div style="gap:14px 26px;font-size:13px;color:#5a4a3a;line-height:1.75;padding-top:18px;border-top:1px solid rgba(111,32,51,0.15)" class="g-2">
+          <div><span style="color:#b8935a;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase">Location</span><br>Next to the Lobby, Ground Floor</div>
+          <div><span style="color:#b8935a;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase">Cuisine</span><br>Whole Tilapia, fish, hog on the spit</div>
+          <div><span style="color:#b8935a;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase">Times Open</span><br>Sunday and Public Holidays</div>
+          <div><span style="color:#b8935a;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase">Covers</span><br>Picnic and barnyard</div>
+          <div><span style="color:#b8935a;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase">Dress Code</span><br>Casual</div>
+          <div><span style="color:#b8935a;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase">Reservations</span><br>+256 752 711 865 &middot; fb@spekeresort.com</div>
+        </div>
+      </div>
+      <div class="hero-tile" style="border-radius:10px;overflow:hidden">
+        <image-slot id="lakeside-photo" shape="rounded" radius="10" placeholder="Drop Lake Grill lakeside photo" style="width:100%;height:340px"></image-slot>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RESERVATIONS CTA ================= -->
+  <div id="reservations" style="background:#5c1728;padding:46px var(--gut);text-align:center" data-reveal>
+    <div class="eyebrow-line" style="justify-content:center;color:#d4af6a">For Reservations</div>
+    <h2 class="serif" style="color:#fff;font-size:30px;font-weight:600;margin:0 0 16px">Rich Cuisines &amp; Classic Cocktails to Kindle Your Taste Buds</h2>
+    <div style="font-size:14.5px;color:#f2e2c8;line-height:2.1;margin-bottom:22px">
+      <div>info@spekegroup.com</div>
+      <div>+256 707 711 750 &nbsp;&middot;&nbsp; +256 702 711 142 &nbsp;&middot;&nbsp; +256 752 711 016</div>
+    </div>
+    <a class="btn btn-light" href="Speke Contact.dc.html"><span>BOOK WITH US TODAY</span></a>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="sg-footer">
+    <div style="gap:30px;padding-bottom:34px" class="g-footer">
+      <div>
+        <div style="margin-bottom:16px;background:#f2e2c8;display:inline-block;padding:9px 13px;border-radius:8px">
+          <img src="assets/speke-logo.png" alt="Speke Group" style="height:48px;width:auto;display:block">
+        </div>
+        <div style="font-size:12px;line-height:1.8;color:#c8a888;max-width:230px">Unparalleled luxurious experiences in the Pearl of Africa.</div>
+      </div>
+      <div>
+        <div class="col-title">Address</div>
+        <div style="font-size:12.5px;line-height:2;color:#dcc0a8">
+          <div>4th Floor, Crane Chambers,</div>
+          <div>Kampala Road, Uganda</div>
+        </div>
+        <div class="col-title" style="margin-top:20px">Reservations</div>
+        <div style="font-size:12.5px;line-height:2;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="tel:+256707711750">(+256) 707 711 750</a>
+          <a href="tel:+256702711142">(+256) 702 711 142</a>
+          <a href="tel:+256752711016">(+256) 752 711 016</a>
+          <a href="mailto:info@spekegroup.com">info@spekegroup.com</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Hotels &amp; Resorts</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://www.spekehotel.com/">Speke Hotel</a>
+          <a href="https://kabiracountryclub.com/">Kabira Country Club</a>
+          <a href="https://forest-cottages.com/">Forest Cottages Hotel</a>
+          <a href="https://dolphinsuites.co.ug/">Dolphin Suites Hotel</a>
+          <a href="https://www.spekeresort.com/">Speke Resort Munyonyo</a>
+          <a href="https://munyonyocommonwealth.com/">Munyonyo Commonwealth Resort</a>
+          <a href="https://www.spekeresort.com/indoor-meetings/">Speke Resort Convention Centre</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Apartments</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://www.spekeapartments.com/wampewo/">Speke Apartments Wampewo</a>
+          <a href="https://www.spekeapartments.com/kitante/">Speke Apartments Kitante</a>
+          <a href="https://www.boulevardsuites.co.ug/">Boulevard Suites</a>
+          <a href="https://bukotoheights.com/">Bukoto Heights</a>
+          <a href="https://www.tagoreapartments.com/">Tagore Apartments</a>
+          <a href="https://spekegroup.com/naguru-apartments/">Naguru Apartments</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Information</div>
+        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+          <a href="https://spekegroup.com/about-us/">About Us</a>
+          <a href="https://spekegroup.com/contact/">Careers</a>
+          <a href="https://spekegroup.com/contact/">SOPs</a>
+          <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
+          <a href="Speke Meetings and Events.dc.html">Events &amp; Meetings</a>
+          <a href="Speke Dining and Leisure.dc.html">Experiences</a>
+        </div>
+      </div>
+      <div>
+        <div class="col-title">Socials</div>
+        <div style="display:flex;gap:10px">
+          <a class="social" href="https://web.facebook.com/spekegroup">f</a>
+          <a class="social" href="https://twitter.com/speke_group">X</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(242,226,200,0.2);padding-top:20px;font-size:11.5px;color:#c8a888;text-align:center">Copyright &copy; 2026. All Rights Reserved to Speke Group of Hotels.</div>
+  </footer>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const restaurants = [
+      { name: "Nyanja", cuisine: "Multi Cuisine", slotId: "r-nyanja",
+        desc: "The Group's multi-cuisine restaurant, serving Continental and Asian specialities with a modern twist.",
+        placeholder: "Drop Nyanja restaurant photo" },
+      { name: "The Stables", cuisine: "Grill", slotId: "r-stables",
+        desc: "A relaxed dining room beside the equestrian grounds at Speke Resort Munyonyo.",
+        placeholder: "Drop The Stables photo" },
+      { name: "Lake Grill", cuisine: "Lakeside Grill", slotId: "r-lake-grill",
+        desc: "Family-friendly cuisine under the African sky on the shores of Lake Victoria. Whole Tilapia and hog on the spit.",
+        placeholder: "Drop Lake Grill photo" },
+      { name: "Pool Side Restaurant", cuisine: "Casual Dining", slotId: "r-poolside",
+        desc: "Sit under a grass-thatched roof or lounge by the pool with drinks in hand, dining on whole Tilapia and burgers.",
+        placeholder: "Drop Pool Side Restaurant photo" },
+      { name: "The Pub", cuisine: "Continental · African · Indian", slotId: "r-pub",
+        desc: "Continental, African and Indian cuisine in a classic pub setting.",
+        placeholder: "Drop The Pub photo" },
+      { name: "La Cabana", cuisine: "Brazilian · Chinese · Indian", slotId: "r-la-cabana",
+        desc: "Brazilian, Chinese and Indian cuisine served across one menu.",
+        placeholder: "Drop La Cabana photo" },
+      { name: "Khyber Pass", cuisine: "Indian", slotId: "r-khyber",
+        desc: "Authentic Indian cuisine, one of the Group's longest-standing restaurant names.",
+        placeholder: "Drop Khyber Pass photo" }
+    ];
+
+    const bars = [
+      { name: "Viking Bar", slotId: "b-viking", desc: "A nightlife hotspot within the Group's Kampala collection.",
+        placeholder: "Drop Viking Bar photo" },
+      { name: "Rock Bar", slotId: "b-rock", desc: "Cool, refined and menu-focused, for a worthwhile night adventure.",
+        placeholder: "Drop Rock Bar photo" },
+      { name: "Forest Cottages Bar", slotId: "b-forest", desc: "A quiet garden bar at Forest Cottages Hotel.",
+        placeholder: "Drop Forest Cottages Bar photo" },
+      { name: "Heights Bar & Cafe", slotId: "b-heights", desc: "Cafe by day and bar by night at Bukoto Heights.",
+        placeholder: "Drop Heights Bar & Cafe photo" }
+    ];
+
+    const leisure = [
+      { name: "Spas & Salons", anchor: "spas", slotId: "l-spa",
+        desc: "Inspired by the riches of nature, we offer massages, facials and steam baths that combine a cocktail of original active ingredients and memorable fragrances.",
+        points: "Body massage · Facials · Steam baths",
+        placeholder: "Drop spa treatment photo" },
+      { name: "Gyms", anchor: "gyms", slotId: "l-gym",
+        desc: "Build the body of your dreams through proper diet and exercise, with state-of-the-art equipment and a team of dedicated professional trainers.",
+        points: "Aerobics · Body building · Personal training",
+        placeholder: "Drop fitness centre photo" },
+      { name: "Marina Experience", anchor: "marina", slotId: "l-marina",
+        desc: "Speke Resort Munyonyo and Munyonyo Commonwealth Resort share the largest privately owned marina in Uganda, offering boat cruises, water safaris and fishing excursions.",
+        points: "Fishing · Bird watching · Boat trips · Trips to islands",
+        placeholder: "Drop marina and boats photo" },
+      { name: "Equestrian", anchor: "equestrian", slotId: "l-equestrian",
+        desc: "The Pony Camp is for children aged 6 to 17, from beginners to advanced riders, with show-quality ponies, experienced year-round trainers and a small teacher-to-student ratio.",
+        points: "Pony camp · Pony rides · Grooming and horsemanship",
+        placeholder: "Drop equestrian pony camp photo" },
+      { name: "Lakeside", anchor: "lakeside-card", slotId: "l-lakeside",
+        desc: "Themed Sundays on the shores of Lake Victoria at Lake Grill, with fresh whole Tilapia and hog on the spit.",
+        points: "Live jazz band · Market fair · Children's activities · Acrobats",
+        placeholder: "Drop lakeside dining photo" },
+      { name: "Swimming Pools", anchor: "pools", slotId: "l-pools",
+        desc: "Sit at a table under a grass-thatched roof or simply lounge by the pool with drinks in hand while dining on whole Tilapia fish and burgers amongst others.",
+        points: "Poolside dining · Olympic-size pool at Speke Resort",
+        placeholder: "Drop swimming pool photo" }
+    ];
+
+    return { restaurants, bars, leisure };
+  }
+}
+
+</script>
+</body>
+</html>
