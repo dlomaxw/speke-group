@@ -698,3 +698,81 @@ img,video{max-width:100%}
   .sg-drop a{padding:9px 6px;font-size:13.5px}
   .sg-drop a:hover{padding-left:12px}
 }
+
+/* ===========================================================
+   14. WOVEN BAND
+   A narrow seam of Ugandan basket-weave motif between sections.
+   Three layers of motion, each doing a different job:
+     1. the weave pans slowly, as if the ribbon is being drawn
+     2. the outlines draw themselves in when scrolled into view
+     3. a gold sheen sweeps across every few seconds
+   =========================================================== */
+.woven-band{
+  position:relative;
+  height:58px;
+  background:var(--maroon-deep);
+  overflow:hidden;
+  isolation:isolate;
+}
+.woven-band::before,
+.woven-band::after{
+  content:"";
+  position:absolute;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-soft),transparent);
+  opacity:.55;
+}
+.woven-band::before{top:0}
+.woven-band::after{bottom:0}
+
+/* the repeating weave, panned by translating a double-width layer */
+.woven-band .weave{
+  position:absolute;inset:0;
+  width:200%;
+  animation:weave-pan 38s linear infinite;
+}
+.woven-band .weave svg{display:block;width:50%;height:100%;float:left}
+@keyframes weave-pan{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* each motif outline draws itself once the band is on screen */
+.woven-band .draw{
+  fill:none;
+  stroke:var(--gold-soft);
+  stroke-width:1.1;
+  stroke-linejoin:round;
+  stroke-dasharray:var(--len,90);
+  stroke-dashoffset:var(--len,90);
+  opacity:.85;
+}
+.woven-band.is-visible .draw{
+  animation:weave-draw 1.5s var(--ease-out) forwards;
+}
+@keyframes weave-draw{to{stroke-dashoffset:0}}
+
+.woven-band .solid{fill:var(--gold);opacity:0}
+.woven-band.is-visible .solid{animation:weave-dot .7s var(--ease-out) forwards}
+@keyframes weave-dot{to{opacity:.9}}
+
+/* sheen */
+.woven-band .sheen{
+  position:absolute;top:0;bottom:0;width:34%;
+  background:linear-gradient(100deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,240,205,.30) 45%,
+    rgba(255,255,255,0) 100%);
+  transform:translateX(-120%);
+  animation:weave-sheen 7.5s ease-in-out 1.4s infinite;
+  pointer-events:none;
+}
+@keyframes weave-sheen{
+  0%{transform:translateX(-120%)}
+  55%,100%{transform:translateX(420%)}
+}
+
+@media (max-width:820px){ .woven-band{height:46px} }
+
+@media (prefers-reduced-motion:reduce){
+  .woven-band .weave{animation:none}
+  .woven-band .sheen{display:none}
+  .woven-band .draw{stroke-dashoffset:0;animation:none}
+  .woven-band .solid{opacity:.9;animation:none}
+}

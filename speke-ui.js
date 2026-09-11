@@ -342,6 +342,29 @@
     }
   }
 
+  /* ---------- 10. Woven band ----------------------------- */
+  /* The motifs draw themselves the first time the band scrolls into
+     view; the panning and sheen are pure CSS and run on their own. */
+  function initWovenBand() {
+    var bands = document.querySelectorAll('.woven-band');
+    if (!bands.length) return;
+
+    if (reduced || !('IntersectionObserver' in window)) {
+      for (var i = 0; i < bands.length; i++) bands[i].classList.add('is-visible');
+      return;
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('is-visible');
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.25 });
+
+    for (var j = 0; j < bands.length; j++) io.observe(bands[j]);
+  }
+
   /* ---------- boot --------------------------------------- */
   function boot() {
     buildLoader();
@@ -354,6 +377,7 @@
     initExternalLinks();
     initMobileNav();
     initHeroVideo();
+    initWovenBand();
 
     var minimum = reduced ? 200 : 2350;
     var started = Date.now();
@@ -370,6 +394,7 @@
       initExternalLinks();
       initMobileNav();
       initHeroVideo();
+      initWovenBand();
     }
     if ('MutationObserver' in window) {
       new MutationObserver(function () {
