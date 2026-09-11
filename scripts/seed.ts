@@ -36,7 +36,7 @@ async function main() {
     { email: 'marketing@spekegroup.com', name: 'Marketing Team',   role: 'marketing' as const, department: 'Marketing' },
     { email: 'viewer@spekegroup.com',    name: 'Read Only',        role: 'viewer' as const,    department: 'General' },
   ];
-  const initialPassword = process.env.SEED_PASSWORD || 'SpekeGroup#2026';
+  const initialPassword = process.env.SEED_PASSWORD || 'Speke2026@';
   const passwordHash = await bcrypt.hash(initialPassword, 12);
 
   for (const u of starterUsers) {

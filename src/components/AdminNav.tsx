@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 
@@ -69,8 +70,14 @@ export default function AdminNav({
           ${open ? 'flex translate-x-0' : 'flex -translate-x-full lg:translate-x-0'}`}
       >
         <div className="px-4 py-4 border-b border-white/10">
-          <div className="serif text-[17px] font-semibold leading-tight">Speke Group</div>
-          <div className="text-[11px] text-[#8a94a4] tracking-wide">Content dashboard</div>
+          <Link href="/admin" className="block rounded-lg bg-[color:var(--color-cream)] px-3 py-2 w-fit">
+            <Image
+              src="/brand/speke-logo.png" alt="Speke Group"
+              width={180} height={113} priority
+              className="h-[38px] w-auto"
+            />
+          </Link>
+          <div className="text-[11px] text-[#8a94a4] tracking-wide mt-2">Content dashboard</div>
         </div>
 
         <nav className="p-2 flex-1">

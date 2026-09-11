@@ -12,7 +12,7 @@ npm run dev        # http://localhost:3000
 ```
 
 The dashboard is at `/admin`. The seed creates four accounts, all with the
-password `SpekeGroup#2026`, each of which must be changed on first sign-in:
+password `Speke2026@`, each of which must be changed on first sign-in:
 
 | Email                      | Role             | Can do                                        |
 | -------------------------- | ---------------- | --------------------------------------------- |
