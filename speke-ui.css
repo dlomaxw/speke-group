@@ -76,6 +76,7 @@ a{color:var(--maroon);text-decoration:none}
 #speke-loader .mark{
   position:relative;z-index:2;
   display:flex;flex-direction:column;align-items:center;gap:26px;
+  width:100%;max-width:100%;padding:0 18px;
   transition:opacity .45s ease,transform .6s var(--ease-out);
 }
 #speke-loader.is-done .mark{opacity:0;transform:translateY(-16px) scale(.97)}
@@ -116,10 +117,16 @@ a{color:var(--maroon);text-decoration:none}
 @keyframes sg-pop{to{opacity:1;transform:scale(1)}}
 
 #speke-loader .word{
-  display:flex;gap:.42em;
+  /* Each letter is its own span, so letter-spacing and gap were both applying
+     and the wordmark came out 456px wide — clipped to "P E K" on a phone.
+     Spacing now comes from gap alone, and the type scales with the viewport
+     so the full name always fits. */
+  display:flex;justify-content:center;flex-wrap:nowrap;
+  gap:.7em;
   font-family:'Playfair Display',Georgia,serif;
-  font-size:26px;letter-spacing:.30em;color:#f4e9d6;
-  text-indent:.30em;
+  font-size:clamp(15px,4.9vw,26px);
+  color:#f4e9d6;
+  max-width:100%;
 }
 #speke-loader .word span{
   opacity:0;transform:translateY(14px);
@@ -128,8 +135,10 @@ a{color:var(--maroon);text-decoration:none}
 @keyframes sg-rise{to{opacity:1;transform:translateY(0)}}
 
 #speke-loader .tag{
-  font-size:10.5px;letter-spacing:.42em;color:rgba(220,192,168,.85);
-  text-transform:uppercase;text-indent:.42em;
+  font-size:clamp(8px,2.4vw,10.5px);
+  letter-spacing:.32em;text-indent:.32em;
+  color:rgba(220,192,168,.85);
+  text-transform:uppercase;text-align:center;max-width:100%;
   opacity:0;animation:sg-fade .8s ease 1.5s forwards;
 }
 @keyframes sg-fade{to{opacity:1}}
@@ -143,6 +152,16 @@ a{color:var(--maroon);text-decoration:none}
   animation:sg-load 1.5s var(--ease) 1.15s forwards;
 }
 @keyframes sg-load{to{width:100%}}
+
+/* The loader is fixed-size by default; scale the whole mark on a phone. */
+@media (max-width:560px){
+  #speke-loader .mark{gap:20px}
+  #speke-loader .ring-wrap,
+  #speke-loader svg{width:132px;height:132px}
+  #speke-loader .logo-badge{width:96px;padding:10px 11px}
+  #speke-loader .bar{width:150px}
+  #speke-loader .glow{width:420px;height:420px}
+}
 
 /* page fades up once the curtains part — only when JS is running */
 .sg-js .page-shell{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .9s var(--ease-out)}
