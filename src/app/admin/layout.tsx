@@ -1,3 +1,4 @@
+import '../globals.css';
 import Link from 'next/link';
 import { getSession } from '@/lib/auth';
 import { can } from '@/lib/rbac';

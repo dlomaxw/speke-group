@@ -18,7 +18,6 @@ const SEQ = ['#cde2fb', '#86b6ef', '#2a78d6', '#1c5aa3'] as const;
 const INK = '#1d2430';
 const INK_SOFT = '#5a6474';
 const GRID = '#e6e9ee';
-const SURFACE = '#ffffff';
 
 /* ============================================================
    Part-to-whole: horizontal stacked bar
@@ -35,13 +34,18 @@ export function StackedShare({
   const W = 100;         // percent-based widths keep it fluid
   const GAP = 0.6;       // surface gap between segments
 
-  let x = 0;
-  const segments = data.map((d, i) => {
-    const w = Math.max((d.value / total) * W - GAP, 0);
-    const seg = { ...d, x, w, colour: SERIES[i % SERIES.length] };
-    x += (d.value / total) * W;
-    return seg;
-  });
+  const { segments } = data.reduce<{
+    currentX: number;
+    segments: Array<{ label: string; value: number; x: number; w: number; colour: string }>;
+  }>(
+    (acc, d, i) => {
+      const w = Math.max((d.value / total) * W - GAP, 0);
+      acc.segments.push({ ...d, x: acc.currentX, w, colour: SERIES[i % SERIES.length] });
+      acc.currentX += (d.value / total) * W;
+      return acc;
+    },
+    { currentX: 0, segments: [] },
+  );
 
   return (
     <figure className="card-surface p-5 m-0">

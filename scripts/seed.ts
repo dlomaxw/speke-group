@@ -12,6 +12,14 @@ import {
   users, properties, venues, venueGroups, restaurants, experiences,
   newsPosts, offers, milestones, highlightBlocks, settings,
 } from '../src/db/schema';
+import {
+  PROPERTY_IMAGES, VENUE_IMAGES, DINING_IMAGES, EXPERIENCE_IMAGES, NEWS_IMAGES,
+  PAGE_IMAGE_SETTINGS, EXTRA_OFFERS, OFFER_ORDER,
+} from '../src/lib/default-images';
+
+/** Attach the original photograph to each seeded record. */
+const withImages = <const T extends { slug: string }>(rows: T[], map: Record<string, string>) =>
+  rows.map((r) => ({ ...r, imageUrl: map[r.slug] ?? null }));
 
 const CONTACT = {
   address1: '4th Floor, Crane Chambers,',
@@ -52,7 +60,7 @@ async function main() {
   }
 
   /* ---------- properties ---------- */
-  await db.insert(properties).values([
+  await db.insert(properties).values(withImages([
     { slug: 'speke-hotel', name: 'Speke Hotel', kind: 'hotel', categoryLabel: 'Hotel', area: 'Nile Avenue, Kampala',
       websiteUrl: 'https://www.spekehotel.com/', sortOrder: 1,
       description: "Uganda's only centurial hotel, with fifty en-suite rooms on Nile Avenue. Built in the 1920s and acquired by the Group in 1996." },
@@ -92,10 +100,10 @@ async function main() {
     { slug: 'naguru-apartments', name: 'Naguru Apartments', kind: 'apartment', categoryLabel: 'Apartment', area: 'Naguru, Kampala',
       websiteUrl: 'https://spekegroup.com/naguru-apartments/', sortOrder: 13,
       description: 'Eighteen furnished two and three bedroom apartments in quiet Naguru, with complimentary access to Kabira Country Club five minutes away.' },
-  ]);
+  ], PROPERTY_IMAGES));
 
   /* ---------- meeting venues ---------- */
-  await db.insert(venues).values([
+  await db.insert(venues).values(withImages([
     { slug: 'kabira-ballroom', name: 'Kabira Ballroom', location: 'Kabira Country Club', capacity: '400 guests', venueSize: 'Ballroom', sizeTag: 's120', sortOrder: 1 },
     { slug: 'palm', name: 'Palm', location: 'Kabira Country Club', capacity: '120 guests', venueSize: 'Conference', sizeTag: 's120', sortOrder: 2 },
     { slug: 'pine', name: 'Pine', location: 'Kabira Country Club', capacity: '80 guests', venueSize: 'Conference', sizeTag: 's50', sortOrder: 3 },
@@ -108,7 +116,7 @@ async function main() {
     { slug: 'victoria-ballroom', name: 'Victoria Ballroom', location: 'Speke Resort Convention Centre', capacity: '1000 to 1400 guests', venueSize: 'Grand ballroom', sizeTag: 's1000', sortOrder: 10 },
     { slug: 'speke-ballroom', name: 'Speke Ballroom', location: 'Speke Resort Convention Centre', capacity: '1000 to 1400 guests', venueSize: 'Grand ballroom', sizeTag: 's1000', sortOrder: 11 },
     { slug: 'commonwealth-banquet-hall', name: 'Commonwealth Banquet Hall', location: 'Munyonyo Commonwealth Resort', capacity: '120 to 400 guests', venueSize: 'Banquet hall', sizeTag: 's120', sortOrder: 12 },
-  ]);
+  ], VENUE_IMAGES));
 
   await db.insert(venueGroups).values([
     { groupName: 'Speke Resort Convention Centre', sortOrder: 1,
@@ -122,7 +130,7 @@ async function main() {
   ]);
 
   /* ---------- restaurants and bars ---------- */
-  await db.insert(restaurants).values([
+  await db.insert(restaurants).values(withImages([
     { slug: 'nyanja', name: 'Nyanja', kind: 'restaurant', cuisine: 'Multi Cuisine', sortOrder: 1,
       description: "The Group's multi-cuisine restaurant, serving Continental and Asian specialities with a modern twist." },
     { slug: 'the-stables', name: 'The Stables', kind: 'restaurant', cuisine: 'Grill', sortOrder: 2,
@@ -142,10 +150,10 @@ async function main() {
     { slug: 'rock-bar', name: 'Rock Bar', kind: 'bar', sortOrder: 2, description: 'Cool, refined and menu-focused, for a worthwhile night adventure.' },
     { slug: 'forest-cottages-bar', name: 'Forest Cottages Bar', kind: 'bar', sortOrder: 3, description: 'A quiet garden bar at Forest Cottages Hotel.' },
     { slug: 'heights-bar-cafe', name: 'Heights Bar & Cafe', kind: 'bar', sortOrder: 4, description: 'Cafe by day and bar by night at Bukoto Heights.' },
-  ]);
+  ], DINING_IMAGES));
 
   /* ---------- experiences ---------- */
-  await db.insert(experiences).values([
+  await db.insert(experiences).values(withImages([
     { slug: 'spas-and-salons', name: 'Spas & Salons', sortOrder: 1,
       description: 'Inspired by the riches of nature, we offer massages, facials and steam baths that combine a cocktail of original active ingredients and memorable fragrances.',
       highlights: 'Body massage · Facials · Steam baths' },
@@ -164,11 +172,11 @@ async function main() {
     { slug: 'swimming-pools', name: 'Swimming Pools', sortOrder: 6,
       description: 'Sit at a table under a grass-thatched roof or simply lounge by the pool with drinks in hand while dining on whole Tilapia fish and burgers amongst others.',
       highlights: 'Poolside dining · Olympic-size pool at Speke Resort' },
-  ]);
+  ], EXPERIENCE_IMAGES));
 
   /* ---------- news ---------- */
   const d = (iso: string) => new Date(iso);
-  await db.insert(newsPosts).values([
+  await db.insert(newsPosts).values(withImages([
     { slug: 'speke-resort-munyonyo-completes-room-renovation', title: 'Speke Resort Munyonyo Completes Room Renovation',
       propertyLabel: 'Speke Resort Munyonyo', tag: 'property', isFeatured: true, status: 'published', publishedAt: d('2026-08-12'),
       excerpt: "All lakeside rooms have been refreshed with new furnishings ahead of the conference season, continuing the Group's programme of investment across its 900-plus modern rooms." },
@@ -190,10 +198,10 @@ async function main() {
     { slug: 'spa-treatment-menu-refreshed', title: 'Spa Treatment Menu Refreshed Across the Group',
       propertyLabel: 'Group', tag: 'group', status: 'published', publishedAt: d('2026-02-05'),
       excerpt: 'New massage, facial and steam treatments drawing on original active ingredients and memorable fragrances.' },
-  ]);
+  ], NEWS_IMAGES));
 
   /* ---------- offers ---------- */
-  await db.insert(offers).values([
+  const baseOffers = [
     { category: 'accommodation', propertyLabel: 'Speke Resort', name: 'Getaway at Speke Resort', description: 'A lakeside escape package at Speke Resort Munyonyo.', sortOrder: 1 },
     { category: 'accommodation', propertyLabel: 'Kabira Country Club', name: 'Your Home, Refined', description: 'Extended-stay comfort at Kabira Country Club.', sortOrder: 2 },
     { category: 'accommodation', propertyLabel: 'Bukoto Heights', name: 'Kumi na Tani — 15 Days', description: 'A fifteen-day residence package at Bukoto Heights.', sortOrder: 3 },
@@ -208,7 +216,10 @@ async function main() {
     { category: 'spa', propertyLabel: 'Calabash Spa', name: 'Body Massage', description: 'Deeply relaxing massages that harmonise and balance your energy flow, de-stress the body and stimulate blood flow.', sortOrder: 1 },
     { category: 'spa', propertyLabel: 'Calabash Spa', name: 'Facials', description: 'Inspired by the riches of nature, combining original active ingredients and memorable fragrances.', sortOrder: 2 },
     { category: 'spa', propertyLabel: 'Calabash Spa', name: 'Steam Baths', description: 'Sauna sessions to burn calories, ease pain, boost mood, improve sleep and support immune function.', sortOrder: 3 },
-  ]);
+  ];
+  await db.insert(offers).values(
+    [...baseOffers, ...EXTRA_OFFERS].map((o) => ({ ...o, sortOrder: OFFER_ORDER[o.name] ?? o.sortOrder })),
+  );
 
   /* ---------- milestones ---------- */
   await db.insert(milestones).values([
@@ -270,15 +281,14 @@ async function main() {
 
     S('events_title', 'Events page headline', 'Redefining Meeting Spaces for Your Events', 'events', 'text', 1),
     S('events_body', 'Events page paragraph', 'Our facilities welcome thousands of visitors attending major national and international conventions, meetings, concerts and competitions. Ballrooms as well as indoor and outdoor conference venues make them the premier conferencing venues in Uganda.', 'events', 'textarea', 2),
-    S('events_hero_image', 'Events hero image', '', 'events', 'image', 3),
 
     S('experiences_title', 'Experiences headline', 'Exquisite Culinary Experiences', 'experiences', 'text', 1),
     S('experiences_body', 'Experiences paragraph', 'Our restaurants focus on a contemporary yet authentic approach to traditional Continental and Asian cuisines. Rich cuisines and classic cocktails to kindle your taste buds.', 'experiences', 'textarea', 2),
-    S('experiences_hero_image', 'Experiences hero image', '', 'experiences', 'image', 3),
 
     S('site_name', 'Site name', 'Speke Group of Hotels', 'general', 'text', 1),
     S('site_tagline', 'Tagline', 'Unparalleled luxurious experiences in the Pearl of Africa.', 'general', 'text', 2),
     S('footer_copyright', 'Footer copyright', 'Copyright © 2026. All Rights Reserved to Speke Group of Hotels.', 'general', 'text', 3),
+    ...PAGE_IMAGE_SETTINGS.map((p) => S(p.key, p.label, p.value, p.group, 'image', p.sortOrder)),
     S('enquiry_notify_email', 'Send enquiry alerts to', 'marketing@spekegroup.com', 'general', 'text', 4, 'Where a notification goes when a new enquiry arrives.'),
   ]);
 
