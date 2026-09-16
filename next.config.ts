@@ -2,11 +2,10 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /**
-   * These ship wasm or native bindings and must be required by Node at
-   * runtime rather than bundled — PGlite in particular fails to resolve its
-   * filesystem when the bundler rewrites its module paths.
+   * libsql ships native bindings (local development only) and must be
+   * required by Node at runtime rather than bundled.
    */
-  serverExternalPackages: ['@electric-sql/pglite', 'postgres', 'bcryptjs'],
+  serverExternalPackages: ['@libsql/client', 'libsql', 'bcryptjs'],
 
   images: {
     remotePatterns: [

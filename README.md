@@ -25,15 +25,21 @@ Change these before the site goes anywhere public.
 
 ## The database
 
-With `DATABASE_URL` set, the app uses that Postgres. Without it, it falls back
-to PGlite, a wasm Postgres stored in `.pglite/`, so a fresh clone runs with
-nothing to install.
+The schema is SQLite and lives in two places:
 
-**PGlite is single-process.** Do not run `db:seed` or `db:migrate` while
-`npm run dev` is running: both processes open the same store and it corrupts,
-after which every query fails with `RuntimeError: Aborted()`. Stop the server
-first, or delete `.pglite/` and re-run `npm run db:setup` to recover. Production
-uses real Postgres and has no such limit.
+- **Production** runs on Cloudflare D1 (`speke-group-db`), reached over
+  Cloudflare's HTTP API. Vercel sets `DATABASE_TARGET=d1`.
+- **Development** uses a local file, `local.db`, created by `npm run db:setup`.
+  Scripts can run while `npm run dev` is up.
+
+To run a script against production, load the env file and target D1:
+
+```bash
+DATABASE_TARGET=d1 npx tsx --env-file=.env.local scripts/migrate.ts
+```
+
+`scripts/seed.ts` wipes and reloads all site content (staff accounts are kept),
+so do not run it against production once the team has started editing.
 
 ## Media
 
@@ -45,7 +51,10 @@ URL. The dashboard refuses uploads and says so if the keys are missing.
 | Name                   | Needed for                                  |
 | ---------------------- | ------------------------------------------- |
 | `AUTH_SECRET`          | Signing session cookies. 32+ characters. Required in production. |
-| `DATABASE_URL`         | Postgres. Falls back to local PGlite if unset. |
+| `DATABASE_TARGET`      | `d1` in production; unset locally uses `local.db` |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare account that owns the D1 database |
+| `CLOUDFLARE_D1_DATABASE_ID` | The D1 database id                     |
+| `CLOUDFLARE_API_TOKEN` | Token with D1 edit access                    |
 | `R2_ACCOUNT_ID`        | Cloudflare R2 account                        |
 | `R2_ACCESS_KEY_ID`     | R2 credentials                               |
 | `R2_SECRET_ACCESS_KEY` | R2 credentials                               |

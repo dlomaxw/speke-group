@@ -1,72 +1,87 @@
-import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+import type { SqliteRemoteDatabase } from 'drizzle-orm/sqlite-proxy';
 import * as schema from './schema';
 
 /**
- * One database, two drivers.
+ * One SQLite schema, two places it lives.
  *
- * Production (and any environment with DATABASE_URL) talks to real Postgres.
- * Local development falls back to PGlite, which is Postgres compiled to wasm
- * and stored in .pglite/ — so the app runs and seeds with nothing to install.
+ * Production (DATABASE_TARGET=d1, set on Vercel) talks to Cloudflare D1 over
+ * Cloudflare's HTTP API, so the app can run on Vercel with no socket to hold.
  *
- * PGlite is STRICTLY SINGLE-PROCESS. Running a script (db:seed, db:migrate)
- * while `npm run dev` is up corrupts the store and every query then fails with
- * "RuntimeError: Aborted()". Stop the dev server first, or point DATABASE_URL
- * at a real Postgres, which has none of this restriction.
+ * Everywhere else it uses a local SQLite file (local.db) through libsql, so
+ * development needs nothing installed and scripts can run alongside
+ * `npm run dev`. To run a script against production, prefix it:
+ *
+ *   DATABASE_TARGET=d1 npm run db:setup
  */
-/**
- * Both drivers expose the same drizzle query API, so the app is typed against
- * the postgres-js flavour. A union of the two would erase inference and force
- * `any` on every select.
- */
-type Db = PostgresJsDatabase<typeof schema>;
 
-function connectionString() {
-  return (
-    process.env.DATABASE_URL ||
-    process.env.POSTGRES_URL ||
-    process.env.POSTGRES_PRISMA_URL ||
-    ''
+/** Both drivers expose the same async drizzle API; the app is typed against the D1 one. */
+type Db = SqliteRemoteDatabase<typeof schema>;
+
+export const usingD1 = () => process.env.DATABASE_TARGET === 'd1';
+
+function d1Config() {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const databaseId = process.env.CLOUDFLARE_D1_DATABASE_ID;
+  const token = process.env.CLOUDFLARE_D1_TOKEN || process.env.CLOUDFLARE_API_TOKEN;
+  if (!accountId || !databaseId || !token) {
+    throw new Error(
+      'DATABASE_TARGET=d1 needs CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_D1_DATABASE_ID and CLOUDFLARE_API_TOKEN.',
+    );
+  }
+  return { accountId, databaseId, token };
+}
+
+type D1RawResponse = {
+  success: boolean;
+  errors?: { message: string }[];
+  result?: { results?: { columns: string[]; rows: unknown[][] } }[];
+};
+
+/** Runs one statement on D1 and returns its rows as arrays, as drizzle's proxy driver expects. */
+export async function d1Raw(sqlText: string, params: unknown[] = []): Promise<unknown[][]> {
+  const { accountId, databaseId, token } = d1Config();
+  const res = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${accountId}/d1/database/${databaseId}/raw`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sql: sqlText, params }),
+      cache: 'no-store',
+    },
   );
+  const data = (await res.json().catch(() => null)) as D1RawResponse | null;
+  if (!res.ok || !data?.success) {
+    const message = data?.errors?.map((e) => e.message).join('; ') || `D1 request failed (${res.status})`;
+    throw new Error(message);
+  }
+  return data.result?.[0]?.results?.rows ?? [];
 }
 
-function buildPostgres(url: string) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const postgres = require('postgres');
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { drizzle } = require('drizzle-orm/postgres-js');
-  const client = postgres(url, {
-    max: 1,                       // serverless: one socket per lambda
-    idle_timeout: 20,
-    connect_timeout: 15,
-    ssl: url.includes('localhost') ? false : 'require',
-  });
+async function buildD1() {
+  const { drizzle } = await import('drizzle-orm/sqlite-proxy');
+  return drizzle(async (sqlText, params, method) => {
+    const rows = await d1Raw(sqlText, params);
+    // "get" wants the first row itself; everything else wants the list.
+    return { rows: method === 'get' ? (rows[0] as unknown[]) : rows };
+  }, { schema });
+}
+
+async function buildLocal() {
+  const { createClient } = await import('@libsql/client');
+  const { drizzle } = await import('drizzle-orm/libsql');
+  const client = createClient({ url: process.env.LOCAL_DATABASE_URL || 'file:local.db' });
   return drizzle(client, { schema });
 }
 
-async function buildPglite() {
-  const { PGlite } = await import('@electric-sql/pglite');
-  const { drizzle } = await import('drizzle-orm/pglite');
-  const client = new PGlite('.pglite');
-  return drizzle(client, { schema });
-}
-
-let cached: Db | null = null;
 let pending: Promise<Db> | null = null;
 
-export async function getDb(): Promise<Db> {
-  if (cached) return cached;
-  if (pending) return pending;
-
-  const url = connectionString();
-  pending = (async () => {
-    const db = url ? buildPostgres(url) : await buildPglite();
-    cached = db as unknown as Db;
-    return cached;
-  })();
+export function getDb(): Promise<Db> {
+  if (!pending) {
+    pending = (usingD1() ? buildD1() : buildLocal()).then((db) => db as unknown as Db);
+  }
   return pending;
 }
 
-export const usingPostgres = () => Boolean(connectionString());
 export { schema };
 
 /**

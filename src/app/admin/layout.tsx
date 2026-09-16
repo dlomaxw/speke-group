@@ -22,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   try {
     const db = await getDb();
     const [row] = await db
-      .select({ count: sql<number>`count(*)::int` })
+      .select({ count: sql<number>`count(*)` })
       .from(enquiries)
       .where(eq(enquiries.status, 'new'));
     newEnquiries = Number(row?.count ?? 0);

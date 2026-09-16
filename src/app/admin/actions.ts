@@ -91,7 +91,7 @@ export async function saveRecord(collectionSlug: string, formData: FormData): Pr
     }
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Could not save.';
-    if (message.includes('duplicate key')) return { error: 'That slug is already used. Pick another.' };
+    if (message.includes('UNIQUE constraint failed') || message.includes('duplicate key')) return { error: 'That slug is already used. Pick another.' };
     return { error: message };
   }
 
@@ -277,7 +277,7 @@ export async function saveUser(_prev: State, formData: FormData): Promise<State>
     }
   } catch (e) {
     const msg = e instanceof Error ? e.message : 'Could not save.';
-    if (msg.includes('duplicate key')) return { error: 'That email address already has an account.' };
+    if (msg.includes('UNIQUE constraint failed') || msg.includes('duplicate key')) return { error: 'That email address already has an account.' };
     return { error: msg };
   }
 
@@ -292,7 +292,7 @@ export async function deleteUser(id: number) {
 
   const db = await getDb();
   const [{ count }] = await db
-    .select({ count: sql<number>`count(*)::int` })
+    .select({ count: sql<number>`count(*)` })
     .from(users)
     .where(eq(users.role, 'admin'));
   const [target] = await db.select().from(users).where(eq(users.id, id)).limit(1);

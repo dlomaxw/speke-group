@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 
 async function countRows(table: unknown, where?: unknown) {
   const db = await getDynamicDb();
-  const q = db.select({ n: sql<number>`count(*)::int` }).from(table);
+  const q = db.select({ n: sql<number>`count(*)` }).from(table);
   const [row] = where ? await q.where(where) : await q;
   return Number(row?.n ?? 0);
 }
@@ -62,7 +62,7 @@ export default async function Overview({
 
   // Portfolio split by kind, for the part-to-whole bar.
   const kindRows = await db
-    .select({ kind: properties.kind, n: sql<number>`count(*)::int` })
+    .select({ kind: properties.kind, n: sql<number>`count(*)` })
     .from(properties)
     .groupBy(properties.kind);
 

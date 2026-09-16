@@ -33,6 +33,17 @@ const CONTACT = {
   twitter: 'https://twitter.com/speke_group',
 };
 
+/** D1 caps a statement at 100 bound values, so bulk inserts go in small batches. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function insertAll(table: any, rows: Record<string, unknown>[]) {
+  const db = await getDb();
+  const columns = Math.max(1, ...rows.map((r) => Object.keys(r).length + 2));
+  const size = Math.max(1, Math.floor(90 / columns));
+  for (let i = 0; i < rows.length; i += size) {
+    await db.insert(table).values(rows.slice(i, i + size));
+  }
+}
+
 async function main() {
   const db = await getDb();
   console.log('Seeding…');
@@ -60,7 +71,7 @@ async function main() {
   }
 
   /* ---------- properties ---------- */
-  await db.insert(properties).values(withImages([
+  await insertAll(properties, withImages([
     { slug: 'speke-hotel', name: 'Speke Hotel', kind: 'hotel', categoryLabel: 'Hotel', area: 'Nile Avenue, Kampala',
       websiteUrl: 'https://www.spekehotel.com/', sortOrder: 1,
       description: "Uganda's only centurial hotel, with fifty en-suite rooms on Nile Avenue. Built in the 1920s and acquired by the Group in 1996." },
@@ -103,7 +114,7 @@ async function main() {
   ], PROPERTY_IMAGES));
 
   /* ---------- meeting venues ---------- */
-  await db.insert(venues).values(withImages([
+  await insertAll(venues, withImages([
     { slug: 'kabira-ballroom', name: 'Kabira Ballroom', location: 'Kabira Country Club', capacity: '400 guests', venueSize: 'Ballroom', sizeTag: 's120', sortOrder: 1 },
     { slug: 'palm', name: 'Palm', location: 'Kabira Country Club', capacity: '120 guests', venueSize: 'Conference', sizeTag: 's120', sortOrder: 2 },
     { slug: 'pine', name: 'Pine', location: 'Kabira Country Club', capacity: '80 guests', venueSize: 'Conference', sizeTag: 's50', sortOrder: 3 },
@@ -118,7 +129,7 @@ async function main() {
     { slug: 'commonwealth-banquet-hall', name: 'Commonwealth Banquet Hall', location: 'Munyonyo Commonwealth Resort', capacity: '120 to 400 guests', venueSize: 'Banquet hall', sizeTag: 's120', sortOrder: 12 },
   ], VENUE_IMAGES));
 
-  await db.insert(venueGroups).values([
+  await insertAll(venueGroups, [
     { groupName: 'Speke Resort Convention Centre', sortOrder: 1,
       venueList: 'Victoria Ballroom · Speke Ballroom · Royal Hall · Royal Palm Hall · Majestic Hall · Mahogany Hall · Ebony Hall · Meera Hall · Sheena Hall · Kalangala Hall · Albert Hall' },
     { groupName: 'Speke Resort Munyonyo', sortOrder: 2,
@@ -130,7 +141,7 @@ async function main() {
   ]);
 
   /* ---------- restaurants and bars ---------- */
-  await db.insert(restaurants).values(withImages([
+  await insertAll(restaurants, withImages([
     { slug: 'nyanja', name: 'Nyanja', kind: 'restaurant', cuisine: 'Multi Cuisine', sortOrder: 1,
       description: "The Group's multi-cuisine restaurant, serving Continental and Asian specialities with a modern twist." },
     { slug: 'the-stables', name: 'The Stables', kind: 'restaurant', cuisine: 'Grill', sortOrder: 2,
@@ -153,7 +164,7 @@ async function main() {
   ], DINING_IMAGES));
 
   /* ---------- experiences ---------- */
-  await db.insert(experiences).values(withImages([
+  await insertAll(experiences, withImages([
     { slug: 'spas-and-salons', name: 'Spas & Salons', sortOrder: 1,
       description: 'Inspired by the riches of nature, we offer massages, facials and steam baths that combine a cocktail of original active ingredients and memorable fragrances.',
       highlights: 'Body massage · Facials · Steam baths' },
@@ -176,7 +187,7 @@ async function main() {
 
   /* ---------- news ---------- */
   const d = (iso: string) => new Date(iso);
-  await db.insert(newsPosts).values(withImages([
+  await insertAll(newsPosts, withImages([
     { slug: 'speke-resort-munyonyo-completes-room-renovation', title: 'Speke Resort Munyonyo Completes Room Renovation',
       propertyLabel: 'Speke Resort Munyonyo', tag: 'property', isFeatured: true, status: 'published', publishedAt: d('2026-08-12'),
       excerpt: "All lakeside rooms have been refreshed with new furnishings ahead of the conference season, continuing the Group's programme of investment across its 900-plus modern rooms." },
@@ -217,12 +228,12 @@ async function main() {
     { category: 'spa', propertyLabel: 'Calabash Spa', name: 'Facials', description: 'Inspired by the riches of nature, combining original active ingredients and memorable fragrances.', sortOrder: 2 },
     { category: 'spa', propertyLabel: 'Calabash Spa', name: 'Steam Baths', description: 'Sauna sessions to burn calories, ease pain, boost mood, improve sleep and support immune function.', sortOrder: 3 },
   ];
-  await db.insert(offers).values(
+  await insertAll(offers, 
     [...baseOffers, ...EXTRA_OFFERS].map((o) => ({ ...o, sortOrder: OFFER_ORDER[o.name] ?? o.sortOrder })),
   );
 
   /* ---------- milestones ---------- */
-  await db.insert(milestones).values([
+  await insertAll(milestones, [
     { year: '1920s', title: 'Speke Hotel Is Built', sortOrder: 1,
       description: "Uganda's only centurial hotel takes shape in the heart of Kampala, draped in the colonial ambiance preserved to this day." },
     { year: '1996', title: 'The Group Begins', sortOrder: 2,
@@ -234,7 +245,7 @@ async function main() {
   ]);
 
   /* ---------- pillars and occasions ---------- */
-  await db.insert(highlightBlocks).values([
+  await insertAll(highlightBlocks, [
     { section: 'pillars', icon: '◇', name: 'Conferences', linkUrl: '/events', sortOrder: 1,
       description: 'Forty-five state-of-the-art conference rooms across the Group, from boardrooms to ballrooms.' },
     { section: 'pillars', icon: '❀', name: 'Spas & Salons', linkUrl: '/experiences', sortOrder: 2,
@@ -255,7 +266,7 @@ async function main() {
   const S = (key: string, label: string, value: string, group: string, valueType = 'text', sortOrder = 0, helpText?: string) =>
     ({ key, label, value, group, valueType, sortOrder, helpText: helpText ?? null });
 
-  await db.insert(settings).values([
+  await insertAll(settings, [
     S('hero_video_url', 'Hero video', '/assets/hero.mp4', 'homepage', 'video', 1, 'The looping film behind the homepage headline. MP4, ideally under 3 MB.'),
     S('hero_poster_url', 'Hero poster image', '/assets/hero-poster.webp', 'homepage', 'image', 2, 'Shown while the video loads.'),
     S('hero_eyebrow', 'Hero eyebrow', 'Speke Group of Hotels', 'homepage', 'text', 3),
@@ -292,17 +303,13 @@ async function main() {
     S('enquiry_notify_email', 'Send enquiry alerts to', 'marketing@spekegroup.com', 'general', 'text', 4, 'Where a notification goes when a new enquiry arrives.'),
   ]);
 
-  const counts = await db.execute(sql`select
-    (select count(*) from properties) as properties,
-    (select count(*) from venues) as venues,
-    (select count(*) from restaurants) as restaurants,
-    (select count(*) from experiences) as experiences,
-    (select count(*) from news_posts) as news,
-    (select count(*) from offers) as offers,
-    (select count(*) from settings) as settings,
-    (select count(*) from users) as users`);
-
-  console.log('Seeded:', (counts as unknown as { rows?: unknown[] }).rows?.[0] ?? counts);
+  const tables = { properties, venues, restaurants, experiences, news: newsPosts, offers, settings, users };
+  const counts: Record<string, number> = {};
+  for (const [label, table] of Object.entries(tables)) {
+    const [row] = await db.select({ n: sql<number>`count(*)` }).from(table);
+    counts[label] = Number(row?.n ?? 0);
+  }
+  console.log('Seeded:', counts);
   console.log('Done.');
 }
 
