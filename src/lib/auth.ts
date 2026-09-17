@@ -7,8 +7,12 @@ import { eq } from 'drizzle-orm';
 import { getDb } from '@/db';
 import { users, activityLog, type Role, type User } from '@/db/schema';
 import { can, type Permission } from './rbac';
+import { mfaRequiredFor } from './mfa';
 
 const COOKIE = 'speke_session';
+/** Set between a correct password and a correct authenticator code. */
+const MFA_COOKIE = 'speke_mfa_pending';
+const MFA_MAX_AGE_SECONDS = 5 * 60;
 const MAX_AGE_SECONDS = 60 * 60 * 8; // a working day
 
 function secret() {
@@ -30,6 +34,8 @@ export type SessionUser = {
   name: string;
   role: Role;
   mustChangePassword: boolean;
+  totpEnabled: boolean;
+  propertyScope: 'all' | 'assigned';
 };
 
 export async function hashPassword(plain: string) {
@@ -86,15 +92,25 @@ export async function getSession(): Promise<SessionUser | null> {
       name: fresh.name,
       role: fresh.role,
       mustChangePassword: fresh.mustChangePassword,
+      totpEnabled: Boolean(fresh.totpEnabledAt),
+      propertyScope: fresh.propertyScope,
     };
   } catch {
     return null;
   }
 }
 
-export async function requireUser(): Promise<SessionUser> {
+/**
+ * The signed-in user, or a redirect to sign in. Administrators without
+ * two-step sign-in set up are sent to set it up before anything else; only
+ * the enrolment screen and its actions pass allowWithoutMfa.
+ */
+export async function requireUser(opts: { allowWithoutMfa?: boolean } = {}): Promise<SessionUser> {
   const user = await getSession();
   if (!user) redirect('/admin/login');
+  if (!opts.allowWithoutMfa && mfaRequiredFor(user.role) && !user.totpEnabled) {
+    redirect('/admin/account/security?required=1');
+  }
   return user;
 }
 
@@ -104,7 +120,8 @@ export async function requirePermission(permission: Permission): Promise<Session
   return user;
 }
 
-export async function signIn(email: string, password: string) {
+/** Checks the password only; the caller decides whether a code is needed next. */
+export async function checkPassword(email: string, password: string) {
   const db = await getDb();
   const [user] = await db
     .select()
@@ -121,15 +138,55 @@ export async function signIn(email: string, password: string) {
 
   if (!user || !ok) return { ok: false as const, error: 'Email or password is incorrect.' };
   if (!user.isActive) return { ok: false as const, error: 'This account has been deactivated.' };
+  return { ok: true as const, user };
+}
 
+/** Issues the full session once every required sign-in step has passed. */
+export async function completeSignIn(user: User) {
+  const db = await getDb();
   await issueSession(user);
   await db.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id));
-  return { ok: true as const, user };
+  const jar = await cookies();
+  jar.delete(MFA_COOKIE);
+}
+
+/** Remembers, for five minutes, that this browser gave a correct password. */
+export async function startMfaChallenge(user: User) {
+  const token = await new SignJWT({ uid: user.id, stage: 'mfa' })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime(`${MFA_MAX_AGE_SECONDS}s`)
+    .sign(secret());
+  const jar = await cookies();
+  jar.set(MFA_COOKIE, token, {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    path: '/admin',
+    maxAge: MFA_MAX_AGE_SECONDS,
+  });
+}
+
+/** The user waiting for their authenticator code, if the challenge is still valid. */
+export async function getMfaChallenge(): Promise<User | null> {
+  const jar = await cookies();
+  const token = jar.get(MFA_COOKIE)?.value;
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, secret());
+    if (payload.stage !== 'mfa') return null;
+    const db = await getDb();
+    const [user] = await db.select().from(users).where(eq(users.id, Number(payload.uid))).limit(1);
+    return user && user.isActive ? user : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function signOut() {
   const jar = await cookies();
   jar.delete(COOKIE);
+  jar.delete(MFA_COOKIE);
 }
 
 /** Refreshes the cookie after a role or password change. */

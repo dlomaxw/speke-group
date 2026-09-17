@@ -1,6 +1,6 @@
 import { asc } from 'drizzle-orm';
 import { getDb } from '@/db';
-import { users } from '@/db/schema';
+import { users, properties, userProperties } from '@/db/schema';
 import { requirePermission } from '@/lib/auth';
 import { can, ROLE_LABELS, ROLE_BLURB } from '@/lib/rbac';
 import UserManager from '@/components/UserManager';
@@ -11,6 +11,9 @@ export default async function UsersPage() {
   const me = await requirePermission('users.view');
   const db = await getDb();
   const rows = await db.select().from(users).orderBy(asc(users.name));
+  const propertyRows = await db.select({ id: properties.id, name: properties.name })
+    .from(properties).orderBy(asc(properties.sortOrder));
+  const links = await db.select().from(userProperties);
 
   return (
     <div className="space-y-5">
@@ -38,7 +41,11 @@ export default async function UsersPage() {
           id: u.id, email: u.email, name: u.name, role: u.role,
           department: u.department, isActive: u.isActive,
           lastLoginAt: u.lastLoginAt ? u.lastLoginAt.toISOString() : null,
+          propertyScope: u.propertyScope,
+          propertyIds: links.filter((l) => l.userId === u.id).map((l) => l.propertyId),
+          totpEnabled: Boolean(u.totpEnabledAt),
         }))}
+        properties={propertyRows}
         canManage={can(me.role, 'users.manage')}
         currentUserId={me.id}
       />

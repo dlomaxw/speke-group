@@ -5,7 +5,7 @@ import {
 
 export type FieldType =
   | 'text' | 'textarea' | 'richtext' | 'number' | 'url'
-  | 'image' | 'select' | 'checkbox' | 'date' | 'status';
+  | 'image' | 'select' | 'checkbox' | 'date' | 'status' | 'property';
 
 export type Field = {
   name: string;
@@ -34,6 +34,12 @@ export type CollectionConfig = {
   defaultSort: 'sortOrder' | 'publishedAt' | 'name';
   /** Content with a draft/published gate. */
   hasStatus: boolean;
+  /**
+   * How a record maps to a property, for staff limited to certain properties:
+   * 'id' (the record is a property), 'propertyId' (a column), or undefined for
+   * group-wide content only unrestricted staff may change.
+   */
+  propertyField?: 'id' | 'propertyId';
   icon: string;
 };
 
@@ -61,6 +67,7 @@ export const COLLECTIONS: CollectionConfig[] = [
     icon: 'building',
     defaultSort: 'sortOrder',
     hasStatus: true,
+    propertyField: 'id',
     listFields: ['name', 'categoryLabel', 'area', 'status'],
     fields: [
       { name: 'name', label: 'Property name', type: 'text', required: true },
@@ -89,11 +96,13 @@ export const COLLECTIONS: CollectionConfig[] = [
     icon: 'calendar',
     defaultSort: 'sortOrder',
     hasStatus: true,
+    propertyField: 'propertyId',
     listFields: ['name', 'location', 'capacity', 'status'],
     fields: [
       { name: 'name', label: 'Venue name', type: 'text', required: true },
       { name: 'slug', label: 'Slug', type: 'text', required: true },
-      { name: 'location', label: 'Property', type: 'text', required: true, placeholder: 'Kabira Country Club' },
+      { name: 'propertyId', label: 'Property', type: 'property', help: 'Which property this belongs to. Leave as group-wide if it covers several.' },
+      { name: 'location', label: 'Location label', type: 'text', required: true, placeholder: 'Kabira Country Club', help: 'The text shown on the venue card.' },
       { name: 'capacity', label: 'Capacity', type: 'text', placeholder: '120 guests' },
       { name: 'venueSize', label: 'Venue size', type: 'text', placeholder: '62 sq m or Ballroom' },
       { name: 'sizeTag', label: 'Capacity bracket', type: 'select', options: [
@@ -117,10 +126,12 @@ export const COLLECTIONS: CollectionConfig[] = [
     icon: 'utensils',
     defaultSort: 'sortOrder',
     hasStatus: true,
+    propertyField: 'propertyId',
     listFields: ['name', 'kind', 'cuisine', 'status'],
     fields: [
       { name: 'name', label: 'Name', type: 'text', required: true },
       { name: 'slug', label: 'Slug', type: 'text', required: true },
+      { name: 'propertyId', label: 'Property', type: 'property', help: 'Which property this belongs to. Leave as group-wide if it covers several.' },
       { name: 'kind', label: 'Type', type: 'select', required: true, options: [
         { value: 'restaurant', label: 'Restaurant' },
         { value: 'bar', label: 'Bar' },
@@ -165,11 +176,13 @@ export const COLLECTIONS: CollectionConfig[] = [
     icon: 'newspaper',
     defaultSort: 'publishedAt',
     hasStatus: true,
+    propertyField: 'propertyId',
     listFields: ['title', 'propertyLabel', 'publishedAt', 'status'],
     fields: [
       { name: 'title', label: 'Headline', type: 'text', required: true },
       { name: 'slug', label: 'Slug', type: 'text', required: true },
-      { name: 'propertyLabel', label: 'Property', type: 'text', placeholder: 'Group', help: 'Shown above the headline.' },
+      { name: 'propertyId', label: 'Property', type: 'property', help: 'Which property this belongs to. Leave as group-wide if it covers several.' },
+      { name: 'propertyLabel', label: 'Property label', type: 'text', placeholder: 'Group', help: 'Shown above the headline.' },
       { name: 'tag', label: 'Category', type: 'select', options: [
         { value: 'group', label: 'Group' },
         { value: 'property', label: 'Properties' },
@@ -193,16 +206,18 @@ export const COLLECTIONS: CollectionConfig[] = [
     icon: 'tag',
     defaultSort: 'sortOrder',
     hasStatus: true,
+    propertyField: 'propertyId',
     listFields: ['name', 'category', 'propertyLabel', 'status'],
     fields: [
       { name: 'name', label: 'Offer name', type: 'text', required: true },
+      { name: 'propertyId', label: 'Property', type: 'property', help: 'Which property this belongs to. Leave as group-wide if it covers several.' },
       { name: 'category', label: 'Tab', type: 'select', required: true, options: [
         { value: 'accommodation', label: 'Accommodation' },
         { value: 'dining', label: 'Dining' },
         { value: 'events', label: 'Events' },
         { value: 'spa', label: 'Spa' },
       ] },
-      { name: 'propertyLabel', label: 'Property', type: 'text' },
+      { name: 'propertyLabel', label: 'Property label', type: 'text', help: 'The small gold text on the offer card.' },
       { name: 'description', label: 'Description', type: 'textarea' },
       { name: 'imageUrl', label: 'Photo', type: 'image' },
       { name: 'linkUrl', label: 'Link', type: 'url' },

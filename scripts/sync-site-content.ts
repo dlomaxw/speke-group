@@ -16,6 +16,8 @@ import {
   PROPERTY_IMAGES, VENUE_IMAGES, DINING_IMAGES, EXPERIENCE_IMAGES, NEWS_IMAGES,
   PAGE_IMAGE_SETTINGS, EXTRA_OFFERS, OFFER_ORDER,
 } from '../src/lib/default-images';
+import { ABOUT_SETTINGS } from '../src/lib/about-content';
+import { linkContentToProperties } from '../src/lib/property-links';
 
 async function main() {
   const db = await getDb();
@@ -64,6 +66,18 @@ async function main() {
     }
   }
   console.log(`  page photo settings added or filled: ${settingsTouched}`);
+
+  let aboutAdded = 0;
+  for (const a of ABOUT_SETTINGS) {
+    const [row] = await db.select({ key: settings.key }).from(settings).where(eq(settings.key, a.key));
+    if (row) continue; // never overwrite text staff may have edited
+    await db.insert(settings).values({
+      key: a.key, label: a.label, value: a.value, group: 'about', valueType: a.valueType, sortOrder: a.sortOrder,
+    });
+    aboutAdded++;
+  }
+  console.log(`  about page settings added: ${aboutAdded}`);
+  console.log(`  property links: ${await linkContentToProperties(db)}`);
   console.log('Done.');
 }
 

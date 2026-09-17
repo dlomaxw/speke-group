@@ -94,7 +94,7 @@ export default async function HomePage() {
       <div class="eyebrow-line">Our Story</div>
       <h2 class="h-sec" style="margin-bottom:12px">${esc(setting(s, 'story_title', 'A Legacy of Ugandan Hospitality'))}</h2>
       <p style="font-size:14px;line-height:1.72;color:#5a4a3a;margin:0 0 14px">${esc(setting(s, 'story_body'))}</p>
-      <a class="link-arrow" href="https://spekegroup.com/about-us/">READ OUR FULL STORY <i>&rarr;</i></a>
+      <a class="link-arrow" href="/about">READ OUR FULL STORY <i>&rarr;</i></a>
     </div>
     <div style="display:flex;align-items:center;gap:30px;flex:none" data-reveal data-reveal-delay="0.12">
       <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_properties', '13'))}</div><div class="lbl">Properties</div></div>

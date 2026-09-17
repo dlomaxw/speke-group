@@ -1,34 +1,42 @@
 'use client';
 
 import { useActionState, useState, useTransition } from 'react';
-import { saveUser, deleteUser } from '@/app/admin/actions';
+import { saveUser, deleteUser, resetUserMfa } from '@/app/admin/actions';
 import { ROLE_LABELS } from '@/lib/rbac';
 
 type Row = {
   id: number; email: string; name: string; role: keyof typeof ROLE_LABELS;
   department: string | null; isActive: boolean; lastLoginAt: string | null;
+  propertyScope: 'all' | 'assigned'; propertyIds: number[]; totpEnabled: boolean;
 };
 
 export default function UserManager({
-  users, canManage, currentUserId,
-}: { users: Row[]; canManage: boolean; currentUserId: number }) {
+  users, canManage, currentUserId, properties,
+}: { users: Row[]; canManage: boolean; currentUserId: number; properties: { id: number; name: string }[] }) {
   const [editing, setEditing] = useState<Row | 'new' | null>(null);
   const [state, formAction, pending] = useActionState(saveUser, {});
   const [removing, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
   const target = editing === 'new' ? null : editing;
+  const [scope, setScope] = useState<'all' | 'assigned'>('all');
+  const nameOf = new Map(properties.map((p) => [p.id, p.name]));
+
+  const openEditor = (row: Row | 'new') => {
+    setScope(row === 'new' ? 'all' : row.propertyScope);
+    setEditing(row);
+  };
 
   return (
     <div className="space-y-4">
       {canManage && !editing && (
-        <button type="button" className="btn-primary" onClick={() => setEditing('new')}>
+        <button type="button" className="btn-primary" onClick={() => openEditor('new')}>
           Add a staff account
         </button>
       )}
 
       {editing && (
-        <form action={formAction} className="card-surface p-5 space-y-4 max-w-[560px]">
+        <form key={target?.id ?? 'new'} action={formAction} className="card-surface p-5 space-y-4 max-w-[560px]">
           <h2 className="font-semibold text-[16px]">
             {target ? `Edit ${target.name}` : 'New staff account'}
           </h2>
@@ -72,6 +80,35 @@ export default function UserManager({
             </p>
           </div>
 
+          <fieldset className="space-y-2">
+            <legend className="block text-[13px] font-semibold mb-1.5">Properties</legend>
+            <label className="flex items-center gap-2 text-[13.5px]">
+              <input type="radio" name="propertyScope" value="all" checked={scope === 'all'}
+                     onChange={() => setScope('all')} className="accent-[color:var(--color-maroon)]" />
+              All properties and group-wide content
+            </label>
+            <label className="flex items-center gap-2 text-[13.5px]">
+              <input type="radio" name="propertyScope" value="assigned" checked={scope === 'assigned'}
+                     onChange={() => setScope('assigned')} className="accent-[color:var(--color-maroon)]" />
+              Only these properties
+            </label>
+            {scope === 'assigned' && (
+              <div className="grid sm:grid-cols-2 gap-1.5 pl-6">
+                {properties.map((p) => (
+                  <label key={p.id} className="flex items-center gap-2 text-[13px]">
+                    <input type="checkbox" name="propertyIds" value={p.id}
+                           defaultChecked={target?.propertyIds.includes(p.id)}
+                           className="h-4 w-4 accent-[color:var(--color-maroon)]" />
+                    {p.name}
+                  </label>
+                ))}
+              </div>
+            )}
+            <p className="text-[12px] text-[#7a8494]">
+              Administrators and general managers always cover every property.
+            </p>
+          </fieldset>
+
           <label className="flex items-center gap-2 text-[13.5px]">
             <input name="isActive" type="checkbox" defaultChecked={target?.isActive ?? true}
                    className="h-4 w-4 accent-[color:var(--color-maroon)]" />
@@ -105,7 +142,7 @@ export default function UserManager({
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[#f9fafb] border-b border-[#e6e9ee]">
-                {['Name', 'Email', 'Role', 'Department', 'Last signed in', ''].map((h) => (
+                {['Name', 'Email', 'Role', 'Properties', 'Two-step', 'Last signed in', ''].map((h) => (
                   <th key={h} className="px-4 py-2.5 text-[11px] font-bold uppercase tracking-wide text-[#5a6474] whitespace-nowrap">
                     {h}
                   </th>
@@ -126,7 +163,18 @@ export default function UserManager({
                   </td>
                   <td className="px-4 py-2.5 text-[13px] text-[#5a6474]">{u.email}</td>
                   <td className="px-4 py-2.5 text-[13px]">{ROLE_LABELS[u.role]}</td>
-                  <td className="px-4 py-2.5 text-[13px] text-[#5a6474]">{u.department ?? '—'}</td>
+                  <td className="px-4 py-2.5 text-[13px] text-[#5a6474] max-w-[220px]">
+                    {u.role === 'admin' || u.role === 'manager' || u.propertyScope === 'all'
+                      ? 'All'
+                      : u.propertyIds.map((id) => nameOf.get(id)).filter(Boolean).join(', ') || 'None'}
+                  </td>
+                  <td className="px-4 py-2.5 text-[13px]">
+                    {u.totpEnabled
+                      ? <span className="text-[#1e6b34] font-semibold">On</span>
+                      : <span className={u.role === 'admin' ? 'text-[#b3261e] font-semibold' : 'text-[#7a8494]'}>
+                          {u.role === 'admin' ? 'Required' : 'Off'}
+                        </span>}
+                  </td>
                   <td className="px-4 py-2.5 text-[13px] text-[#5a6474]">
                     {u.lastLoginAt
                       ? new Date(u.lastLoginAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -135,7 +183,21 @@ export default function UserManager({
                   <td className="px-4 py-2.5 text-right whitespace-nowrap">
                     {canManage && (
                       <>
-                        <button type="button" onClick={() => setEditing(u)}
+                        {u.totpEnabled && u.id !== currentUserId && (
+                          <button
+                            type="button" disabled={removing}
+                            onClick={() => start(async () => {
+                              setError(null);
+                              try { await resetUserMfa(u.id); }
+                              catch (e) { setError(e instanceof Error ? e.message : 'Could not reset.'); }
+                            })}
+                            className="mr-3 text-[12.5px] text-[#7a8494] hover:underline"
+                            title="For a lost or replaced phone"
+                          >
+                            Reset two-step
+                          </button>
+                        )}
+                        <button type="button" onClick={() => openEditor(u)}
                                 className="text-[12.5px] font-semibold text-[#38414f] hover:underline">
                           Edit
                         </button>

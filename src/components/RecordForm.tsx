@@ -9,6 +9,7 @@ import MediaField from './MediaField';
 
 export default function RecordForm({
   collection, collectionLabel, singular, fields, record, canPublish, mediaOptions,
+  propertyOptions = [], allowGroupWide = true,
 }: {
   collection: string;
   collectionLabel: string;
@@ -17,6 +18,8 @@ export default function RecordForm({
   record: Record<string, unknown> | null;
   canPublish: boolean;
   mediaOptions: { url: string; filename: string; alt: string | null }[];
+  propertyOptions?: { id: number; name: string }[];
+  allowGroupWide?: boolean;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -33,8 +36,10 @@ export default function RecordForm({
     start(async () => {
       const result = await saveRecord(collection, formData);
       setMessage(result);
-      if (result.ok) {
+      if (result.ok && result.ok === 'Saved.') {
         router.push(`/admin/${collection}`);
+        router.refresh();
+      } else if (result.ok) {
         router.refresh();
       }
     });
@@ -64,6 +69,13 @@ export default function RecordForm({
                   placeholder={field.placeholder}
                   required={field.required}
                 />
+              ) : field.type === 'property' ? (
+                <select id={id} name={field.name} className="field" defaultValue={initial(field.name)}>
+                  {allowGroupWide && <option value="">Group-wide (no single property)</option>}
+                  {propertyOptions.map((p) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
               ) : field.type === 'select' || field.type === 'status' ? (
                 <select id={id} name={field.name} className="field" defaultValue={initial(field.name) || field.options?.[0]?.value}>
                   {field.options?.map((o) => (
@@ -103,6 +115,12 @@ export default function RecordForm({
           );
         })}
       </div>
+
+      {message.ok && message.ok !== 'Saved.' && (
+        <p className="text-[13px] text-[#1e6b34] bg-[#e6f4ea] border border-[#bfe0c9] rounded-lg px-3 py-2">
+          {message.ok}
+        </p>
+      )}
 
       {message.error && (
         <p role="alert" className="text-[13px] text-[#b3261e] bg-[#fdeceb] border border-[#f6c9c5] rounded-lg px-3 py-2">

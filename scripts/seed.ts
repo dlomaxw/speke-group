@@ -16,6 +16,8 @@ import {
   PROPERTY_IMAGES, VENUE_IMAGES, DINING_IMAGES, EXPERIENCE_IMAGES, NEWS_IMAGES,
   PAGE_IMAGE_SETTINGS, EXTRA_OFFERS, OFFER_ORDER,
 } from '../src/lib/default-images';
+import { linkContentToProperties } from '../src/lib/property-links';
+import { ABOUT_SETTINGS } from '../src/lib/about-content';
 
 /** Attach the original photograph to each seeded record. */
 const withImages = <const T extends { slug: string }>(rows: T[], map: Record<string, string>) =>
@@ -300,8 +302,11 @@ async function main() {
     S('site_tagline', 'Tagline', 'Unparalleled luxurious experiences in the Pearl of Africa.', 'general', 'text', 2),
     S('footer_copyright', 'Footer copyright', 'Copyright © 2026. All Rights Reserved to Speke Group of Hotels.', 'general', 'text', 3),
     ...PAGE_IMAGE_SETTINGS.map((p) => S(p.key, p.label, p.value, p.group, 'image', p.sortOrder)),
+    ...ABOUT_SETTINGS.map((a) => S(a.key, a.label, a.value, 'about', a.valueType, a.sortOrder)),
     S('enquiry_notify_email', 'Send enquiry alerts to', 'marketing@spekegroup.com', 'general', 'text', 4, 'Where a notification goes when a new enquiry arrives.'),
   ]);
+
+  console.log(`  property links: ${await linkContentToProperties(db)}`);
 
   const tables = { properties, venues, restaurants, experiences, news: newsPosts, offers, settings, users };
   const counts: Record<string, number> = {};

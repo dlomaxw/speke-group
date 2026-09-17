@@ -1,12 +1,19 @@
 'use client';
 
 import { useActionState, useState, useTransition } from 'react';
-import { uploadMedia, deleteMedia } from '@/app/admin/actions';
+import { uploadMedia, deleteMedia, reviewMediaRights } from '@/app/admin/actions';
 
 type FileRow = {
   id: number; url: string; filename: string;
   contentType: string | null; bytes: number | null;
   alt: string | null; createdAt: string;
+  credit: string | null; rightsStatus: 'pending' | 'approved' | 'rejected'; rightsNote: string | null;
+};
+
+const RIGHTS_STYLE = {
+  pending: 'bg-[#fff1cf] text-[#7a5c00]',
+  approved: 'bg-[#e6f4ea] text-[#1e6b34]',
+  rejected: 'bg-[#fdeceb] text-[#b3261e]',
 };
 
 const FOLDERS = ['general', 'properties', 'venues', 'dining', 'experiences', 'news', 'hero'];
@@ -19,8 +26,8 @@ function size(bytes: number | null) {
 }
 
 export default function MediaLibrary({
-  files, canUpload, canDelete,
-}: { files: FileRow[]; canUpload: boolean; canDelete: boolean }) {
+  files, canUpload, canDelete, canApprove,
+}: { files: FileRow[]; canUpload: boolean; canDelete: boolean; canApprove: boolean }) {
   const [state, formAction, pending] = useActionState(uploadMedia, {});
   const [removing, start] = useTransition();
   const [copied, setCopied] = useState<number | null>(null);
@@ -61,6 +68,17 @@ export default function MediaLibrary({
             </p>
           </div>
 
+          <div className="sm:col-span-3">
+            <label htmlFor="credit" className="block text-[13px] font-semibold mb-1.5">
+              Source and rights
+            </label>
+            <input id="credit" name="credit" className="field"
+                   placeholder="Taken by our marketing team, 2026 / Licensed from photographer X" />
+            <p className="text-[12px] text-[#7a8494] mt-1">
+              Who took it and on what terms. A manager checks this before it can be used on the site.
+            </p>
+          </div>
+
           {state.error && (
             <p role="alert" className="sm:col-span-3 text-[13px] text-[#b3261e] bg-[#fdeceb] border border-[#f6c9c5] rounded-lg px-3 py-2">
               {state.error}
@@ -97,6 +115,28 @@ export default function MediaLibrary({
                 <div className="p-2.5 flex-1 flex flex-col gap-1.5">
                   <div className="text-[12.5px] font-medium truncate" title={f.filename}>{f.filename}</div>
                   <div className="text-[11.5px] text-[#7a8494]">{size(f.bytes)}</div>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className={`text-[10px] uppercase font-bold tracking-wide px-1.5 py-0.5 rounded-full ${RIGHTS_STYLE[f.rightsStatus]}`}>
+                      {f.rightsStatus === 'approved' ? 'rights ok' : f.rightsStatus === 'rejected' ? 'not usable' : 'rights check'}
+                    </span>
+                    {f.credit && <span className="text-[11px] text-[#7a8494] truncate" title={f.credit}>{f.credit}</span>}
+                  </div>
+                  {canApprove && f.rightsStatus !== 'approved' && (
+                    <div className="flex gap-2">
+                      <button type="button" disabled={removing}
+                              onClick={() => start(() => reviewMediaRights(f.id, 'approved', '').then(() => {}))}
+                              className="text-[12px] font-semibold text-[#1e6b34] hover:underline">
+                        Approve rights
+                      </button>
+                      {f.rightsStatus === 'pending' && (
+                        <button type="button" disabled={removing}
+                                onClick={() => start(() => reviewMediaRights(f.id, 'rejected', '').then(() => {}))}
+                                className="text-[12px] text-[#b3261e] hover:underline">
+                          Reject
+                        </button>
+                      )}
+                    </div>
+                  )}
                   <div className="mt-auto flex items-center gap-2 pt-1">
                     <button
                       type="button"

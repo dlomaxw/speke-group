@@ -367,7 +367,18 @@
   }
 
   /* ---------- 11. Enquiry form --------------------------- */
-  /* Posts to the dashboard's enquiry inbox, where marketing picks it up. */
+  /* Posts to the dashboard's enquiry inbox. The idempotency key rendered in
+     the form is sent as a header and kept until the server confirms receipt,
+     so a double click or a retry after a dropped connection stores the
+     enquiry once. A fresh key is issued only after success. Without
+     JavaScript the form posts normally and the server redirects back. */
+  function newKey() {
+    if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+    var a = new Uint8Array(16);
+    (window.crypto || window.msCrypto).getRandomValues(a);
+    return Array.prototype.map.call(a, function (b) { return ('0' + b.toString(16)).slice(-2); }).join('');
+  }
+
   function initEnquiryForm() {
     var forms = document.querySelectorAll('form[data-enquiry]');
     for (var f = 0; f < forms.length; f++) {
@@ -376,6 +387,8 @@
         form.dataset.sgWired = '1';
         var status = form.querySelector('.form-status');
         var button = form.querySelector('button[type="submit"]');
+        var keyField = form.querySelector('input[name="idempotencyKey"]');
+        var busy = false;
 
         function say(text, ok) {
           if (!status) return;
@@ -383,32 +396,75 @@
           status.className = 'form-status ' + (ok ? 'ok' : 'err');
         }
 
+        function clearInvalid() {
+          var bad = form.querySelectorAll('[aria-invalid="true"]');
+          for (var i = 0; i < bad.length; i++) bad[i].removeAttribute('aria-invalid');
+        }
+
+        /* Departure can never be earlier than the chosen arrival. */
+        var arrival = form.querySelector('input[name="arrivalDate"]');
+        var departure = form.querySelector('input[name="departureDate"]');
+        if (arrival && departure) {
+          arrival.addEventListener('change', function () {
+            if (arrival.value) departure.min = arrival.value;
+          });
+        }
+
         form.addEventListener('submit', function (ev) {
           ev.preventDefault();
+          if (busy) return;
+          clearInvalid();
+
           var data = {};
           var fields = form.querySelectorAll('input[name],textarea[name],select[name]');
-          for (var i = 0; i < fields.length; i++) data[fields[i].name] = fields[i].value;
+          for (var i = 0; i < fields.length; i++) {
+            var el = fields[i];
+            if (el.type === 'radio') { if (el.checked) data[el.name] = el.value; continue; }
+            if (el.type === 'checkbox') { data[el.name] = el.checked; continue; }
+            data[el.name] = el.value;
+          }
           data.sourcePage = window.location.pathname;
 
+          busy = true;
           if (button) button.disabled = true;
           say('Sending…', true);
 
           fetch('/api/enquiries', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Idempotency-Key': keyField ? keyField.value : newKey() },
             body: JSON.stringify(data)
           })
             .then(function (res) {
               return res.json().catch(function () { return {}; }).then(function (body) {
-                if (!res.ok) throw new Error(body.error || 'Something went wrong. Please try again.');
+                if (!res.ok) {
+                  var err = new Error(body.error || 'Something went wrong. Please try again.');
+                  err.fields = body.fields || {};
+                  throw err;
+                }
+                return body;
               });
             })
-            .then(function () {
+            .then(function (body) {
               form.reset();
-              say('Thank you. Your message has reached our team and we will be in touch shortly.', true);
+              if (keyField) keyField.value = newKey();
+              say('Thank you. Your message has reached our team' +
+                  (body.reference ? '. Your reference is ' + body.reference + '.' : '.'), true);
             })
-            .catch(function (err) { say(err.message, false); })
-            .then(function () { if (button) button.disabled = false; });
+            .catch(function (err) {
+              var names = err.fields ? Object.keys(err.fields) : [];
+              for (var n = 0; n < names.length; n++) {
+                var target = form.querySelector('[name="' + names[n] + '"]');
+                if (target) target.setAttribute('aria-invalid', 'true');
+              }
+              var first = names.length && form.querySelector('[aria-invalid="true"]');
+              if (first && first.focus) first.focus();
+              // A network failure has no field list; the same key is kept so trying again is safe.
+              say(err.fields ? err.message : 'We could not reach our server. Please check your connection and try again.', false);
+            })
+            .then(function () {
+              busy = false;
+              if (button) button.disabled = false;
+            });
         });
       })(forms[f]);
     }

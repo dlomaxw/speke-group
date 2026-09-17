@@ -8,12 +8,14 @@ import { useState } from 'react';
 type LinkItem = { href: string; label: string };
 
 export default function AdminNav({
-  user, contentLinks, newEnquiries,
+  user, contentLinks, newEnquiries, pendingChanges, showReview,
   showEnquiries, showUsers, showSettings, showActivity,
 }: {
   user: { name: string; role: string };
   contentLinks: LinkItem[];
   newEnquiries: number;
+  pendingChanges: number;
+  showReview: boolean;
   showEnquiries: boolean;
   showUsers: boolean;
   showSettings: boolean;
@@ -23,7 +25,7 @@ export default function AdminNav({
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string) =>
-    href === '/admin' ? pathname === '/admin' : pathname.startsWith(href);
+    href === '/admin' || href === '/admin/account' ? pathname === href : pathname.startsWith(href);
 
   const item = (href: string, label: string, badge?: number) => (
     <Link
@@ -83,6 +85,8 @@ export default function AdminNav({
         <nav className="p-2 flex-1">
           {item('/admin', 'Overview')}
           {showEnquiries && item('/admin/enquiries', 'Enquiries', newEnquiries)}
+          {showReview && item('/admin/review', 'Changes to approve', pendingChanges)}
+          {item('/admin/preview', 'Preview site')}
 
           {heading('Content')}
           {contentLinks.map((l) => item(l.href, l.label))}
@@ -97,6 +101,7 @@ export default function AdminNav({
 
           {heading('You')}
           {item('/admin/account', 'Your account')}
+          {item('/admin/account/security', 'Two-step sign-in')}
         </nav>
 
         <div className="px-4 py-3 border-t border-white/10 text-[11px] text-[#8a94a4]">

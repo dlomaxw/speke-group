@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { asc, desc } from 'drizzle-orm';
-import { getDynamicDb } from '@/db';
+import { and, asc, desc, eq, inArray } from 'drizzle-orm';
+import { getDb, getDynamicDb } from '@/db';
+import { contentVersions } from '@/db/schema';
+import { getAccess, covers } from '@/lib/access';
 import { requireUser } from '@/lib/auth';
 import { can } from '@/lib/rbac';
 import { getCollection } from '@/lib/collections';
 import RowActions from '@/components/RowActions';
+import VersionHistory from '@/components/VersionHistory';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +41,24 @@ export default async function CollectionList({
     .from(table)
     .orderBy(config.defaultSort === 'publishedAt' ? desc(sortColumn) : asc(sortColumn))
   ) as Record<string, unknown>[];
+
+  const access = await getAccess(user);
+  const inScope = (row: Record<string, unknown>) =>
+    access.all || (config.propertyField ? covers(access, row[config.propertyField] as number | null) : false);
+
+  const plain = await getDb();
+  const pendingRows = await plain.select({ recordId: contentVersions.recordId })
+    .from(contentVersions)
+    .where(and(eq(contentVersions.collection, config.slug), eq(contentVersions.state, 'pending')));
+  const pendingIds = new Set(pendingRows.map((r) => r.recordId));
+
+  // Deleted records whose last saved state can be put back.
+  const liveIds = new Set(rows.map((r) => Number(r.id)));
+  const deletions = await plain.select().from(contentVersions)
+    .where(and(eq(contentVersions.collection, config.slug), eq(contentVersions.action, 'deleted'), inArray(contentVersions.state, ['history'])))
+    .orderBy(desc(contentVersions.id))
+    .limit(20);
+  const recentlyDeleted = deletions.filter((d) => d.recordId != null && !liveIds.has(d.recordId));
 
   const labelFor = (name: string) =>
     config.fields.find((f) => f.name === name)?.label ?? name;
@@ -94,11 +115,20 @@ export default async function CollectionList({
                           }`}>
                             {String(row.status)}
                           </span>
+                        ) : i === 0 && mayEdit && inScope(row) ? (
+                          <span className="flex items-center gap-2">
+                            <Link href={`/admin/${config.slug}/${row.id}`}
+                                  className="font-medium text-[color:var(--color-maroon)] hover:underline">
+                              {cell(row[f])}
+                            </Link>
+                            {pendingIds.has(Number(row.id)) && (
+                              <span className="text-[10px] uppercase font-bold tracking-wide bg-[#fff1cf] text-[#7a5c00] px-1.5 py-0.5 rounded-full">
+                                awaiting approval
+                              </span>
+                            )}
+                          </span>
                         ) : i === 0 && mayEdit ? (
-                          <Link href={`/admin/${config.slug}/${row.id}`}
-                                className="font-medium text-[color:var(--color-maroon)] hover:underline">
-                            {cell(row[f])}
-                          </Link>
+                          <span className="text-[#38414f]" title="Not one of your properties">{cell(row[f])} <span className="text-[#9aa3b0]">· view only</span></span>
                         ) : (
                           <span className="text-[#38414f]">{cell(row[f])}</span>
                         )}
@@ -109,9 +139,9 @@ export default async function CollectionList({
                         collection={config.slug}
                         id={Number(row.id)}
                         status={config.hasStatus ? (row.status as 'draft' | 'published') : undefined}
-                        canEdit={mayEdit}
-                        canDelete={can(user.role, 'content.delete')}
-                        canPublish={can(user.role, 'content.publish')}
+                        canEdit={mayEdit && inScope(row)}
+                        canDelete={can(user.role, 'content.delete') && inScope(row)}
+                        canPublish={can(user.role, 'content.publish') && inScope(row)}
                       />
                     </td>
                   </tr>
@@ -120,6 +150,21 @@ export default async function CollectionList({
             </table>
           </div>
         </div>
+      )}
+
+      {recentlyDeleted.length > 0 && (
+        <VersionHistory
+          title="Recently deleted"
+          versions={recentlyDeleted.map((v) => {
+            const data = JSON.parse(v.data) as Record<string, unknown>;
+            return {
+              id: v.id, action: 'deleted', state: 'history', userEmail: v.userEmail,
+              createdAt: v.createdAt.toISOString(),
+              note: String(data.name ?? data.title ?? data.year ?? data.groupName ?? `#${v.recordId}`),
+            };
+          })}
+          canRestore={can(user.role, 'content.publish')}
+        />
       )}
 
       {!can(user.role, 'content.publish') && config.hasStatus && (

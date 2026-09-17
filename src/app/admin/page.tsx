@@ -94,7 +94,7 @@ export default async function Overview({
     ? await db.select({ createdAt: enquiries.createdAt, status: enquiries.status }).from(enquiries)
     : [];
   const weekly = weeklyBuckets(allEnquiries.map((e) => e.createdAt));
-  const statusRows = ['new', 'assigned', 'answered', 'closed', 'spam'].map((s) => ({
+  const statusRows = ['new', 'assigned', 'contacted', 'qualified', 'converted', 'lost', 'spam'].map((s) => ({
     status: s,
     count: allEnquiries.filter((e) => e.status === s).length,
   }));

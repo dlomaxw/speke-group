@@ -40,7 +40,7 @@ export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
    Header
    ------------------------------------------------------------------ */
 
-type Active = 'home' | 'events' | 'experiences' | 'news' | 'contact';
+type Active = 'home' | 'about' | 'events' | 'experiences' | 'news' | 'contact';
 
 export function header(opts: {
   active: Active;
@@ -59,7 +59,15 @@ export function header(opts: {
   <header class="sg-header">
     <a href="/"><img class="logo" src="/brand/speke-logo.png" alt="Speke Group"></a>
     <nav class="sg-nav">
-      <div class="item"><a href="${home ? '#our-group' : '/#our-group'}"${cls('home')}>Our Group</a></div>
+      <div class="item">
+        <a href="/about"${active === 'about' || home ? ' class="active"' : ''}>Our Group</a>
+        <div class="sg-drop">
+          <a href="/about">About Us</a>
+          <a href="/about#chairman">Our Chairman</a>
+          <a href="/about#history">Our History</a>
+          <a href="/#portfolio">Our Properties</a>
+        </div>
+      </div>
       <div class="item">
         <a href="${home ? '#portfolio' : '/#portfolio'}">Find &amp; Book</a>
         <div class="sg-drop">
@@ -144,7 +152,7 @@ export function footer(s: SettingsMap, hotels: NavProperty[], resorts: NavProper
       <div>
         <div class="col-title">Information</div>
         <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
-          <a href="https://spekegroup.com/about-us/">About Us</a>
+          <a href="/about">About Us</a>
           <a href="https://spekegroup.com/contact/">Careers</a>
           <a href="https://spekegroup.com/contact/">SOPs</a>
           <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
@@ -202,6 +210,16 @@ export function monthYear(date: Date | string | null | undefined, style: 'long' 
   const month = d.toLocaleString('en-GB', { month: style, timeZone: 'UTC' });
   const text = `${month} ${d.getUTCFullYear()}`;
   return style === 'short' ? text.toUpperCase() : text;
+}
+
+/** Text with blank lines between paragraphs, as escaped <p> elements. */
+export function paragraphs(text: string, style: string) {
+  return text
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => `<p style="${style}">${esc(p)}</p>`)
+    .join('\n');
 }
 
 /** The count-up number, split into target and suffix ("900+" → 900, "+"). */

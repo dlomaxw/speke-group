@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 
+// Every page is rendered per request so each one carries its own CSP nonce (see src/proxy.ts).
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Speke Group of Hotels',
   description: 'Unparalleled luxurious experiences in the Pearl of Africa.',

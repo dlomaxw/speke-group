@@ -19,6 +19,8 @@ export const PERMISSIONS = {
   'media.view':      ['admin', 'manager', 'marketing', 'viewer'],
   'media.upload':    ['admin', 'manager', 'marketing'],
   'media.delete':    ['admin', 'manager'],
+  /** Confirms the Group holds the rights to use a file publicly. */
+  'media.approve':   ['admin', 'manager'],
 
   'enquiries.view':   ['admin', 'manager', 'marketing'],
   'enquiries.manage': ['admin', 'manager', 'marketing'],

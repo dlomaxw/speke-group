@@ -1,4 +1,5 @@
 import Script from 'next/script';
+import { isPreview } from '@/lib/site-data';
 import './speke-ui.css';
 
 // Content is edited in the dashboard, so pages are rendered per request.
@@ -38,7 +39,8 @@ const NO_SCRIPT_STYLE =
   '.sg-js .page-shell,.sg-js [data-reveal],.sg-js .hero-copy > *' +
   '{opacity:1!important;transform:none!important;animation:none!important}</style>';
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const preview = await isPreview();
   return (
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -55,6 +57,12 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
       <div id="speke-loader" dangerouslySetInnerHTML={{ __html: loaderInner }} />
       <noscript dangerouslySetInnerHTML={{ __html: NO_SCRIPT_STYLE }} />
+      {preview && (
+        <div className="sg-preview-bar" role="status">
+          <span><strong>Preview.</strong> Showing drafts and changes waiting for approval. Visitors do not see these.</span>
+          <a href="/api/preview?action=disable&amp;path=/">Exit preview</a>
+        </div>
+      )}
       <Script src="/site/speke-ui.js" strategy="afterInteractive" />
     </>
   );

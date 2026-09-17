@@ -4,7 +4,7 @@ import { getSession } from '@/lib/auth';
 import { can } from '@/lib/rbac';
 import { COLLECTIONS } from '@/lib/collections';
 import { getDb } from '@/db';
-import { enquiries } from '@/db/schema';
+import { enquiries, contentVersions } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { signOutAction } from './actions';
 import AdminNav from '@/components/AdminNav';
@@ -28,6 +28,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     newEnquiries = Number(row?.count ?? 0);
   } catch { /* a fresh database with no tables yet shouldn't break the shell */ }
 
+  let pendingChanges = 0;
+  if (can(user.role, 'content.publish')) {
+    try {
+      const db = await getDb();
+      const [row] = await db.select({ count: sql<number>`count(*)` }).from(contentVersions)
+        .where(eq(contentVersions.state, 'pending'));
+      pendingChanges = Number(row?.count ?? 0);
+    } catch { /* see above */ }
+  }
+
   const contentLinks = COLLECTIONS.map((c) => ({ href: `/admin/${c.slug}`, label: c.label }));
 
   return (
@@ -36,6 +46,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         user={user}
         contentLinks={contentLinks}
         newEnquiries={newEnquiries}
+        pendingChanges={pendingChanges}
+        showReview={can(user.role, 'content.publish')}
         showEnquiries={can(user.role, 'enquiries.view')}
         showUsers={can(user.role, 'users.view')}
         showSettings={can(user.role, 'settings.view')}

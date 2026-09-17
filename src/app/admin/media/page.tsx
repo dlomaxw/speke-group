@@ -18,8 +18,9 @@ export default async function MediaPage() {
       <div>
         <h1 className="serif text-[25px] font-semibold">Images &amp; video</h1>
         <p className="text-[13.5px] text-[#5a6474] mt-1 max-w-[70ch]">
-          Everything uploaded here can be picked from any photo field. Images work best at
-          about 1600 pixels wide; keep hero video under 3 MB so the homepage stays quick.
+          Everything uploaded here can be picked from any photo field once a manager has
+          confirmed the Group has the rights to use it. Images work best at about 1600 pixels
+          wide; keep hero video under 3 MB so the homepage stays quick.
         </p>
       </div>
 
@@ -34,7 +35,9 @@ export default async function MediaPage() {
           id: f.id, url: f.url, filename: f.filename,
           contentType: f.contentType, bytes: f.bytes, alt: f.alt,
           createdAt: f.createdAt.toISOString(),
+          credit: f.credit, rightsStatus: f.rightsStatus, rightsNote: f.rightsNote,
         }))}
+        canApprove={can(user.role, 'media.approve')}
         canUpload={can(user.role, 'media.upload')}
         canDelete={can(user.role, 'media.delete')}
       />
