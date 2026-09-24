@@ -27,9 +27,11 @@ const MILESTONES = [
     description: 'Speke Hotel opens in central Kampala, beginning a history of welcoming visitors to the city.' },
   { year: '1996', title: 'A New Chapter', sortOrder: 2,
     description: 'Dr. Sudhir Ruparelia acquires Speke Hotel, laying the foundation for the group’s hospitality collection.' },
-  { year: 'Expansion', title: 'New Places to Stay and Meet', sortOrder: 3,
+  { year: '2006', title: 'Munyonyo Commonwealth Resort', sortOrder: 3,
+    description: 'Completed in a record eleven months, marking the next stage in the Group’s expansion.' },
+  { year: 'Expansion', title: 'New Places to Stay and Meet', sortOrder: 4,
     description: 'The collection grows to include lakeside resorts, city hotels, serviced apartments and venues for meetings and celebrations.' },
-  { year: 'Today', title: 'A Growing Collection', sortOrder: 4,
+  { year: 'Today', title: 'A Growing Collection', sortOrder: 5,
     description: 'Speke Group brings together accommodation, dining, leisure and events, welcoming guests travelling for business and pleasure.' },
 ];
 

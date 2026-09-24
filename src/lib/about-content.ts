@@ -47,7 +47,7 @@ export const ABOUT_SETTINGS = [
   { key: 'about_history_image', label: 'Our history: photo', valueType: 'image', sortOrder: 22,
     value: '/images/about-history-1960.webp' },
   { key: 'about_history_caption', label: 'Our history: photo caption', valueType: 'text', sortOrder: 23,
-    value: 'Speke Hotel, Kampala — a historic view' },
+    value: 'Speke Hotel, Kampala — under its earlier owners, before the Group acquired it in 1996' },
 
   { key: 'chairman_role', label: 'Chairman: small heading', valueType: 'text', sortOrder: 30,
     value: 'A Message from Our Chairman' },

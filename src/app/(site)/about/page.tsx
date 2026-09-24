@@ -45,7 +45,7 @@ export default async function AboutPage() {
   <div class="row-stats" style="display:flex;align-items:center;justify-content:center;gap:56px;padding:38px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12)" data-reveal>
     <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_properties', '13'))}</div><div class="lbl">Resorts, Hotels &amp; Apartments</div></div>
     <div class="rule-v"></div>
-    <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Modern Rooms</div></div>
+    <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Guest Rooms &amp; Apartments</div></div>
     <div class="rule-v"></div>
     <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_conference_rooms', '45'))}</div><div class="lbl">Conference Rooms</div></div>
     <div class="rule-v"></div>
@@ -110,7 +110,7 @@ export default async function AboutPage() {
       <div class="eyebrow-line" style="justify-content:center">Our Journey</div>
       <h2 class="h-sec">Milestones in the Speke Story</h2>
     </div>
-    <div style="gap:22px" data-stagger="0.08" class="g-4">${timeline}
+    <div style="gap:22px" data-stagger="0.08" class="${milestones.length === 5 ? 'g-5' : 'g-4'}">${timeline}
     </div>
   </div>
 

@@ -99,7 +99,7 @@ export default async function HomePage() {
     <div style="display:flex;align-items:center;gap:30px;flex:none" data-reveal data-reveal-delay="0.12">
       <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_properties', '13'))}</div><div class="lbl">Properties</div></div>
       <div class="rule-v"></div>
-      <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Modern Rooms</div></div>
+      <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Guest Rooms &amp; Apartments</div></div>
       <div class="rule-v"></div>
       <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_conference_rooms', '45'))}</div><div class="lbl">Conference Rooms</div></div>
       <div class="rule-v"></div>
