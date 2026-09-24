@@ -110,7 +110,7 @@ export default async function AboutPage() {
       <div class="eyebrow-line" style="justify-content:center">Our Journey</div>
       <h2 class="h-sec">Milestones in the Speke Story</h2>
     </div>
-    <div style="gap:22px" data-stagger="0.08" class="${milestones.length === 5 ? 'g-5' : 'g-4'}">${timeline}
+    <div style="gap:22px" data-stagger="0.08" class="${milestones.length === 5 ? 'g-5' : milestones.length === 6 ? 'g-3' : 'g-4'}">${timeline}
     </div>
   </div>
 

@@ -244,7 +244,11 @@ async function main() {
       description: 'Completed in a record eleven months, marking the next stage in the Group’s expansion.' },
     { year: 'Expansion', title: 'New Places to Stay and Meet', sortOrder: 4,
       description: 'The collection grows to include lakeside resorts, city hotels, serviced apartments and venues for meetings and celebrations.' },
-    { year: 'Today', title: 'A Growing Collection', sortOrder: 5,
+    { year: '2026', title: 'World’s Best Luxury Convention Resort', sortOrder: 5,
+      description: 'Speke Resort Convention Centre secures the top global title at the Luxe Global Awards.' },
+    { year: 'July 2026', title: 'IAPCO Convention Centre Partnership', sortOrder: 6,
+      description: 'The centre joins the International Association of Professional Congress Organisers, connecting it to a global network of international event organisers.' },
+    { year: 'Today', title: 'A Growing Collection', sortOrder: 7,
       description: 'Speke Group brings together accommodation, dining, leisure and events, welcoming guests travelling for business and pleasure.' },
   ]);
 
