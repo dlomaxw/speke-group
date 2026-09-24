@@ -6,7 +6,7 @@ import { ABOUT_DEFAULTS } from '@/lib/about-content';
 
 export const metadata: Metadata = {
   title: 'About Speke Group of Hotels | Uganda Hospitality Group',
-  description: 'The story, history and leadership behind the Speke Group of Hotels, Uganda’s pioneering collection of resorts, hotels and apartments.',
+  description: 'Speke Group brings together hotels, resorts, serviced apartments and event venues in Uganda, with distinctive settings, thoughtful service and a warm welcome.',
 };
 
 const BODY = 'font-size:14.5px;line-height:1.78;color:#5a4a3a;margin:0 0 14px';
@@ -33,10 +33,10 @@ export default async function AboutPage() {
     <div class="hero-copy" style="position:absolute;left:var(--gut);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;max-width:660px;pointer-events:none">
       <div class="eyebrow-line" style="color:#d4af6a">${esc(get('about_eyebrow'))}</div>
       <h1 class="serif" style="color:#fff;font-size:48px;font-weight:600;margin:0 0 16px;line-height:1.08">${esc(get('about_title'))}</h1>
-      <p style="color:#efe4d2;font-size:15px;line-height:1.68;margin:0 0 22px;max-width:540px">More than 25 years of Ugandan hospitality, from the country’s only centurial hotel to a collection of thirteen resorts, hotels and apartments.</p>
+      <p style="color:#efe4d2;font-size:15px;line-height:1.68;margin:0 0 22px;max-width:560px">${esc(get('about_lead'))}</p>
       <div style="display:flex;gap:12px;pointer-events:auto;flex-wrap:wrap">
-        <a class="btn btn-solid" href="#chairman"><span>MEET OUR CHAIRMAN</span></a>
-        <a class="btn btn-light" href="#history"><span>OUR HISTORY</span></a>
+        <a class="btn btn-solid" href="/#portfolio"><span>EXPLORE OUR PROPERTIES</span></a>
+        <a class="btn btn-light" href="#story"><span>OUR STORY</span></a>
       </div>
     </div>
   </div>
@@ -49,11 +49,11 @@ export default async function AboutPage() {
     <div class="rule-v"></div>
     <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_conference_rooms', '45'))}</div><div class="lbl">Conference Rooms</div></div>
     <div class="rule-v"></div>
-    <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_years', '25'), '+')}</div><div class="lbl">Years of Experience</div></div>
+    <div class="stat" style="text-align:center"><div class="num">${esc(setting(s, 'founded_year', '1996'))}</div><div class="lbl">Welcoming Guests Since</div></div>
   </div>
 
   <!-- ================= OUR STORY ================= -->
-  <div id="story" style="padding:56px var(--gut)">
+  <div id="story" style="padding:46px var(--gut)">
     <div style="gap:48px;align-items:center" class="g-2">
       <div data-reveal>
         <div class="eyebrow-line">Our Story</div>
@@ -61,7 +61,7 @@ export default async function AboutPage() {
         ${paragraphs(get('about_story_body'), BODY)}
       </div>
       <div class="hero-tile about-photo" data-reveal data-reveal-delay="0.12">
-        ${slot(get('about_story_image'), 'Speke Apartments', 'width:100%;height:460px')}
+        ${slot(get('about_story_image'), 'Speke Apartments', 'width:100%;height:400px')}
       </div>
     </div>
   </div>
@@ -77,6 +77,7 @@ export default async function AboutPage() {
       <div class="chairman-copy" data-reveal data-reveal-delay="0.12">
         <div class="eyebrow-line chairman-role">${esc(get('chairman_role'))}</div>
         <h2 id="chairman-name" class="serif chairman-name">${esc(get('chairman_name'))}</h2>
+        <div class="chairman-tagline">${esc(get('chairman_tagline'))}</div>
         <span class="chairman-rule" aria-hidden="true"></span>
         <blockquote class="chairman-quote">
           <p>${esc(get('chairman_quote'))}</p>
@@ -106,7 +107,7 @@ export default async function AboutPage() {
   <!-- ================= MILESTONES ================= -->
   <div style="background:#efe6d6;padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:32px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">Milestones</div>
+      <div class="eyebrow-line" style="justify-content:center">Our Journey</div>
       <h2 class="h-sec">Milestones in the Speke Story</h2>
     </div>
     <div style="gap:22px" data-stagger="0.08" class="g-4">${timeline}
@@ -115,14 +116,14 @@ export default async function AboutPage() {
 
   <!-- ================= TODAY ================= -->
   <div style="padding:56px var(--gut);text-align:center" data-reveal>
-    <div class="eyebrow-line" style="justify-content:center">Today</div>
+    <div class="eyebrow-line" style="justify-content:center">Speke Group Today</div>
     <h2 class="h-sec" style="margin-bottom:18px">${esc(get('about_today_title'))}</h2>
     <div style="max-width:820px;margin:0 auto">
       ${paragraphs(get('about_today_body'), BODY)}
     </div>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px">
       <a class="btn btn-solid" href="/#portfolio"><span>EXPLORE OUR PROPERTIES</span></a>
-      <a class="btn btn-ghost" href="/contact"><span>CONTACT US</span></a>
+      <a class="btn btn-ghost" href="/contact"><span>CONTACT OUR TEAM</span></a>
     </div>
   </div>
 

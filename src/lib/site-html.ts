@@ -125,7 +125,7 @@ export function footer(s: SettingsMap, hotels: NavProperty[], resorts: NavProper
         <div style="margin-bottom:16px;background:#f2e2c8;display:inline-block;padding:9px 13px;border-radius:8px">
           <img src="/brand/speke-logo.png" alt="Speke Group" style="height:48px;width:auto;display:block">
         </div>
-        <div style="font-size:12px;line-height:1.8;color:#c8a888;max-width:230px">${esc(setting(s, 'site_tagline', 'Unparalleled luxurious experiences in the Pearl of Africa.'))}</div>
+        <div style="font-size:12px;line-height:1.8;color:#c8a888;max-width:230px">${esc(setting(s, 'site_tagline', 'Hotels, resorts, serviced apartments and event venues across Uganda.'))}</div>
       </div>
       <div>
         <div class="col-title">Address</div>

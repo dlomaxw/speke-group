@@ -970,3 +970,9 @@ a.card.sg-opening::after,a.tile.sg-opening::after{
 @media (max-width:560px){
   .about-photo image-slot{height:280px!important}
 }
+
+/* Chairman: the line under the name */
+.chairman-tagline{
+  font-family:'Playfair Display',Georgia,serif;font-style:italic;
+  font-size:clamp(16px,1.6vw,19px);color:#f2d9a0;margin:-6px 0 16px;
+}

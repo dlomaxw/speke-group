@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Speke Group of Hotels',
-  description: 'Unparalleled luxurious experiences in the Pearl of Africa.',
+  description: 'Hotels, resorts, serviced apartments and event venues across Uganda.',
 };
 
 /**

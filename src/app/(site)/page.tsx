@@ -72,7 +72,7 @@ export default async function HomePage() {
     <div class="scrim"></div>
     <div class="hero-copy">
       <div class="eyebrow-line" style="color:#d4af6a">${esc(setting(s, 'hero_eyebrow', 'Speke Group of Hotels'))}</div>
-      <h1 class="serif" style="color:#fff;font-size:56px;line-height:1.06;font-weight:600;margin:0 0 18px;letter-spacing:-0.015em">${esc(setting(s, 'hero_title', 'Unparalleled Luxurious Experiences'))}<br><span style="color:#d4af6a">${esc(setting(s, 'hero_title_accent', 'in the Pearl of Africa'))}</span></h1>
+      <h1 class="serif" style="color:#fff;font-size:56px;line-height:1.06;font-weight:600;margin:0 0 18px;letter-spacing:-0.015em">${esc(setting(s, 'hero_title', 'Distinctive Places Across Uganda'))}<br><span style="color:#d4af6a">${esc(setting(s, 'hero_title_accent', 'One Warm Welcome'))}</span></h1>
       <p style="color:#f2e9db;font-size:16px;line-height:1.62;max-width:540px;margin:0 0 26px">${esc(setting(s, 'hero_body'))}</p>
       <div style="display:flex;gap:12px;pointer-events:auto">
         <a class="btn btn-solid" href="#our-group"><span>DISCOVER SPEKE GROUP</span></a>
@@ -92,7 +92,7 @@ export default async function HomePage() {
   <div id="our-group" class="row-split" style="display:flex;align-items:center;justify-content:space-between;padding:46px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12);gap:50px">
     <div style="max-width:560px" data-reveal>
       <div class="eyebrow-line">Our Story</div>
-      <h2 class="h-sec" style="margin-bottom:12px">${esc(setting(s, 'story_title', 'A Legacy of Ugandan Hospitality'))}</h2>
+      <h2 class="h-sec" style="margin-bottom:12px">${esc(setting(s, 'story_title', 'A Collection Built on Ugandan Hospitality'))}</h2>
       <p style="font-size:14px;line-height:1.72;color:#5a4a3a;margin:0 0 14px">${esc(setting(s, 'story_body'))}</p>
       <a class="link-arrow" href="/about">READ OUR FULL STORY <i>&rarr;</i></a>
     </div>

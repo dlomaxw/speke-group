@@ -76,7 +76,7 @@ async function main() {
   await insertAll(properties, withImages([
     { slug: 'speke-hotel', name: 'Speke Hotel', kind: 'hotel', categoryLabel: 'Hotel', area: 'Nile Avenue, Kampala',
       websiteUrl: 'https://www.spekehotel.com/', sortOrder: 1,
-      description: "Uganda's only centurial hotel, with fifty en-suite rooms on Nile Avenue. Built in the 1920s and acquired by the Group in 1996." },
+      description: 'A historic Kampala landmark on Nile Avenue with fifty en-suite rooms. Its origins date to the 1920s, and it has been part of the Group since 1996.' },
     { slug: 'kabira-country-club', name: 'Kabira Country Club', kind: 'hotel', categoryLabel: 'Hotel', area: 'Bukoto, Kampala',
       websiteUrl: 'https://kabiracountryclub.com/', sortOrder: 2,
       description: 'A world-class abode for guests and travellers, added to the Group shortly after Munyonyo.' },
@@ -236,14 +236,14 @@ async function main() {
 
   /* ---------- milestones ---------- */
   await insertAll(milestones, [
-    { year: '1920s', title: 'Speke Hotel Is Built', sortOrder: 1,
-      description: "Uganda's only centurial hotel takes shape in the heart of Kampala, draped in the colonial ambiance preserved to this day." },
-    { year: '1996', title: 'The Group Begins', sortOrder: 2,
-      description: 'Speke Hotel becomes the first hotel acquired as a member of the Ruparelia Group by Dr. Sudhir Ruparelia.' },
-    { year: '2006', title: 'Munyonyo Commonwealth Resort', sortOrder: 3,
-      description: "Completed in a record eleven months, marking the next stage in the Group's expansion." },
-    { year: 'Today', title: 'Thirteen Properties', sortOrder: 4,
-      description: 'Over 900 modern rooms, 45 state-of-the-art conference rooms, award-winning restaurants, health clubs, spas and leisure facilities.' },
+    { year: '1920s', title: 'A Kampala Landmark', sortOrder: 1,
+      description: 'Speke Hotel opens in central Kampala, beginning a history of welcoming visitors to the city.' },
+    { year: '1996', title: 'A New Chapter', sortOrder: 2,
+      description: 'Dr. Sudhir Ruparelia acquires Speke Hotel, laying the foundation for the group’s hospitality collection.' },
+    { year: 'Expansion', title: 'New Places to Stay and Meet', sortOrder: 3,
+      description: 'The collection grows to include lakeside resorts, city hotels, serviced apartments and venues for meetings and celebrations.' },
+    { year: 'Today', title: 'A Growing Collection', sortOrder: 4,
+      description: 'Speke Group brings together accommodation, dining, leisure and events, welcoming guests travelling for business and pleasure.' },
   ]);
 
   /* ---------- pillars and occasions ---------- */
@@ -272,11 +272,11 @@ async function main() {
     S('hero_video_url', 'Hero video', '/assets/hero.mp4', 'homepage', 'video', 1, 'The looping film behind the homepage headline. MP4, ideally under 3 MB.'),
     S('hero_poster_url', 'Hero poster image', '/assets/hero-poster.webp', 'homepage', 'image', 2, 'Shown while the video loads.'),
     S('hero_eyebrow', 'Hero eyebrow', 'Speke Group of Hotels', 'homepage', 'text', 3),
-    S('hero_title', 'Hero headline', 'Unparalleled Luxurious Experiences', 'homepage', 'text', 4),
-    S('hero_title_accent', 'Hero headline, gold line', 'in the Pearl of Africa', 'homepage', 'text', 5),
-    S('hero_body', 'Hero paragraph', "A collection of award-winning resorts, hotels and apartments offering Uganda's most exquisite accommodation, built to an international standard over more than 25 years.", 'homepage', 'textarea', 6),
-    S('story_title', 'Our story heading', 'A Legacy of Ugandan Hospitality', 'homepage', 'text', 7),
-    S('story_body', 'Our story paragraph', 'As one of the pioneers of the hospitality industry in Uganda, we began our journey by acquiring the most historic hotel in the country, Speke Hotel. Over the years we have passionately built a collection of resorts, hotels and apartments to an international standard.', 'homepage', 'textarea', 8),
+    S('hero_title', 'Hero headline', 'Distinctive Places Across Uganda', 'homepage', 'text', 4),
+    S('hero_title_accent', 'Hero headline, gold line', 'One Warm Welcome', 'homepage', 'text', 5),
+    S('hero_body', 'Hero paragraph', 'Hotels, resorts, serviced apartments and event venues, each with its own character and the same attentive service.', 'homepage', 'textarea', 6),
+    S('story_title', 'Our story heading', 'A Collection Built on Ugandan Hospitality', 'homepage', 'text', 7),
+    S('story_body', 'Our story paragraph', 'Our story began with Speke Hotel, a historic Kampala landmark, acquired in 1996. Since then the collection has grown to include lakeside resorts, city hotels, serviced apartments and venues for meetings and celebrations across Uganda.', 'homepage', 'textarea', 8),
     S('stat_properties', 'Number of properties', '13', 'homepage', 'number', 9),
     S('stat_rooms', 'Number of rooms', '900', 'homepage', 'number', 10),
     S('stat_conference_rooms', 'Conference rooms', '45', 'homepage', 'number', 11),
@@ -299,7 +299,8 @@ async function main() {
     S('experiences_body', 'Experiences paragraph', 'Our restaurants focus on a contemporary yet authentic approach to traditional Continental and Asian cuisines. Rich cuisines and classic cocktails to kindle your taste buds.', 'experiences', 'textarea', 2),
 
     S('site_name', 'Site name', 'Speke Group of Hotels', 'general', 'text', 1),
-    S('site_tagline', 'Tagline', 'Unparalleled luxurious experiences in the Pearl of Africa.', 'general', 'text', 2),
+    S('site_tagline', 'Tagline', 'Hotels, resorts, serviced apartments and event venues across Uganda.', 'general', 'text', 2),
+    S('founded_year', 'Welcoming guests since', '1996', 'general', 'text', 5),
     S('footer_copyright', 'Footer copyright', 'Copyright © 2026. All Rights Reserved to Speke Group of Hotels.', 'general', 'text', 3),
     ...PAGE_IMAGE_SETTINGS.map((p) => S(p.key, p.label, p.value, p.group, 'image', p.sortOrder)),
     ...ABOUT_SETTINGS.map((a) => S(a.key, a.label, a.value, 'about', a.valueType, a.sortOrder)),
