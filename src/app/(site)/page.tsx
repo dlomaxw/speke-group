@@ -64,10 +64,12 @@ export default async function HomePage() {
 
   <!-- ================= HERO (video) ================= -->
   <div class="hero-video">
-    <video class="hero-media" poster="${safeUrl(setting(s, 'hero_poster_url', '/assets/hero-poster.webp'), '')}"
+    <video class="hero-media" poster="${safeUrl(setting(s, 'hero_poster_url', '/assets/hero-properties-poster.webp'), '')}"
+           data-mobile-src="${safeUrl(setting(s, 'hero_video_mobile_url', '/assets/hero-properties-mobile.mp4'), '')}"
+           data-mobile-poster="${safeUrl(setting(s, 'hero_poster_mobile_url', '/assets/hero-properties-mobile-poster.webp'), '')}"
            autoplay muted loop playsinline preload="metadata"
            aria-hidden="true" tabindex="-1">
-      <source src="${safeUrl(setting(s, 'hero_video_url', '/assets/hero.mp4'), '')}" type="video/mp4">
+      <source src="${safeUrl(setting(s, 'hero_video_url', '/assets/hero-properties.mp4'), '')}" type="video/mp4">
     </video>
     <div class="scrim"></div>
     <div class="hero-copy">

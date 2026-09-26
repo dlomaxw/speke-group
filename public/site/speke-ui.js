@@ -285,6 +285,18 @@
     var btn = document.querySelector('.video-toggle');
     var userPaused = false;
 
+    /* Phones get the vertical cut of the film: the landscape one, cropped to
+       a tall hero, would show little more than the middle of each property.
+       <source media> is ignored by browsers, so the swap happens here. */
+    var portrait = video.getAttribute('data-mobile-src');
+    if (portrait && window.matchMedia && window.matchMedia('(max-width: 767px)').matches) {
+      var portraitPoster = video.getAttribute('data-mobile-poster');
+      if (portraitPoster) video.setAttribute('poster', portraitPoster);
+      var source = video.querySelector('source');
+      if (source) source.setAttribute('src', portrait); else video.setAttribute('src', portrait);
+      video.load();
+    }
+
     /* Set these as properties, not markup: the canvas runtime rebuilds the
        DOM and drops the bare boolean attributes, which left the hero
        playing once and then freezing. Muted is also what makes autoplay
