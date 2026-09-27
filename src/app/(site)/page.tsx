@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getChrome, getOffers, getWellness, setting, splitHighlights } from '@/lib/site-data';
+import { getChrome, getHighlights, getOffers, getWellness, setting, splitHighlights } from '@/lib/site-data';
 import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
@@ -25,8 +25,8 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, offers, spas] = await Promise.all([
-    getChrome(), getOffers(), getWellness(),
+  const [chrome, offers, spas, occasions] = await Promise.all([
+    getChrome(), getOffers(), getWellness(), getHighlights('occasions'),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
@@ -67,6 +67,24 @@ export default async function HomePage() {
             ${w.location ? `<div class="wellness-where">${esc(w.location)}</div>` : ''}
           </div>
         </div>`).join('');
+
+  /* Two ways in to Events & Meetings: a meeting, and a celebration. */
+  const OCCASION_IMAGES: Record<string, string> = {
+    Meetings: '/images/v-victoria.webp',
+    Weddings: '/images/v-kabira-ballroom.webp',
+  };
+  const eventCards = occasions.slice(0, 2).map((o) => `
+        <a class="card" href="/events${o.name === 'Weddings' ? '#occasions' : '#venues'}" data-reveal>
+          <div class="media" style="aspect-ratio:16/10">
+            ${slot(o.imageUrl || OCCASION_IMAGES[o.name], o.imageAlt || `${o.name} at Speke Group`, 'width:100%;height:100%')}
+          </div>
+          <div class="body">
+            <div class="eyebrow">Events &amp; Meetings</div>
+            <div class="title">${esc(o.name)}</div>
+            <div class="desc">${esc(o.description)}</div>
+            <span class="link-arrow">FIND OUT MORE <i>&rarr;</i></span>
+          </div>
+        </a>`).join('');
 
   const tabs = OFFER_TABS.filter((t) => offers.some((o) => o.category === t.key));
   const offerPanels = tabs.map((t, i) => {
@@ -202,6 +220,11 @@ export default async function HomePage() {
       <h2 class="serif" style="color:#fff;font-size:34px;font-weight:600;margin:0 0 12px">${esc(setting(s, 'events_title', 'Redefining Meeting Spaces for Your Events'))}</h2>
       <p style="color:#efe4d2;font-size:14px;max-width:470px;line-height:1.65;margin:0 0 20px">Our facilities welcome thousands of visitors attending major national and international conventions, meetings, concerts and competitions, making them the premier conferencing venues in Uganda.</p>
       <a class="btn btn-solid" href="/events" style="pointer-events:auto;width:max-content"><span>EXPLORE MEETINGS &amp; EVENTS</span></a>
+    </div>
+  </div>
+
+  <div style="padding:44px var(--gut) 10px">
+    <div class="g-2" style="gap:24px">${eventCards}
     </div>
   </div>
 

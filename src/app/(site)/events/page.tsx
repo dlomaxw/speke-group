@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getChrome, getHighlights, getVenueGroups, getVenues, setting } from '@/lib/site-data';
+import { getChrome, getHighlights, getVenues, setting } from '@/lib/site-data';
 import { esc, slot, header, footer, countUp, phones, bookingBar, BOOKING_ANCHOR } from '@/lib/site-html';
 import { VENUE_IMAGES } from '@/lib/default-images';
 
@@ -18,8 +18,8 @@ function bookingDates() {
 }
 
 export default async function EventsPage() {
-  const [chrome, venues, groups, occasions] = await Promise.all([
-    getChrome(), getVenues(), getVenueGroups(), getHighlights('occasions'),
+  const [chrome, venues, occasions] = await Promise.all([
+    getChrome(), getVenues(), getHighlights('occasions'),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
   const email = setting(s, 'contact_email');
@@ -46,12 +46,6 @@ export default async function EventsPage() {
             <a class="link-arrow" href="/contact">VIEW VENUE <i>&rarr;</i></a>
           </div>
         </div>`).join('');
-
-  const indexCols = groups.map((g) => `
-          <div>
-            <div class="eyebrow" style="font-size:10px;letter-spacing:.14em;color:#b8935a;font-weight:700;text-transform:uppercase;margin-bottom:10px">${esc(g.groupName)}</div>
-            <div style="font-size:12.8px;line-height:2.05;color:#5a4a3a">${esc(g.venueList)}</div>
-          </div>`).join('');
 
   const occasionTiles = occasions.map((o) => `
         <div class="tile" data-reveal>
@@ -119,19 +113,6 @@ export default async function EventsPage() {
     <div style="gap:22px" data-stagger="0.06" class="g-3">${venueCards}
     </div>
     <p class="wellness-none" data-filter-none="venues" hidden>No venue at that location takes a party of this size. <a href="/contact">Tell us what you need</a> and we will find the right room.</p>
-  </div>
-
-  <!-- ================= FULL VENUE INDEX ================= -->
-  <div style="padding:14px var(--gut) 48px">
-    <div class="tile" data-reveal style="padding:28px 30px">
-      <div class="serif" style="font-size:20px;font-weight:600;color:#3a2020;margin-bottom:6px">The Complete Venue Index</div>
-      <p style="font-size:13px;color:#5a4a3a;margin:0 0 20px;line-height:1.6">Forty-five state-of-the-art conference and banqueting spaces across the Group, from intimate boardrooms to ballrooms, gardens, poolsides and sports grounds.</p>
-      <div style="gap:24px" class="g-4">${indexCols}
-      </div>
-      <div style="margin-top:22px">
-        <a class="link-arrow" href="https://spekegroup.com/meeting-venues/">SEE ALL VENUES ON SPEKEGROUP.COM <i>&rarr;</i></a>
-      </div>
-    </div>
   </div>
 
   <!-- ================= OCCASIONS ================= -->

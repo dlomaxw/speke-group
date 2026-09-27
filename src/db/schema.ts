@@ -278,6 +278,9 @@ export const highlightBlocks = sqliteTable('highlight_blocks', {
   name: text('name', { length: 160 }).notNull(),
   description: text('description'),
   linkUrl: text('link_url'),
+  /** Used where a block is shown as a card rather than an icon tile. */
+  imageUrl: text('image_url'),
+  imageAlt: text('image_alt', { length: 300 }),
   sortOrder: integer('sort_order').notNull().default(0),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, (t) => [index('highlight_section_idx').on(t.section)]);
