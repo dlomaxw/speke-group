@@ -187,6 +187,40 @@
     }
   }
 
+
+  /* ---------- 5b. Filter by a select ---------------------- */
+  /* <select data-filter-select="wellness"> against the same
+     [data-filter-item="wellness"] cards the chips use. */
+  function initSelectFilters() {
+    var selects = document.querySelectorAll('[data-filter-select]');
+    Array.prototype.forEach.call(selects, function (select) {
+      if (select.dataset.sgWired === '1') return;
+      select.dataset.sgWired = '1';
+      var name = select.getAttribute('data-filter-select');
+      var none = document.querySelector('[data-filter-none="' + name + '"]');
+
+      function apply() {
+        var value = select.value;
+        var items = document.querySelectorAll('[data-filter-item="' + name + '"]');
+        var shown = 0;
+        Array.prototype.forEach.call(items, function (item) {
+          var tags = (item.getAttribute('data-tags') || '').split(/\s+/);
+          /* Group-wide facilities belong to every location. */
+          var show = value === 'all' || tags.indexOf(value) !== -1 || tags.indexOf('group') !== -1;
+          item.classList.toggle('filter-hide', !show);
+          if (show) {
+            shown++;
+            item.style.transitionDelay = '0s';
+            item.classList.add('revealed');
+          }
+        });
+        if (none) none.hidden = shown > 0;
+      }
+      select.addEventListener('change', apply);
+      apply();
+    });
+  }
+
   /* ---------- 6. Tab panels ------------------------------ */
   /* <div data-tabs="offers"> buttons data-tab="accommodation" */
   /* panels: <div data-tab-panel="offers" data-tab-key="accommodation"> */
@@ -711,6 +745,7 @@
     initHeader();
     initCounters();
     initFilters();
+    initSelectFilters();
     initTabs();
     initExternalLinks();
     initMobileNav();
@@ -734,6 +769,7 @@
     function reapply() {
       reapplyQueued = false;
       initExternalLinks();
+      initSelectFilters();
       initMobileNav();
       initHeroVideo();
       initBookingBar();

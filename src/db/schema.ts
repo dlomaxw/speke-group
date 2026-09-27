@@ -197,6 +197,31 @@ export const experiences = sqliteTable('experiences', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, (t) => [uniqueIndex('experiences_slug_idx').on(t.slug)]);
 
+export const wellnessKindEnum = ['spa', 'salon', 'gym', 'pool'] as const;
+
+/** Spas, salons, gyms and pools, each attached to the property it sits in, so
+ *  the homepage can answer "where do you have a spa?" by location. */
+export const wellness = sqliteTable('wellness', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug', { length: 120 }).notNull(),
+  name: text('name', { length: 160 }).notNull(),
+  /** Owning property; empty means group-wide. */
+  propertyId: integer('property_id').references(() => properties.id, { onDelete: 'set null' }),
+  kind: text('kind', { enum: wellnessKindEnum }).notNull().default('spa'),
+  /** Where in the property to find it, e.g. "Ground floor, next to the pool". */
+  location: text('location', { length: 160 }),
+  description: text('description'),
+  /** Short bullet points, separated by a middle dot. */
+  highlights: text('highlights'),
+  openingTimes: text('opening_times', { length: 160 }),
+  phone: text('phone', { length: 60 }),
+  imageUrl: text('image_url'),
+  imageAlt: text('image_alt', { length: 300 }),
+  sortOrder: integer('sort_order').notNull().default(0),
+  status: text('status', { enum: statusEnum }).notNull().default('published'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
+}, (t) => [uniqueIndex('wellness_slug_idx').on(t.slug)]);
+
 export const newsPosts = sqliteTable('news_posts', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   slug: text('slug', { length: 160 }).notNull(),

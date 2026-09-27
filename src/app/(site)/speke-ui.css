@@ -481,6 +481,36 @@ a{color:var(--maroon);text-decoration:none}
 .social:hover{background:var(--gold);border-color:var(--gold);color:var(--maroon-deep);transform:translateY(-3px) scale(1.06)}
 
 /* ===========================================================
+   10e. WELLNESS
+   =========================================================== */
+.wellness-pick{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  margin:0 auto 28px;max-width:340px;
+}
+.wellness-pick .fl{
+  font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:var(--gold-pale);
+}
+.wellness-pick select{
+  width:100%;padding:11px 14px;cursor:pointer;
+  font-family:inherit;font-size:14px;color:var(--maroon-ink);
+  background:#fff;border:1px solid var(--line);border-radius:3px;
+  transition:border-color .25s var(--ease),box-shadow .25s var(--ease);
+}
+.wellness-pick select:hover{border-color:rgba(201,162,39,.55)}
+.wellness-pick select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.wellness-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.wellness-tags span{
+  font-size:10.5px;letter-spacing:.04em;color:var(--maroon);
+  background:rgba(111,32,51,.07);border-radius:20px;padding:4px 10px;
+}
+.wellness-where{font-size:11.5px;color:var(--muted)}
+.wellness-none{
+  text-align:center;font-size:13.5px;color:var(--body);margin:26px 0 0;
+}
+.wellness-none a{color:var(--maroon);text-decoration:underline}
+
+/* ===========================================================
    10d. PROPERTY CAROUSEL
    Three properties at a time on a desktop; the rest slide in.
    Native scroll-snap does the moving, so a touch swipe and the

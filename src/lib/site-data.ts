@@ -5,7 +5,7 @@ import { asc, desc, eq } from 'drizzle-orm';
 import { getDb } from '@/db';
 import {
   properties, venues, venueGroups, restaurants, experiences,
-  newsPosts, offers, milestones, highlightBlocks, settings,
+  newsPosts, offers, milestones, highlightBlocks, settings, wellness,
 } from '@/db/schema';
 import { getSession } from '@/lib/auth';
 import { allPending, reviveSnapshot } from '@/lib/versions';
@@ -113,6 +113,12 @@ export async function getExperiences() {
   const db = await getDb();
   const rows = await db.select().from(experiences).orderBy(asc(experiences.sortOrder));
   return visible('experiences', rows, () => true, bySort);
+}
+
+export async function getWellness() {
+  const db = await getDb();
+  const rows = await db.select().from(wellness).orderBy(asc(wellness.sortOrder));
+  return visible('wellness', rows, () => true, bySort);
 }
 
 export async function getNews() {

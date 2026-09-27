@@ -1,6 +1,6 @@
 import {
   properties, venues, restaurants, experiences, newsPosts,
-  offers, milestones, highlightBlocks, venueGroups,
+  offers, milestones, highlightBlocks, venueGroups, wellness,
 } from '@/db/schema';
 
 export type FieldType =
@@ -115,6 +115,37 @@ export const COLLECTIONS: CollectionConfig[] = [
       { name: 'imageUrl', label: 'Photo', type: 'image' },
       { name: 'imageAlt', label: 'Photo description', type: 'text' },
       SORT_FIELD, STATUS_FIELD,
+    ],
+  },
+  {
+    slug: 'wellness',
+    label: 'Spas, salons & gyms',
+    singular: 'Facility',
+    description: 'Wellness facilities, each attached to the property it sits in. The homepage lists them by location.',
+    table: wellness,
+    icon: 'sparkles',
+    defaultSort: 'sortOrder',
+    hasStatus: true,
+    propertyField: 'propertyId',
+    listFields: ['name', 'kind', 'propertyId', 'status'],
+    fields: [
+      { name: 'name', label: 'Name', type: 'text', required: true },
+      { name: 'slug', label: 'Slug', type: 'text', required: true },
+      { name: 'propertyId', label: 'Property', type: 'property', help: 'Which property this facility is in. The location filter on the homepage uses this.' },
+      { name: 'kind', label: 'Type', type: 'select', required: true, options: [
+        { value: 'spa', label: 'Spa' },
+        { value: 'salon', label: 'Salon' },
+        { value: 'gym', label: 'Gym' },
+        { value: 'pool', label: 'Swimming pool' },
+      ] },
+      { name: 'location', label: 'Where to find it', type: 'text', placeholder: 'Ground floor, next to the pool' },
+      { name: 'description', label: 'Description', type: 'textarea' },
+      { name: 'highlights', label: 'Highlights', type: 'text', help: 'Separated by a middle dot, e.g. Massage · Facials · Steam bath' },
+      { name: 'openingTimes', label: 'Opening times', type: 'text' },
+      { name: 'phone', label: 'Phone', type: 'text' },
+      { name: 'imageUrl', label: 'Photo', type: 'image' },
+      { name: 'imageAlt', label: 'Photo description', type: 'text' },
+      { name: 'sortOrder', label: 'Order', type: 'number' },
     ],
   },
   {

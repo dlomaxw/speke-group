@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getChrome, getHighlights, getOffers, setting } from '@/lib/site-data';
+import { getChrome, getOffers, getWellness, setting, splitHighlights } from '@/lib/site-data';
 import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
@@ -25,8 +25,8 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, pillars, offers] = await Promise.all([
-    getChrome(), getHighlights('pillars'), getOffers(),
+  const [chrome, offers, spas] = await Promise.all([
+    getChrome(), getOffers(), getWellness(),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
@@ -44,12 +44,29 @@ export default async function HomePage() {
           </div>
         </a>`).join('');
 
-  const pillarTiles = pillars.map((w) => `
-        <a class="tile" href="${safeUrl(w.linkUrl)}" data-reveal style="text-align:center">
-          <div class="serif" style="font-size:32px;color:#c9a227;margin-bottom:10px">${esc(w.icon)}</div>
-          <div class="serif" style="font-size:19px;font-weight:600;color:#3a2020;margin-bottom:8px">${esc(w.name)}</div>
-          <div style="font-size:12.8px;line-height:1.65;color:#5a4a3a">${esc(w.description)}</div>
-        </a>`).join('');
+  /* Wellness: the cards, plus the locations that actually have a facility, so
+     the selector only ever offers somewhere with something to show. */
+  const KIND_LABEL: Record<string, string> = { spa: 'Spa', salon: 'Salon', gym: 'Gym', pool: 'Swimming pool' };
+  const propertyName = (id: number | null) =>
+    allProperties.find((p) => p.id === id)?.name ?? 'Across the Group';
+  const wellnessPlaces = allProperties
+    .filter((p) => spas.some((w) => w.propertyId === p.id))
+    .map((p) => `<option value="p${p.id}">${esc(p.name)}</option>`).join('');
+  const wellnessCards = spas.map((w) => `
+        <div class="card wellness-card" data-reveal data-filter-item="wellness" data-tags="${w.propertyId ? `p${w.propertyId}` : 'group'}">
+          <div class="media" style="aspect-ratio:4/3">
+            <div class="badge">${esc(KIND_LABEL[w.kind] ?? w.kind)}</div>
+            ${slot(w.imageUrl, w.imageAlt || w.name, 'width:100%;height:100%')}
+          </div>
+          <div class="body">
+            <div class="eyebrow">${esc(propertyName(w.propertyId))}</div>
+            <div class="title">${esc(w.name)}</div>
+            <div class="desc">${esc(w.description)}</div>
+            ${w.highlights ? `<div class="wellness-tags">${splitHighlights(w.highlights)
+              .map((h) => `<span>${esc(h)}</span>`).join('')}</div>` : ''}
+            ${w.location ? `<div class="wellness-where">${esc(w.location)}</div>` : ''}
+          </div>
+        </div>`).join('');
 
   const tabs = OFFER_TABS.filter((t) => offers.some((o) => o.category === t.key));
   const offerPanels = tabs.map((t, i) => {
@@ -87,7 +104,7 @@ export default async function HomePage() {
       <p style="color:#f2e9db;font-size:16px;line-height:1.62;max-width:540px;margin:0 0 26px">${esc(setting(s, 'hero_body'))}</p>
       <div style="display:flex;gap:12px;pointer-events:auto">
         <a class="btn btn-solid" href="#our-group"><span>DISCOVER SPEKE GROUP</span></a>
-        <a class="btn btn-light" href="#portfolio"><span>VIEW OUR PORTFOLIO</span></a>
+        <a class="btn btn-light" href="#portfolio"><span>VIEW OUR COLLECTION</span></a>
       </div>
     </div>
     <button class="video-toggle" type="button" aria-label="Pause background video" aria-pressed="false">
@@ -132,7 +149,7 @@ export default async function HomePage() {
     <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px" data-reveal>
       <div>
         <div class="eyebrow-line">Find &amp; Book</div>
-        <h2 class="h-sec">Our Portfolio</h2>
+        <h2 class="h-sec">Our Collection</h2>
       </div>
       <div data-filter-group="portfolio" style="display:flex;gap:9px">
         <button class="chip active" data-filter="all">All</button>
@@ -144,7 +161,7 @@ export default async function HomePage() {
     </div>
 
     <div class="sg-carousel" data-carousel>
-      <div class="carousel-track" data-stagger="0.06" tabindex="0" role="group" aria-label="Our properties, scrollable">${portfolio}
+      <div class="carousel-track" data-stagger="0.06" tabindex="0" role="group" aria-label="Our collection, scrollable">${portfolio}
       </div>
       <button class="carousel-arrow prev" type="button" aria-label="Previous properties">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg>
@@ -156,15 +173,24 @@ export default async function HomePage() {
     <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
   </div>
 
-  <!-- ================= WHY STAY WITH US ================= -->
-  <div style="background:#efe6d6;padding:50px var(--gut)">
-    <div style="text-align:center;margin-bottom:32px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">Why Stay With Us</div>
-      <h2 class="h-sec">Where Simple Luxury &amp; Tranquility Meet</h2>
-      <p style="font-size:14px;color:#5a4a3a;max-width:620px;margin:12px auto 0;line-height:1.7">Start your day or cool off your busy week with our five-star leisure facilities.</p>
+  <!-- ================= WELLNESS ================= -->
+  <div id="wellness" style="background:#efe6d6;padding:50px var(--gut)">
+    <div style="text-align:center;margin-bottom:26px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">Wellness</div>
+      <h2 class="h-sec">${esc(setting(s, 'wellness_title', 'Spas & Salons Across Our Hotels and Apartments'))}</h2>
+      <p style="font-size:14px;color:#5a4a3a;max-width:660px;margin:12px auto 0;line-height:1.7">${esc(setting(s, 'wellness_body', 'Massages, facials and steam baths, hair and beauty salons, gyms and pools — choose a location to see what is on offer there.'))}</p>
     </div>
-    <div style="gap:20px" data-stagger="0.09" class="g-4">${pillarTiles}
+
+    <div class="wellness-pick" data-reveal>
+      <label class="fl" for="wellness-place">Choose a location</label>
+      <select id="wellness-place" data-filter-select="wellness">
+        <option value="all">All our locations</option>${wellnessPlaces}
+      </select>
     </div>
+
+    <div class="g-3" style="gap:22px" data-stagger="0.08" data-filter-empty="wellness">${wellnessCards}
+    </div>
+    <p class="wellness-none" data-filter-none="wellness" hidden>We have nothing listed here yet. <a href="/contact">Ask our team</a> and we will point you to the nearest spa or salon.</p>
   </div>
 
   <!-- ================= MEETINGS BANNER ================= -->
