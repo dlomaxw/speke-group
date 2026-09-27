@@ -1,18 +1,27 @@
 import type { Metadata } from 'next';
+import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
 import { getChrome, getHighlights, getVenueGroups, getVenues, setting } from '@/lib/site-data';
-import { esc, slot, header, footer, countUp, phones } from '@/lib/site-html';
+import { esc, slot, header, footer, countUp, phones, bookingBar, BOOKING_ANCHOR } from '@/lib/site-html';
 import { VENUE_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
   title: 'Events & Meeting Venues | Speke Group of Hotels',
 };
 
+/** Today and tomorrow in Kampala, for the booking bar's date fields. */
+function bookingDates() {
+  const today = kampalaToday();
+  const next = new Date(today + 'T00:00:00Z');
+  next.setUTCDate(next.getUTCDate() + 1);
+  return { today, tomorrow: next.toISOString().slice(0, 10) };
+}
+
 export default async function EventsPage() {
   const [chrome, venues, groups, occasions] = await Promise.all([
     getChrome(), getVenues(), getVenueGroups(), getHighlights('occasions'),
   ]);
-  const { settings: s, hotels, resorts, apartments } = chrome;
+  const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
   const email = setting(s, 'contact_email');
   const phoneLine = phones(s).map((p) => esc(p.replace(/[()]/g, ''))).join(' &nbsp;&middot;&nbsp; ');
 
@@ -47,7 +56,7 @@ export default async function EventsPage() {
         </div>`).join('');
 
   const html = `
-  ${header({ active: 'events', cta: { label: 'ENQUIRE NOW', href: '/contact' }, hotels, resorts, apartments })}
+  ${header({ active: 'events', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
   <!-- ================= HERO ================= -->
   <div class="hero-tile band" style="height:400px">
@@ -63,6 +72,8 @@ export default async function EventsPage() {
       </div>
     </div>
   </div>
+
+  ${bookingBar({ properties: allProperties, ...bookingDates(), phone: phones(s)[0] })}
 
   <!-- ================= STATS ================= -->
   <div class="row-stats" style="display:flex;align-items:center;justify-content:center;gap:56px;padding:38px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12)" data-reveal>

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
+import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
 import { getChrome, getHighlights, getOffers, setting } from '@/lib/site-data';
-import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref } from '@/lib/site-html';
+import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -15,17 +16,43 @@ const OFFER_TABS = [
   { key: 'spa', label: 'Spa', grid: 'g-3' },
 ];
 
+/** Today and tomorrow in Kampala, for the booking bar's date fields. */
+function bookingDates() {
+  const today = kampalaToday();
+  const next = new Date(today + 'T00:00:00Z');
+  next.setUTCDate(next.getUTCDate() + 1);
+  return { today, tomorrow: next.toISOString().slice(0, 10) };
+}
+
 export default async function HomePage() {
   const [chrome, pillars, offers] = await Promise.all([
     getChrome(), getHighlights('pillars'), getOffers(),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
+  const KINDS: { kind: string; label: string; blurb: string }[] = [
+    { kind: 'hotel', label: 'Hotels', blurb: 'City hotels in the heart of Kampala, a short drive from business and government.' },
+    { kind: 'resort', label: 'Resorts', blurb: 'Lakeside grounds, gardens and leisure on the shores of Lake Victoria.' },
+    { kind: 'convention', label: 'Convention Centre', blurb: 'Halls and meeting rooms for conferences, congresses and state occasions.' },
+    { kind: 'apartment', label: 'Serviced Apartments', blurb: 'Furnished one, two and three bedroom apartments for longer stays.' },
+  ];
+  const groupTiles = KINDS.map(({ kind, label, blurb }) => {
+    const count = allProperties.filter((p) => p.kind === kind).length;
+    if (!count) return '';
+    return `
+        <a class="group-tile" href="#portfolio" data-jump-filter="${esc(kind)}" data-reveal>
+          <div class="group-count">${count}</div>
+          <div class="group-name">${esc(label)}</div>
+          <p class="group-blurb">${esc(blurb)}</p>
+          <span class="link-arrow">SEE THEM <i>&rarr;</i></span>
+        </a>`;
+  }).join('');
+
   const portfolio = allProperties.map((p) => `
         <a class="card" href="${safeUrl(p.websiteUrl, `https://spekegroup.com/${esc(p.slug)}/`)}" data-reveal data-filter-item="portfolio" data-tags="${esc(p.kind)}">
-          <div class="media" style="height:168px">
+          <div class="media" style="height:218px">
             <div class="badge">${esc(p.categoryLabel)}</div>
-            ${slot(p.imageUrl || PROPERTY_IMAGES[p.slug], p.imageAlt || p.name, 'width:100%;height:168px')}
+            ${slot(p.imageUrl || PROPERTY_IMAGES[p.slug], p.imageAlt || p.name, 'width:100%;height:218px')}
           </div>
           <div class="body">
             <div class="eyebrow">${esc(p.categoryLabel)}</div>
@@ -60,7 +87,7 @@ export default async function HomePage() {
   }).join('');
 
   const html = `
-  ${header({ active: 'home', cta: { label: 'EXPLORE OUR PROPERTIES', href: '#portfolio' }, hotels, resorts, apartments })}
+  ${header({ active: 'home', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
   <!-- ================= HERO (video) ================= -->
   <div class="hero-video">
@@ -87,11 +114,24 @@ export default async function HomePage() {
     <a class="scroll-cue" href="#our-group" aria-label="Scroll to content"><span></span></a>
   </div>
 
+  ${bookingBar({ properties: allProperties, ...bookingDates(), phone: phones(s)[0] })}
+
   <!-- ================= WOVEN BAND ================= -->
   ${wovenBand()}
 
+  <!-- ================= OUR GROUP ================= -->
+  <div id="our-group" style="padding:48px var(--gut) 10px">
+    <div style="text-align:center;max-width:720px;margin:0 auto 30px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">Our Group</div>
+      <h2 class="h-sec">${esc(setting(s, 'group_title', 'Thirteen Places to Stay, Meet and Celebrate'))}</h2>
+      <p style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'group_body', 'Speke Group brings together city hotels, lakeside resorts, serviced apartments and a convention centre across Uganda — each with its own character, and the same attentive welcome.'))}</p>
+    </div>
+    <div class="g-4" style="gap:20px" data-stagger="0.08">${groupTiles}
+    </div>
+  </div>
+
   <!-- ================= OUR STORY + STATS ================= -->
-  <div id="our-group" class="row-split" style="display:flex;align-items:center;justify-content:space-between;padding:46px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12);gap:50px">
+  <div id="our-story" class="row-split" style="display:flex;align-items:center;justify-content:space-between;padding:46px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12);gap:50px">
     <div style="max-width:560px" data-reveal>
       <div class="eyebrow-line">Our Story</div>
       <h2 class="h-sec" style="margin-bottom:12px">${esc(setting(s, 'story_title', 'A Collection Built on Ugandan Hospitality'))}</h2>
@@ -125,8 +165,17 @@ export default async function HomePage() {
       </div>
     </div>
 
-    <div style="gap:22px" data-stagger="0.06" class="g-4">${portfolio}
+    <div class="sg-carousel" data-carousel>
+      <div class="carousel-track" data-stagger="0.06" tabindex="0" role="group" aria-label="Our properties, scrollable">${portfolio}
+      </div>
+      <button class="carousel-arrow prev" type="button" aria-label="Previous properties">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg>
+      </button>
+      <button class="carousel-arrow next" type="button" aria-label="More properties">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg>
+      </button>
     </div>
+    <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
   </div>
 
   <!-- ================= WHY STAY WITH US ================= -->

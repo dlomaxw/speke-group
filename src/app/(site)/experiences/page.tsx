@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
+import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
 import { getChrome, getDining, getExperiences, setting, splitHighlights } from '@/lib/site-data';
-import { esc, slot, header, footer, phones } from '@/lib/site-html';
+import { esc, slot, header, footer, phones, bookingBar, BOOKING_ANCHOR } from '@/lib/site-html';
 import { DINING_IMAGES, EXPERIENCE_ANCHORS, EXPERIENCE_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -10,11 +11,19 @@ export const metadata: Metadata = {
 
 const LABEL = 'color:#b8935a;font-weight:700;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase';
 
+/** Today and tomorrow in Kampala, for the booking bar's date fields. */
+function bookingDates() {
+  const today = kampalaToday();
+  const next = new Date(today + 'T00:00:00Z');
+  next.setUTCDate(next.getUTCDate() + 1);
+  return { today, tomorrow: next.toISOString().slice(0, 10) };
+}
+
 export default async function ExperiencesPage() {
   const [chrome, restaurants, bars, leisure] = await Promise.all([
     getChrome(), getDining('restaurant'), getDining('bar'), getExperiences(),
   ]);
-  const { settings: s, hotels, resorts, apartments } = chrome;
+  const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
   const email = setting(s, 'contact_email');
   const phoneLine = phones(s).map((p) => esc(p.replace(/[()]/g, ''))).join(' &nbsp;&middot;&nbsp; ');
 
@@ -61,7 +70,7 @@ export default async function ExperiencesPage() {
         </div>`).join('');
 
   const html = `
-  ${header({ active: 'experiences', cta: { label: 'MAKE A RESERVATION', href: '#reservations' }, hotels, resorts, apartments })}
+  ${header({ active: 'experiences', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
   <!-- ================= HERO ================= -->
   <div class="hero-tile band" style="height:400px">
@@ -77,6 +86,8 @@ export default async function ExperiencesPage() {
       </div>
     </div>
   </div>
+
+  ${bookingBar({ properties: allProperties, ...bookingDates(), phone: phones(s)[0] })}
 
   <!-- ================= THREE PILLARS ================= -->
   <div style="gap:22px;padding:var(--gut) var(--gut) 10px" data-stagger="0.08" class="g-3">

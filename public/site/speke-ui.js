@@ -103,6 +103,8 @@
     var ticking = false;
     function update() {
       header.classList.toggle('scrolled', window.scrollY > 28);
+      /* The booking bar docks against whatever height the header is now. */
+      document.documentElement.style.setProperty('--sg-header-now', header.offsetHeight + 'px');
       ticking = false;
     }
     window.addEventListener('scroll', function () {
@@ -173,6 +175,12 @@
               items[i].style.transitionDelay = '0s';
               items[i].classList.add('revealed');
             }
+          }
+          /* A carousel holding these items has to recount its pages. */
+          var wrap = items.length ? items[0].closest('[data-carousel]') : null;
+          if (wrap) {
+            wrap.querySelector('.carousel-track').scrollLeft = 0;
+            wrap.dispatchEvent(new CustomEvent('sg:filtered'));
           }
         });
       })(groups[g]);
@@ -355,6 +363,105 @@
     }
   }
 
+
+  /* ---------- 9b. Booking bar ---------------------------- */
+  /* The bar sits at the foot of the hero. Once it has scrolled under the
+     header it parks out of sight, and the header's BOOK NOW slides it back
+     down. The markup works without any of this; we only add the polish. */
+  function initBookingBar() {
+    var anchor = document.getElementById('sg-booking');
+    var header = document.querySelector('.sg-header');
+    if (!header) return;
+
+    /* The hero is sized against the header, so keep the measurement honest
+       through logo loading, font swaps and window resizes. */
+    function measure() {
+      /* Always the resting height: the header shrinks once you scroll, and its
+         padding is animated, so the transition comes off for the measurement. */
+      var shrunk = header.classList.contains('scrolled');
+      header.style.transition = 'none';
+      if (shrunk) header.classList.remove('scrolled');
+      var h = header.offsetHeight;
+      if (shrunk) header.classList.add('scrolled');
+      void header.offsetHeight;
+      header.style.transition = '';
+      document.documentElement.style.setProperty('--sg-header-h', h + 'px');
+    }
+    /* Measure once per page, not on every re-render. */
+    if (header.dataset.sgMeasured !== '1') {
+      header.dataset.sgMeasured = '1';
+      measure();
+      window.addEventListener('resize', measure);
+      window.addEventListener('load', measure);
+    }
+
+    if (!anchor || anchor.dataset.sgWired === '1') return;
+    anchor.dataset.sgWired = '1';
+    var bar = anchor.querySelector('.sg-bm');
+    var toggle = document.querySelector('.sg-bm-toggle');
+    var closeBtn = anchor.querySelector('.bm-close');
+    var body = document.body;
+
+    function setOpen(open) {
+      body.classList.toggle('sg-bm-open', open);
+      if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+
+    /* Docked = the bar's place in the page has gone up behind the header. */
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var docked = anchor.getBoundingClientRect().top < header.offsetHeight - 1;
+      if (docked === body.classList.contains('sg-bm-docked')) return;
+      body.classList.toggle('sg-bm-docked', docked);
+      if (!docked) setOpen(false);   /* back at the hero: the bar is in the page again */
+    }
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    }, { passive: true });
+    update();
+
+    if (toggle) {
+      toggle.addEventListener('click', function () {
+        if (!body.classList.contains('sg-bm-docked')) {
+          /* Still on the hero, where the bar is already visible. */
+          anchor.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' });
+          return;
+        }
+        setOpen(!body.classList.contains('sg-bm-open'));
+      });
+    }
+    if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && body.classList.contains('sg-bm-open')) setOpen(false);
+    });
+
+    /* Guests stepper. */
+    var guests = bar.querySelector('input[name="guests"]');
+    bar.addEventListener('click', function (e) {
+      var step = e.target.closest ? e.target.closest('.bm-step') : null;
+      if (!step || !guests) return;
+      var next = (parseInt(guests.value, 10) || 1) + parseInt(step.dataset.step, 10);
+      guests.value = Math.min(60, Math.max(1, next));
+    });
+
+    /* Departure always follows arrival. */
+    var arrival = bar.querySelector('input[name="arrival"]');
+    var departure = bar.querySelector('input[name="departure"]');
+    if (arrival && departure) {
+      arrival.addEventListener('change', function () {
+        if (!arrival.value) return;
+        var next = new Date(arrival.value + 'T00:00:00');
+        next.setDate(next.getDate() + 1);
+        var min = next.toISOString().slice(0, 10);
+        departure.min = min;
+        if (!departure.value || departure.value < min) departure.value = min;
+      });
+    }
+  }
+
   /* ---------- 10. Woven band ----------------------------- */
   /* The motifs draw themselves the first time the band scrolls into
      view; the panning and sheen are pure CSS and run on their own. */
@@ -509,6 +616,107 @@
     });
   }
 
+
+  /* ---------- 9c. Property carousel ---------------------- */
+  /* Scroll-snap does the sliding; this adds the arrows, the dots and the
+     end-of-track states. Filtering hides cards, so everything is measured
+     from the cards that are actually on screen. */
+  function initCarousel() {
+    var wraps = document.querySelectorAll('[data-carousel]');
+    Array.prototype.forEach.call(wraps, function (wrap) {
+      if (wrap.dataset.sgWired === '1') return;
+      wrap.dataset.sgWired = '1';
+      var track = wrap.querySelector('.carousel-track');
+      var prev = wrap.querySelector('.carousel-arrow.prev');
+      var next = wrap.querySelector('.carousel-arrow.next');
+      var dots = wrap.parentNode.querySelector('[data-carousel-dots]');
+      if (!track) return;
+
+      function cards() {
+        return Array.prototype.filter.call(track.children, function (c) {
+          return c.offsetParent !== null;
+        });
+      }
+      function step() {
+        var list = cards();
+        if (!list.length) return track.clientWidth;
+        var w = list[0].getBoundingClientRect().width;
+        var gap = parseFloat(getComputedStyle(track).columnGap || '22') || 22;
+        var perView = Math.max(1, Math.round(track.clientWidth / (w + gap)));
+        return (w + gap) * perView;
+      }
+      function pages() {
+        var list = cards();
+        if (!list.length) return 1;
+        var w = list[0].getBoundingClientRect().width;
+        var gap = parseFloat(getComputedStyle(track).columnGap || '22') || 22;
+        var perView = Math.max(1, Math.round(track.clientWidth / (w + gap)));
+        return Math.max(1, Math.ceil(list.length / perView));
+      }
+      function current() {
+        var s = step();
+        return s ? Math.round(track.scrollLeft / s) : 0;
+      }
+
+      function paint() {
+        var max = track.scrollWidth - track.clientWidth - 2;
+        if (prev) prev.disabled = track.scrollLeft <= 2;
+        if (next) next.disabled = track.scrollLeft >= max;
+        if (!dots) return;
+        var total = pages();
+        if (dots.children.length !== total) {
+          dots.innerHTML = '';
+          for (var i = 0; i < total; i++) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.dataset.page = String(i);
+            b.setAttribute('aria-label', 'Properties, page ' + (i + 1));
+            dots.appendChild(b);
+          }
+          dots.removeAttribute('aria-hidden');
+        }
+        var at = current();
+        Array.prototype.forEach.call(dots.children, function (b, i) {
+          b.classList.toggle('active', i === at);
+        });
+      }
+
+      if (prev) prev.addEventListener('click', function () { track.scrollLeft -= step(); });
+      if (next) next.addEventListener('click', function () { track.scrollLeft += step(); });
+      if (dots) dots.addEventListener('click', function (e) {
+        var b = e.target.closest ? e.target.closest('button') : null;
+        if (b) track.scrollLeft = step() * Number(b.dataset.page);
+      });
+
+      var queued = false;
+      track.addEventListener('scroll', function () {
+        if (queued) return;
+        queued = true;
+        window.requestAnimationFrame(function () { queued = false; paint(); });
+      }, { passive: true });
+      window.addEventListener('resize', paint);
+      /* The filter chips show and hide cards, which changes the page count. */
+      wrap.addEventListener('sg:filtered', paint);
+      paint();
+      window.setTimeout(paint, 400);
+    });
+  }
+
+
+  /* ---------- 9d. Group tiles -> portfolio filter -------- */
+  function initGroupJump() {
+    var tiles = document.querySelectorAll('[data-jump-filter]');
+    Array.prototype.forEach.call(tiles, function (tile) {
+      if (tile.dataset.sgWired === '1') return;
+      tile.dataset.sgWired = '1';
+      tile.addEventListener('click', function () {
+        var want = tile.getAttribute('data-jump-filter');
+        var chip = document.querySelector('[data-filter-group="portfolio"] [data-filter="' + want + '"]');
+        if (chip) chip.click();   /* the link still carries us to #portfolio */
+      });
+    });
+  }
+
   /* ---------- boot --------------------------------------- */
   function boot() {
     buildLoader();
@@ -521,6 +729,9 @@
     initExternalLinks();
     initMobileNav();
     initHeroVideo();
+    initBookingBar();
+    initCarousel();
+    initGroupJump();
     initWovenBand();
     initEnquiryForm();
     initCardReveal();
@@ -540,6 +751,9 @@
       initExternalLinks();
       initMobileNav();
       initHeroVideo();
+      initBookingBar();
+      initCarousel();
+      initGroupJump();
       initWovenBand();
     }
     if ('MutationObserver' in window) {

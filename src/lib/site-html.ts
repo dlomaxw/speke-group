@@ -42,6 +42,9 @@ export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 
 type Active = 'home' | 'about' | 'events' | 'experiences' | 'news' | 'contact';
 
+/** Pages that carry the booking bar pass this as their header link. */
+export const BOOKING_ANCHOR = '#sg-booking';
+
 export function header(opts: {
   active: Active;
   cta: { label: string; href: string };
@@ -98,8 +101,83 @@ export function header(opts: {
       <div class="item"><a href="/news"${cls('news')}>News</a></div>
       <div class="item"><a href="/contact"${cls('contact')}>Contact</a></div>
     </nav>
-    <a class="btn btn-ghost" href="${safeUrl(cta.href)}"><span>${esc(cta.label)}</span></a>
+    ${cta.href === BOOKING_ANCHOR
+      ? `<button class="btn btn-solid sg-bm-toggle" type="button" aria-expanded="false" aria-controls="sg-booking"><span>${esc(cta.label)}</span></button>`
+      : `<a class="btn btn-ghost" href="${safeUrl(cta.href)}"><span>${esc(cta.label)}</span></a>`}
   </header>`;
+}
+
+/* ------------------------------------------------------------------
+   Booking bar
+   ------------------------------------------------------------------ */
+
+type BookingProperty = { id: number; name: string; kind: string };
+
+const PIN_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>';
+const DATE_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v2H5.5A2.5 2.5 0 0 0 3 6.5v13A2.5 2.5 0 0 0 5.5 22h13a2.5 2.5 0 0 0 2.5-2.5v-13A2.5 2.5 0 0 0 18.5 4H17V2h-2v2H9V2H7Zm12 7.5v10a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-10h14Z"/></svg>';
+const GUEST_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm0 2c-4.42 0-8 2.24-8 5v1.5h16V19c0-2.76-3.58-5-8-5Z"/></svg>';
+
+/**
+ * The booking bar that sits at the foot of the hero. It is a plain GET form to
+ * the enquiry page, so it works with JavaScript switched off; speke-ui.js adds
+ * the stepper, the date guard and the docking behaviour on top.
+ */
+export function bookingBar(opts: {
+  properties: BookingProperty[];
+  today: string;
+  tomorrow: string;
+  phone?: string;
+  selected?: number;
+}): string {
+  const { properties, today, tomorrow, phone, selected } = opts;
+  const group = (label: string, kind: string) => {
+    const rows = properties.filter((p) => p.kind === kind);
+    if (!rows.length) return '';
+    return `
+            <optgroup label="${esc(label)}">${rows.map((p) =>
+              `<option value="${p.id}"${p.id === selected ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</optgroup>`;
+  };
+
+  return `
+  <div class="sg-bm-anchor" id="sg-booking">
+    <form class="sg-bm" action="/contact" method="get" data-sg-bm>
+      <input type="hidden" name="type" value="stay">
+      <div class="bm-fields">
+        <label class="bm-field bm-where">
+          <span class="bm-label">Where would you like to stay?</span>
+          <span class="bm-value">${PIN_ICON}<select name="property">
+            <option value="">Any of our properties</option>${group('Hotels', 'hotel')}${group('Resorts', 'resort')}${group('Convention', 'convention')}${group('Apartments', 'apartment')}
+          </select></span>
+        </label>
+        <label class="bm-field">
+          <span class="bm-label">Arrival</span>
+          <span class="bm-value">${DATE_ICON}<input type="date" name="arrival" value="${esc(today)}" min="${esc(today)}"></span>
+        </label>
+        <label class="bm-field">
+          <span class="bm-label">Departure</span>
+          <span class="bm-value">${DATE_ICON}<input type="date" name="departure" value="${esc(tomorrow)}" min="${esc(tomorrow)}"></span>
+        </label>
+        <div class="bm-field bm-guests">
+          <span class="bm-label">Guests</span>
+          <span class="bm-value">${GUEST_ICON}
+            <button class="bm-step" type="button" data-step="-1" aria-label="One guest fewer">&#8722;</button>
+            <input type="number" name="guests" value="2" min="1" max="60" step="1" inputmode="numeric" aria-label="Number of guests">
+            <button class="bm-step" type="button" data-step="1" aria-label="One more guest">&#43;</button>
+          </span>
+        </div>
+      </div>
+      <div class="bm-go">
+        <button class="btn btn-solid bm-submit" type="submit"><span>CHECK AVAILABILITY</span></button>
+        ${phone ? `<a class="bm-alt" href="${telHref(phone)}">or call ${esc(phone)}</a>` : ''}
+      </div>
+      <button class="bm-close" type="button" aria-label="Close the booking bar">
+        <svg viewBox="0 0 15 15" aria-hidden="true"><line x1="1" y1="13" x2="13" y2="1"/><line x1="1" y1="1" x2="13" y2="13"/></svg>
+      </button>
+    </form>
+  </div>`;
 }
 
 /* ------------------------------------------------------------------

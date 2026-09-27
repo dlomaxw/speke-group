@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
+import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
 import { getChrome, getMilestones, setting } from '@/lib/site-data';
-import { esc, slot, header, footer, countUp, paragraphs } from '@/lib/site-html';
+import { esc, slot, header, footer, countUp, paragraphs, bookingBar, BOOKING_ANCHOR, phones } from '@/lib/site-html';
 import { ABOUT_DEFAULTS } from '@/lib/about-content';
 
 export const metadata: Metadata = {
@@ -12,8 +13,16 @@ export const metadata: Metadata = {
 const BODY = 'font-size:14.5px;line-height:1.78;color:#5a4a3a;margin:0 0 14px';
 const LIGHT = 'font-size:14.5px;line-height:1.8;color:#e9dccb;margin:0 0 14px';
 
+/** Today and tomorrow in Kampala, for the booking bar's date fields. */
+function bookingDates() {
+  const today = kampalaToday();
+  const next = new Date(today + 'T00:00:00Z');
+  next.setUTCDate(next.getUTCDate() + 1);
+  return { today, tomorrow: next.toISOString().slice(0, 10) };
+}
+
 export default async function AboutPage() {
-  const [{ settings: s, hotels, resorts, apartments }, milestones] = await Promise.all([getChrome(), getMilestones()]);
+  const [{ settings: s, hotels, resorts, apartments, allProperties }, milestones] = await Promise.all([getChrome(), getMilestones()]);
   const get = (key: string) => setting(s, key, ABOUT_DEFAULTS[key] ?? '');
 
   const timeline = milestones.map((m) => `
@@ -24,7 +33,7 @@ export default async function AboutPage() {
         </div>`).join('');
 
   const html = `
-  ${header({ active: 'about', cta: { label: 'EXPLORE OUR PROPERTIES', href: '/#portfolio' }, hotels, resorts, apartments })}
+  ${header({ active: 'about', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
   <!-- ================= HERO ================= -->
   <div class="hero-tile band" style="height:420px">
@@ -40,6 +49,8 @@ export default async function AboutPage() {
       </div>
     </div>
   </div>
+
+  ${bookingBar({ properties: allProperties, ...bookingDates(), phone: phones(s)[0] })}
 
   <!-- ================= STATS ================= -->
   <div class="row-stats" style="display:flex;align-items:center;justify-content:center;gap:56px;padding:38px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12)" data-reveal>

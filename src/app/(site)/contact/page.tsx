@@ -11,12 +11,19 @@ export const metadata: Metadata = {
 
 export default async function ContactPage({
   searchParams,
-}: { searchParams: Promise<{ sent?: string; error?: string; property?: string; type?: string }> }) {
+}: { searchParams: Promise<{ sent?: string; error?: string; property?: string; type?: string;
+                            arrival?: string; departure?: string; guests?: string }> }) {
   const { settings: s, hotels, resorts, apartments, allProperties } = await getChrome();
   const query = await searchParams;
   const today = kampalaToday();
   const preselect = Number(query.property);
   const preType = ENQUIRY_TYPES.some((t) => t.value === query.type) ? query.type : 'stay';
+
+  // The booking bar hands us its dates and party size; keep only sane values.
+  const preDate = (v: string | undefined) => (v && /^\d{4}-\d{2}-\d{2}$/.test(v) && v >= today ? v : '');
+  const preArrival = preDate(query.arrival);
+  const preDeparture = preDate(query.departure);
+  const preGuests = Number(query.guests) >= 1 && Number(query.guests) <= 2000 ? String(Number(query.guests)) : '';
 
   // Shown when the form was posted without JavaScript and came back here.
   const status = query.sent
@@ -131,15 +138,15 @@ export default async function ContactPage({
         <div class="row3">
           <div>
             <label class="fl" for="f-arrival">Arrival <span class="opt">optional</span></label>
-            <input id="f-arrival" type="date" name="arrivalDate" min="${today}">
+            <input id="f-arrival" type="date" name="arrivalDate" min="${today}" value="${esc(preArrival)}">
           </div>
           <div>
             <label class="fl" for="f-departure">Departure <span class="opt">optional</span></label>
-            <input id="f-departure" type="date" name="departureDate" min="${today}">
+            <input id="f-departure" type="date" name="departureDate" min="${today}" value="${esc(preDeparture)}">
           </div>
           <div>
             <label class="fl" for="f-guests">Guests <span class="opt">optional</span></label>
-            <input id="f-guests" type="number" name="guests" min="1" max="2000" inputmode="numeric">
+            <input id="f-guests" type="number" name="guests" min="1" max="2000" inputmode="numeric" value="${esc(preGuests)}">
           </div>
         </div>
         <div>
