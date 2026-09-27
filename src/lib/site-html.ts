@@ -189,9 +189,7 @@ export function phones(s: SettingsMap): string[] {
     .filter(Boolean);
 }
 
-export function footer(s: SettingsMap, hotels: NavProperty[], resorts: NavProperty[], apartments: NavProperty[]): string {
-  const col = (list: NavProperty[]) =>
-    list.map((p) => `\n          <a href="${safeUrl(p.url)}">${esc(p.name)}</a>`).join('');
+export function footer(s: SettingsMap): string {
   const email = setting(s, 'contact_email');
   const facebook = setting(s, 'social_facebook');
   const twitter = setting(s, 'social_twitter');
@@ -215,16 +213,6 @@ export function footer(s: SettingsMap, hotels: NavProperty[], resorts: NavProper
         <div style="font-size:12.5px;line-height:2;color:#dcc0a8;display:flex;flex-direction:column">${phones(s)
           .map((p) => `\n          <a href="${esc(telHref(p))}">${esc(p)}</a>`).join('')}${email ? `
           <a href="mailto:${esc(email)}">${esc(email)}</a>` : ''}
-        </div>
-      </div>
-      <div>
-        <div class="col-title">Hotels &amp; Resorts</div>
-        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">${col(hotels)}${col(resorts)}
-        </div>
-      </div>
-      <div>
-        <div class="col-title">Apartments</div>
-        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">${col(apartments)}
         </div>
       </div>
       <div>

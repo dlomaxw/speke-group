@@ -30,24 +30,6 @@ export default async function HomePage() {
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
-  const KINDS: { kind: string; label: string; blurb: string }[] = [
-    { kind: 'hotel', label: 'Hotels', blurb: 'City hotels in the heart of Kampala, a short drive from business and government.' },
-    { kind: 'resort', label: 'Resorts', blurb: 'Lakeside grounds, gardens and leisure on the shores of Lake Victoria.' },
-    { kind: 'convention', label: 'Convention Centre', blurb: 'Halls and meeting rooms for conferences, congresses and state occasions.' },
-    { kind: 'apartment', label: 'Serviced Apartments', blurb: 'Furnished one, two and three bedroom apartments for longer stays.' },
-  ];
-  const groupTiles = KINDS.map(({ kind, label, blurb }) => {
-    const count = allProperties.filter((p) => p.kind === kind).length;
-    if (!count) return '';
-    return `
-        <a class="group-tile" href="#portfolio" data-jump-filter="${esc(kind)}" data-reveal>
-          <div class="group-count">${count}</div>
-          <div class="group-name">${esc(label)}</div>
-          <p class="group-blurb">${esc(blurb)}</p>
-          <span class="link-arrow">SEE THEM <i>&rarr;</i></span>
-        </a>`;
-  }).join('');
-
   const portfolio = allProperties.map((p) => `
         <a class="card" href="${safeUrl(p.websiteUrl, `https://spekegroup.com/${esc(p.slug)}/`)}" data-reveal data-filter-item="portfolio" data-tags="${esc(p.kind)}">
           <div class="media" style="height:218px">
@@ -120,14 +102,10 @@ export default async function HomePage() {
   ${wovenBand()}
 
   <!-- ================= OUR GROUP ================= -->
-  <div id="our-group" style="padding:48px var(--gut) 10px">
-    <div style="text-align:center;max-width:720px;margin:0 auto 30px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">Our Group</div>
-      <h2 class="h-sec">${esc(setting(s, 'group_title', 'Thirteen Places to Stay, Meet and Celebrate'))}</h2>
-      <p style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'group_body', 'Speke Group brings together city hotels, lakeside resorts, serviced apartments and a convention centre across Uganda — each with its own character, and the same attentive welcome.'))}</p>
-    </div>
-    <div class="g-4" style="gap:20px" data-stagger="0.08">${groupTiles}
-    </div>
+  <div id="our-group" style="padding:54px var(--gut) 44px;text-align:center" data-reveal>
+    <div class="eyebrow-line" style="justify-content:center">Our Group</div>
+    <h2 class="h-sec" style="max-width:820px;margin:0 auto">${esc(setting(s, 'group_title', 'Thirteen Places to Stay, Meet and Celebrate'))}</h2>
+    <p style="font-size:15px;color:#5a4a3a;line-height:1.8;max-width:760px;margin:16px auto 0">${esc(setting(s, 'group_body', 'Speke Group brings together city hotels, lakeside resorts, serviced apartments and a convention centre across Uganda — each with its own character, and the same attentive welcome.'))}</p>
   </div>
 
   <!-- ================= OUR STORY + STATS ================= -->
@@ -233,7 +211,7 @@ ${offerPanels}
     </div>
   </div>
 
-  ${footer(s, hotels, resorts, apartments)}
+  ${footer(s)}
 `;
 
   return <Html html={html} />;

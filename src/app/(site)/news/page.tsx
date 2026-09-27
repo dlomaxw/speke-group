@@ -104,7 +104,7 @@ ${featuredHtml}
     <a class="btn btn-light" href="/contact"><span>CONTACT OUR TEAM</span></a>
   </div>
 
-  ${footer(s, hotels, resorts, apartments)}
+  ${footer(s)}
 `;
 
   return <Html html={html} />;

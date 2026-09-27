@@ -138,7 +138,7 @@ export default async function AboutPage() {
     </div>
   </div>
 
-  ${footer(s, hotels, resorts, apartments)}
+  ${footer(s)}
 `;
 
   return <Html html={html} />;

@@ -175,7 +175,7 @@ export default async function ExperiencesPage() {
     <a class="btn btn-light" href="/contact"><span>BOOK WITH US TODAY</span></a>
   </div>
 
-  ${footer(s, hotels, resorts, apartments)}
+  ${footer(s)}
 `;
 
   return <Html html={html} />;

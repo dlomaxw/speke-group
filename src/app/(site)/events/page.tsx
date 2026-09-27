@@ -145,7 +145,7 @@ export default async function EventsPage() {
     </div>
   </div>
 
-  ${footer(s, hotels, resorts, apartments)}
+  ${footer(s)}
 `;
 
   return <Html html={html} />;

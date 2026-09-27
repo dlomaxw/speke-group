@@ -481,36 +481,6 @@ a{color:var(--maroon);text-decoration:none}
 .social:hover{background:var(--gold);border-color:var(--gold);color:var(--maroon-deep);transform:translateY(-3px) scale(1.06)}
 
 /* ===========================================================
-   10e. OUR GROUP HIGHLIGHT
-   The four kinds of stay, counted from the properties themselves.
-   =========================================================== */
-.group-tile{
-  display:flex;flex-direction:column;
-  padding:24px 22px 20px;border-radius:3px;
-  background:#fff;border:1px solid var(--line);
-  transition:transform .4s var(--ease-out),box-shadow .4s var(--ease),border-color .4s var(--ease);
-}
-.group-tile:hover{
-  transform:translateY(-4px);
-  border-color:rgba(201,162,39,.45);
-  box-shadow:0 18px 38px rgba(58,32,32,.12);
-}
-.group-count{
-  font-family:'Playfair Display',Georgia,serif;font-size:36px;font-weight:700;line-height:1;
-  color:var(--gold);margin-bottom:8px;
-}
-.group-name{
-  font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:600;
-  color:var(--maroon-ink);margin-bottom:8px;
-}
-.group-blurb{font-size:12.8px;line-height:1.7;color:var(--body);margin:0 0 14px;flex:1}
-
-@media (max-width:900px){
-  .group-tile{padding:20px 18px 16px}
-  .group-count{font-size:30px}
-}
-
-/* ===========================================================
    10d. PROPERTY CAROUSEL
    Three properties at a time on a desktop; the rest slide in.
    Native scroll-snap does the moving, so a touch swipe and the
@@ -761,7 +731,7 @@ img,video{max-width:100%}
 .g-split-a{grid-template-columns:1.1fr 1fr}
 .g-split-b{grid-template-columns:1.15fr 1fr}
 .g-split-c{grid-template-columns:.88fr 1.12fr}
-.g-footer {grid-template-columns:1.25fr 1fr 1fr .85fr .75fr .9fr}
+.g-footer {grid-template-columns:1.3fr 1.1fr .9fr .6fr}
 
 /* ===========================================================
    12. RESPONSIVE — desktop, tablet, phone
@@ -772,7 +742,7 @@ img,video{max-width:100%}
   :root{--gut:32px}
   .sg-nav{gap:20px;font-size:13.5px}
   .g-5,.g-4{grid-template-columns:repeat(3,1fr)}
-  .g-footer{grid-template-columns:repeat(3,1fr);row-gap:34px}
+  .g-footer{grid-template-columns:repeat(2,1fr);row-gap:34px}
 }
 
 /* ---------- tablet landscape ------------------------------ */

@@ -194,7 +194,7 @@ export default async function ContactPage({
     </div>
   </div>
 
-  ${footer(s, hotels, resorts, apartments)}
+  ${footer(s)}
 `;
 
   return <Html html={html} />;

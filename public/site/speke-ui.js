@@ -703,20 +703,6 @@
   }
 
 
-  /* ---------- 9d. Group tiles -> portfolio filter -------- */
-  function initGroupJump() {
-    var tiles = document.querySelectorAll('[data-jump-filter]');
-    Array.prototype.forEach.call(tiles, function (tile) {
-      if (tile.dataset.sgWired === '1') return;
-      tile.dataset.sgWired = '1';
-      tile.addEventListener('click', function () {
-        var want = tile.getAttribute('data-jump-filter');
-        var chip = document.querySelector('[data-filter-group="portfolio"] [data-filter="' + want + '"]');
-        if (chip) chip.click();   /* the link still carries us to #portfolio */
-      });
-    });
-  }
-
   /* ---------- boot --------------------------------------- */
   function boot() {
     buildLoader();
@@ -731,7 +717,6 @@
     initHeroVideo();
     initBookingBar();
     initCarousel();
-    initGroupJump();
     initWovenBand();
     initEnquiryForm();
     initCardReveal();
@@ -753,8 +738,7 @@
       initHeroVideo();
       initBookingBar();
       initCarousel();
-      initGroupJump();
-      initWovenBand();
+        initWovenBand();
     }
     if ('MutationObserver' in window) {
       new MutationObserver(function () {
