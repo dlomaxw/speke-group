@@ -466,6 +466,32 @@
       if (e.key === 'Escape' && body.classList.contains('sg-bm-open')) setOpen(false);
     });
 
+    /* Each property books through its own engine. When one is chosen, that is
+       where CHECK AVAILABILITY goes, carrying the dates and party size where
+       the engine understands them. Without a property, or for the few booked
+       through our own team, the form posts to the enquiry page as it stands. */
+    var place = bar.querySelector('select[name="property"]');
+    bar.addEventListener('submit', function (e) {
+      if (!place) return;
+      var option = place.options[place.selectedIndex];
+      var booking = option && option.getAttribute('data-booking');
+      if (!booking) return;                       /* let the form reach /contact */
+      e.preventDefault();
+
+      var arrive = bar.querySelector('input[name="arrival"]');
+      var depart = bar.querySelector('input[name="departure"]');
+      var url = booking;
+      /* Only the dates travel: these engines read them, and ignore a party
+         size passed this way, so the guest picks that on their own page. */
+      if (/staah\.com|swiftbook\.io/.test(booking)) {
+        var q = [];
+        if (arrive && arrive.value) q.push('checkIn=' + encodeURIComponent(arrive.value));
+        if (depart && depart.value) q.push('checkOut=' + encodeURIComponent(depart.value));
+        if (q.length) url += (booking.indexOf('?') === -1 ? '?' : '&') + q.join('&');
+      }
+      window.location.href = url;
+    });
+
     /* Guests stepper. */
     var guests = bar.querySelector('input[name="guests"]');
     bar.addEventListener('click', function (e) {

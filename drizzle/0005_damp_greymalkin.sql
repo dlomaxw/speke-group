@@ -1,0 +1,1 @@
+ALTER TABLE `properties` ADD `booking_url` text;

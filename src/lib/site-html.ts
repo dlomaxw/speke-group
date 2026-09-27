@@ -111,7 +111,7 @@ export function header(opts: {
    Booking bar
    ------------------------------------------------------------------ */
 
-type BookingProperty = { id: number; name: string; kind: string };
+type BookingProperty = { id: number; name: string; kind: string; bookingUrl?: string | null };
 
 const PIN_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>';
@@ -138,7 +138,8 @@ export function bookingBar(opts: {
     if (!rows.length) return '';
     return `
             <optgroup label="${esc(label)}">${rows.map((p) =>
-              `<option value="${p.id}"${p.id === selected ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</optgroup>`;
+              `<option value="${p.id}"${p.bookingUrl ? ` data-booking="${safeUrl(p.bookingUrl, '')}"` : ''}${
+                p.id === selected ? ' selected' : ''}>${esc(p.name)}</option>`).join('')}</optgroup>`;
   };
 
   return `

@@ -126,6 +126,8 @@ export const properties = sqliteTable('properties', {
   description: text('description'),
   /** The property's own website, e.g. spekehotel.com. */
   websiteUrl: text('website_url'),
+  /** The property's own booking engine. The booking bar sends guests here. */
+  bookingUrl: text('booking_url'),
   area: text('area', { length: 160 }),
   imageUrl: text('image_url'),
   imageAlt: text('image_alt', { length: 300 }),

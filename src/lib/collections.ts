@@ -82,6 +82,7 @@ export const COLLECTIONS: CollectionConfig[] = [
       { name: 'description', label: 'Description', type: 'textarea' },
       { name: 'area', label: 'Area', type: 'text', placeholder: 'Bukoto, Kampala' },
       { name: 'websiteUrl', label: "Property's own website", type: 'url', placeholder: 'https://…' },
+      { name: 'bookingUrl', label: "Property's booking engine", type: 'url', placeholder: 'https://…', help: 'Where CHECK AVAILABILITY sends a guest who picks this property. Leave empty to send them to the enquiry form instead.' },
       { name: 'imageUrl', label: 'Photo', type: 'image' },
       { name: 'imageAlt', label: 'Photo description', type: 'text', help: 'Describes the photo for screen readers and search engines.' },
       SORT_FIELD, STATUS_FIELD,
