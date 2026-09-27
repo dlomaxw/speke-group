@@ -499,15 +499,18 @@ a{color:var(--maroon);text-decoration:none}
   flex:0 0 calc((100% - 44px) / 3);
   scroll-snap-align:start;
 }
+.carousel-track .card .body{padding:20px 22px 24px}
+.carousel-track .card .title{font-size:20px}
+.carousel-track .card .desc{font-size:13.5px;line-height:1.72}
 .carousel-arrow{
-  position:absolute;top:110px;z-index:3;
-  width:42px;height:42px;border-radius:50%;cursor:pointer;
+  position:absolute;top:50%;margin-top:-23px;z-index:3;
+  width:46px;height:46px;border-radius:50%;cursor:pointer;
   background:rgba(255,255,255,.94);border:1px solid var(--line);
   box-shadow:0 8px 24px rgba(58,32,32,.16);
   display:flex;align-items:center;justify-content:center;
   transition:background .25s var(--ease),transform .25s var(--ease-out),opacity .25s var(--ease);
 }
-.carousel-arrow svg{width:17px;height:17px;fill:none;stroke:var(--maroon);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.carousel-arrow svg{width:18px;height:18px;fill:none;stroke:var(--maroon);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .carousel-arrow:hover{background:var(--maroon);transform:scale(1.06)}
 .carousel-arrow:hover svg{stroke:#fff}
 .carousel-arrow[disabled]{opacity:0;pointer-events:none}

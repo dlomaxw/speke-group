@@ -32,9 +32,9 @@ export default async function HomePage() {
 
   const portfolio = allProperties.map((p) => `
         <a class="card" href="${safeUrl(p.websiteUrl, `https://spekegroup.com/${esc(p.slug)}/`)}" data-reveal data-filter-item="portfolio" data-tags="${esc(p.kind)}">
-          <div class="media" style="height:218px">
+          <div class="media" style="aspect-ratio:1/1">
             <div class="badge">${esc(p.categoryLabel)}</div>
-            ${slot(p.imageUrl || PROPERTY_IMAGES[p.slug], p.imageAlt || p.name, 'width:100%;height:218px')}
+            ${slot(p.imageUrl || PROPERTY_IMAGES[p.slug], p.imageAlt || p.name, 'width:100%;height:100%')}
           </div>
           <div class="body">
             <div class="eyebrow">${esc(p.categoryLabel)}</div>
