@@ -25,8 +25,13 @@ export default async function EventsPage() {
   const email = setting(s, 'contact_email');
   const phoneLine = phones(s).map((p) => esc(p.replace(/[()]/g, ''))).join(' &nbsp;&middot;&nbsp; ');
 
+  /* Only offer locations that have a venue to show. */
+  const venuePlaces = allProperties
+    .filter((p) => venues.some((v) => v.propertyId === p.id))
+    .map((p) => `<option value="p${p.id}">${esc(p.name)}</option>`).join('');
+
   const venueCards = venues.map((v) => `
-        <div class="card" data-reveal data-filter-item="venues" data-tags="${esc(v.sizeTag)}">
+        <div class="card" data-reveal data-filter-item="venues" data-tags="${esc(v.sizeTag)} ${v.propertyId ? `p${v.propertyId}` : 'group'}">
           <div class="media" style="height:178px">
             <div class="badge">${esc(v.location)}</div>
             ${slot(v.imageUrl || VENUE_IMAGES[v.slug], v.imageAlt || v.name, 'width:100%;height:178px')}
@@ -94,17 +99,26 @@ export default async function EventsPage() {
         <h2 class="h-sec">Meeting Venues</h2>
         <p style="font-size:13.5px;color:#5a4a3a;margin:10px 0 0;max-width:560px;line-height:1.65">Each of our venues is unique in its own way and can be set up to suit your particular needs and requirements.</p>
       </div>
-      <div data-filter-group="venues" style="display:flex;gap:9px;flex-wrap:wrap;max-width:560px;justify-content:flex-end">
+      <div class="venue-filters">
+        <div class="venue-place">
+          <label class="fl" for="venue-place">Location</label>
+          <select id="venue-place" data-filter-select="venues">
+            <option value="all">All our locations</option>${venuePlaces}
+          </select>
+        </div>
+        <div data-filter-group="venues" style="display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end">
         <button class="chip active" data-filter="all">All Venues</button>
         <button class="chip" data-filter="s10">10 &ndash; 35 Guests</button>
         <button class="chip" data-filter="s50">50 &ndash; 100 Guests</button>
         <button class="chip" data-filter="s120">120 &ndash; 400 Guests</button>
         <button class="chip" data-filter="s1000">1000 &ndash; 1400 Guests</button>
+        </div>
       </div>
     </div>
 
     <div style="gap:22px" data-stagger="0.06" class="g-3">${venueCards}
     </div>
+    <p class="wellness-none" data-filter-none="venues" hidden>No venue at that location takes a party of this size. <a href="/contact">Tell us what you need</a> and we will find the right room.</p>
   </div>
 
   <!-- ================= FULL VENUE INDEX ================= -->

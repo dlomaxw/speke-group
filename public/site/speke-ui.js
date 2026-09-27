@@ -149,75 +149,69 @@
     for (var j = 0; j < nums.length; j++) io.observe(nums[j]);
   }
 
-  /* ---------- 5. Chip filters ---------------------------- */
-  /* <div data-filter-group="portfolio"> chips with data-filter="hotel" */
-  /* items: <div data-filter-item="portfolio" data-tags="hotel resort">  */
-  function initFilters() {
-    var groups = document.querySelectorAll('[data-filter-group]');
-    for (var g = 0; g < groups.length; g++) {
-      (function (group) {
-        var name = group.getAttribute('data-filter-group');
-        group.addEventListener('click', function (ev) {
-          var chip = ev.target.closest('[data-filter]');
-          if (!chip || !group.contains(chip)) return;
-          var value = chip.getAttribute('data-filter');
+  /* ---------- 5. Filters --------------------------------- */
+  /* Two controls over the same cards: chips
+     (<div data-filter-group="venues"> holding data-filter="s120">) and a
+     location <select data-filter-select="venues">. A card shows when it
+     satisfies both, so you can ask for "a room for 120 at Kabira". */
+  var filterState = {};
 
-          var chips = group.querySelectorAll('[data-filter]');
-          for (var c = 0; c < chips.length; c++) chips[c].classList.remove('active');
-          chip.classList.add('active');
-
-          var items = document.querySelectorAll('[data-filter-item="' + name + '"]');
-          for (var i = 0; i < items.length; i++) {
-            var tags = (items[i].getAttribute('data-tags') || '').split(/\s+/);
-            var show = value === 'all' || tags.indexOf(value) !== -1;
-            items[i].classList.toggle('filter-hide', !show);
-            if (show) {
-              items[i].style.transitionDelay = '0s';
-              items[i].classList.add('revealed');
-            }
-          }
-          /* A carousel holding these items has to recount its pages. */
-          var wrap = items.length ? items[0].closest('[data-carousel]') : null;
-          if (wrap) {
-            wrap.querySelector('.carousel-track').scrollLeft = 0;
-            wrap.dispatchEvent(new CustomEvent('sg:filtered'));
-          }
-        });
-      })(groups[g]);
+  function applyFilter(name) {
+    var state = filterState[name] || (filterState[name] = { chip: 'all', place: 'all' });
+    var items = document.querySelectorAll('[data-filter-item="' + name + '"]');
+    var shown = 0;
+    for (var i = 0; i < items.length; i++) {
+      var tags = (items[i].getAttribute('data-tags') || '').split(/\s+/);
+      var byChip = state.chip === 'all' || tags.indexOf(state.chip) !== -1;
+      /* Something the whole group offers belongs to every location. */
+      var byPlace = state.place === 'all' || tags.indexOf(state.place) !== -1 || tags.indexOf('group') !== -1;
+      var show = byChip && byPlace;
+      items[i].classList.toggle('filter-hide', !show);
+      if (show) {
+        shown++;
+        items[i].style.transitionDelay = '0s';
+        items[i].classList.add('revealed');
+      }
+    }
+    var none = document.querySelector('[data-filter-none="' + name + '"]');
+    if (none) none.hidden = shown > 0;
+    /* A carousel holding these cards has to recount its pages. */
+    var wrap = items.length ? items[0].closest('[data-carousel]') : null;
+    if (wrap) {
+      wrap.querySelector('.carousel-track').scrollLeft = 0;
+      wrap.dispatchEvent(new CustomEvent('sg:filtered'));
     }
   }
 
+  function initFilters() {
+    var groups = document.querySelectorAll('[data-filter-group]');
+    Array.prototype.forEach.call(groups, function (group) {
+      if (group.dataset.sgWired === '1') return;
+      group.dataset.sgWired = '1';
+      var name = group.getAttribute('data-filter-group');
+      filterState[name] = filterState[name] || { chip: 'all', place: 'all' };
+      group.addEventListener('click', function (ev) {
+        var chip = ev.target.closest('[data-filter]');
+        if (!chip || !group.contains(chip)) return;
+        var chips = group.querySelectorAll('[data-filter]');
+        for (var c = 0; c < chips.length; c++) chips[c].classList.remove('active');
+        chip.classList.add('active');
+        filterState[name].chip = chip.getAttribute('data-filter');
+        applyFilter(name);
+      });
+    });
 
-  /* ---------- 5b. Filter by a select ---------------------- */
-  /* <select data-filter-select="wellness"> against the same
-     [data-filter-item="wellness"] cards the chips use. */
-  function initSelectFilters() {
     var selects = document.querySelectorAll('[data-filter-select]');
     Array.prototype.forEach.call(selects, function (select) {
       if (select.dataset.sgWired === '1') return;
       select.dataset.sgWired = '1';
       var name = select.getAttribute('data-filter-select');
-      var none = document.querySelector('[data-filter-none="' + name + '"]');
-
-      function apply() {
-        var value = select.value;
-        var items = document.querySelectorAll('[data-filter-item="' + name + '"]');
-        var shown = 0;
-        Array.prototype.forEach.call(items, function (item) {
-          var tags = (item.getAttribute('data-tags') || '').split(/\s+/);
-          /* Group-wide facilities belong to every location. */
-          var show = value === 'all' || tags.indexOf(value) !== -1 || tags.indexOf('group') !== -1;
-          item.classList.toggle('filter-hide', !show);
-          if (show) {
-            shown++;
-            item.style.transitionDelay = '0s';
-            item.classList.add('revealed');
-          }
-        });
-        if (none) none.hidden = shown > 0;
-      }
-      select.addEventListener('change', apply);
-      apply();
+      filterState[name] = filterState[name] || { chip: 'all', place: 'all' };
+      select.addEventListener('change', function () {
+        filterState[name].place = select.value;
+        applyFilter(name);
+      });
+      applyFilter(name);
     });
   }
 
@@ -745,7 +739,6 @@
     initHeader();
     initCounters();
     initFilters();
-    initSelectFilters();
     initTabs();
     initExternalLinks();
     initMobileNav();
@@ -769,7 +762,7 @@
     function reapply() {
       reapplyQueued = false;
       initExternalLinks();
-      initSelectFilters();
+      initFilters();
       initMobileNav();
       initHeroVideo();
       initBookingBar();

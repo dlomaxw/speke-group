@@ -481,6 +481,33 @@ a{color:var(--maroon);text-decoration:none}
 .social:hover{background:var(--gold);border-color:var(--gold);color:var(--maroon-deep);transform:translateY(-3px) scale(1.06)}
 
 /* ===========================================================
+   10f. VENUE FILTERS
+   A location beside the capacity chips: "a room for 120 at Kabira".
+   =========================================================== */
+.venue-filters{
+  display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;
+  justify-content:flex-end;max-width:640px;
+}
+.venue-place{display:flex;flex-direction:column;gap:6px;min-width:220px}
+.venue-place .fl{
+  font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:var(--gold-pale);
+}
+.venue-place select{
+  padding:9px 12px;cursor:pointer;
+  font-family:inherit;font-size:13.5px;color:var(--maroon-ink);
+  background:#fff;border:1px solid var(--line);border-radius:3px;
+  transition:border-color .25s var(--ease);
+}
+.venue-place select:hover{border-color:rgba(201,162,39,.55)}
+.venue-place select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+@media (max-width:900px){
+  .venue-filters{justify-content:flex-start;max-width:none;width:100%}
+  .venue-place{width:100%;min-width:0}
+}
+
+/* ===========================================================
    10e. WELLNESS
    =========================================================== */
 .wellness-pick{
