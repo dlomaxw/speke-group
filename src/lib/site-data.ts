@@ -5,7 +5,7 @@ import { asc, desc, eq } from 'drizzle-orm';
 import { getDb } from '@/db';
 import {
   properties, venues, venueGroups, restaurants, experiences,
-  newsPosts, offers, milestones, highlightBlocks, settings, wellness,
+  newsPosts, offers, milestones, highlightBlocks, settings, wellness, awards, faqs,
 } from '@/db/schema';
 import { getSession } from '@/lib/auth';
 import { allPending, reviveSnapshot } from '@/lib/versions';
@@ -119,6 +119,18 @@ export async function getWellness() {
   const db = await getDb();
   const rows = await db.select().from(wellness).orderBy(asc(wellness.sortOrder));
   return visible('wellness', rows, () => true, bySort);
+}
+
+export async function getAwards() {
+  const db = await getDb();
+  const rows = await db.select().from(awards).orderBy(asc(awards.sortOrder));
+  return visible('awards', rows, () => true, bySort);
+}
+
+export async function getFaqs() {
+  const db = await getDb();
+  const rows = await db.select().from(faqs).orderBy(asc(faqs.sortOrder));
+  return visible('faqs', rows, () => true, bySort);
 }
 
 export async function getNews() {

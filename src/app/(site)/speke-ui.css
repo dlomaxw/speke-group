@@ -508,6 +508,108 @@ a{color:var(--maroon);text-decoration:none}
 }
 
 /* ===========================================================
+   10g. AWARDS + LOCATIONS MAP
+   =========================================================== */
+.awards-band{background:var(--maroon-deep);color:#f2e2c8;padding:46px var(--gut)}
+.award-card{
+  display:flex;flex-direction:column;gap:8px;
+  padding:24px 24px 22px;border-radius:3px;
+  background:rgba(242,226,200,.06);
+  border:1px solid rgba(242,226,200,.18);
+  transition:border-color .35s var(--ease),background .35s var(--ease);
+}
+.award-card:hover{border-color:var(--gold);background:rgba(242,226,200,.1)}
+.award-year{
+  font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:700;color:var(--gold-soft);
+}
+.award-title{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:21px;font-weight:600;color:#fff;line-height:1.25;
+}
+.award-org{font-size:12px;color:var(--sand);letter-spacing:.02em}
+.award-desc{font-size:13px;line-height:1.72;color:#e9dccb;margin:2px 0 0}
+.award-where{font-size:11.5px;color:var(--gold-soft);margin-top:auto;padding-top:8px}
+
+/* The map is a grid of tiles with pins placed over it. */
+.map-wrap{display:grid;grid-template-columns:1.55fr 1fr;gap:26px;align-items:start}
+.map-canvas{
+  position:relative;overflow:hidden;border-radius:4px;
+  border:1px solid var(--line);background:var(--cream-2);
+}
+.map-tiles{position:absolute;display:grid}
+.map-tile{width:100%;height:100%;display:block;object-fit:cover}
+.map-pin{
+  position:absolute;z-index:2;transform:translate(-50%,-100%);
+  display:flex;align-items:center;gap:6px;
+  padding:4px;border-radius:20px;
+  background:var(--maroon);color:#fff;white-space:nowrap;
+  box-shadow:0 6px 16px rgba(30,14,18,.35);
+  transition:transform .25s var(--ease-out),background .25s var(--ease);
+}
+.map-pin:hover,
+.map-pin:focus-visible{background:var(--maroon-deep);transform:translate(-50%,-100%) scale(1.06);z-index:3;padding:4px 10px 4px 4px}
+.map-pin-no{
+  width:19px;height:19px;flex:none;border-radius:50%;
+  background:var(--gold);color:#3a2020;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+/* The names would collide in the city cluster, so they wait for a hover;
+   the numbered list beside the map carries them all anyway. */
+.map-pin-name{display:none;font-size:11px;letter-spacing:.02em}
+.map-pin:hover .map-pin-name,
+.map-pin:focus-visible .map-pin-name{display:inline}
+.map-list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.map-row{
+  display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:center;
+  padding:11px 4px;border-bottom:1px solid var(--line);
+  transition:background .25s var(--ease),padding-left .25s var(--ease-out);
+}
+.map-row:hover{background:rgba(111,32,51,.04);padding-left:9px}
+.map-row-no{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--maroon);color:#fff;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.map-row-name{display:block;font-size:13.5px;font-weight:600;color:var(--maroon-ink)}
+.map-row-area{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.map-row-go{font-size:10px;letter-spacing:.12em;font-weight:700;color:var(--gold-pale)}
+.map-credit{font-size:11px;color:var(--muted);text-align:right;margin:10px 0 0}
+.map-credit a{color:var(--maroon);text-decoration:underline}
+
+@media (max-width:1000px){
+  .map-wrap{grid-template-columns:1fr}
+}
+
+/* ===========================================================
+   10h. FAQ
+   =========================================================== */
+.faq-group{margin-bottom:34px}
+.faq-group h3{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:21px;font-weight:600;color:var(--maroon-ink);margin:0 0 14px;
+}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;
+  padding:16px 2px;font-size:15px;font-weight:600;color:var(--maroon-ink);
+  transition:color .25s var(--ease);
+}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary:hover{color:var(--maroon)}
+.faq-item summary::after{
+  content:"+";flex:none;font-size:19px;font-weight:400;color:var(--gold);
+  line-height:1;transition:transform .3s var(--ease-out);
+}
+.faq-item[open] summary::after{transform:rotate(45deg)}
+.faq-answer{
+  font-size:14px;line-height:1.78;color:var(--body);
+  margin:0;padding:0 40px 18px 2px;
+}
+
+/* ===========================================================
    10e. WELLNESS
    =========================================================== */
 .wellness-pick{

@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, real, index, uniqueIndex } from 'drizzle-orm/sqlite-core';
 
 /*
  * SQLite schema (Cloudflare D1 in production, a local SQLite file in
@@ -128,6 +128,9 @@ export const properties = sqliteTable('properties', {
   websiteUrl: text('website_url'),
   /** The property's own booking engine. The booking bar sends guests here. */
   bookingUrl: text('booking_url'),
+  /** Where the pin sits on the locations map. */
+  latitude: real('latitude'),
+  longitude: real('longitude'),
   area: text('area', { length: 160 }),
   imageUrl: text('image_url'),
   imageAlt: text('image_alt', { length: 300 }),
@@ -223,6 +226,36 @@ export const wellness = sqliteTable('wellness', {
   status: text('status', { enum: statusEnum }).notNull().default('published'),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, (t) => [uniqueIndex('wellness_slug_idx').on(t.slug)]);
+
+/** Awards and recognitions, shown on the homepage and editable like any
+ *  other content. */
+export const awards = sqliteTable('awards', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug', { length: 120 }).notNull(),
+  title: text('title', { length: 200 }).notNull(),
+  /** Who gave it, e.g. "Luxe Global Awards". */
+  organisation: text('organisation', { length: 160 }),
+  /** Shown as given, e.g. "2026" or "July 2026". */
+  year: text('year', { length: 40 }),
+  propertyId: integer('property_id').references(() => properties.id, { onDelete: 'set null' }),
+  description: text('description'),
+  linkUrl: text('link_url'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  status: text('status', { enum: statusEnum }).notNull().default('published'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
+}, (t) => [uniqueIndex('awards_slug_idx').on(t.slug)]);
+
+export const faqCategoryEnum = ['booking', 'stay', 'events', 'group'] as const;
+
+export const faqs = sqliteTable('faqs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  question: text('question', { length: 300 }).notNull(),
+  answer: text('answer').notNull(),
+  category: text('category', { enum: faqCategoryEnum }).notNull().default('booking'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  status: text('status', { enum: statusEnum }).notNull().default('published'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
+});
 
 export const newsPosts = sqliteTable('news_posts', {
   id: integer('id').primaryKey({ autoIncrement: true }),

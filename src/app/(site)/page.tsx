@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getChrome, getHighlights, getOffers, getWellness, setting, splitHighlights } from '@/lib/site-data';
-import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones } from '@/lib/site-html';
+import { getAwards, getChrome, getHighlights, getOffers, getWellness, setting, splitHighlights } from '@/lib/site-data';
+import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones, locationsMap } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -25,8 +25,8 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, offers, spas, occasions] = await Promise.all([
-    getChrome(), getOffers(), getWellness(), getHighlights('occasions'),
+  const [chrome, offers, spas, occasions, honours] = await Promise.all([
+    getChrome(), getOffers(), getWellness(), getHighlights('occasions'), getAwards(),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
@@ -85,6 +85,18 @@ export default async function HomePage() {
             <span class="link-arrow">FIND OUT MORE <i>&rarr;</i></span>
           </div>
         </a>`).join('');
+
+  const awardCards = honours.map((a) => {
+    const at = allProperties.find((p) => p.id === a.propertyId);
+    return `
+        <a class="award-card" href="${safeUrl(a.linkUrl, '/news')}" data-reveal>
+          <div class="award-year">${esc(a.year)}</div>
+          <div class="award-title">${esc(a.title)}</div>
+          <div class="award-org">${esc(a.organisation)}</div>
+          <p class="award-desc">${esc(a.description)}</p>
+          ${at ? `<div class="award-where">${esc(at.name)}</div>` : ''}
+        </a>`;
+  }).join('');
 
   const tabs = OFFER_TABS.filter((t) => offers.some((o) => o.category === t.key));
   const offerPanels = tabs.map((t, i) => {
@@ -191,6 +203,18 @@ export default async function HomePage() {
     <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
   </div>
 
+  <!-- ================= AWARDS ================= -->
+  ${honours.length ? `
+  <div class="awards-band">
+    <div style="text-align:center;max-width:680px;margin:0 auto 28px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center;color:#d4af6a">Recognition</div>
+      <h2 class="serif" style="font-size:30px;font-weight:600;color:#fff;margin:0">${esc(setting(s, 'awards_title', 'Recognised Beyond Our Borders'))}</h2>
+      <p style="font-size:14px;color:#e9dccb;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'awards_body'))}</p>
+    </div>
+    <div class="${honours.length === 2 ? 'g-2' : 'g-3'}" style="gap:22px" data-stagger="0.08">${awardCards}
+    </div>
+  </div>` : ''}
+
   <!-- ================= WELLNESS ================= -->
   <div id="wellness" style="background:#efe6d6;padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:26px" data-reveal>
@@ -259,6 +283,8 @@ ${offerPanels}
       <div class="hero-tile" style="height:200px">${slot(setting(s, 'home_news_image', '/images/news-photo.webp'), 'Resort at sunset', 'width:100%;height:200px')}</div>
     </div>
   </div>
+
+  ${locationsMap(allProperties, { title: setting(s, 'map_title', 'Find Us Across Kampala'), body: setting(s, 'map_body') })}
 
   ${footer(s)}
 `;

@@ -1,6 +1,6 @@
 import {
   properties, venues, restaurants, experiences, newsPosts,
-  offers, milestones, highlightBlocks, venueGroups, wellness,
+  offers, milestones, highlightBlocks, venueGroups, wellness, awards, faqs,
 } from '@/db/schema';
 
 export type FieldType =
@@ -82,6 +82,8 @@ export const COLLECTIONS: CollectionConfig[] = [
       { name: 'description', label: 'Description', type: 'textarea' },
       { name: 'area', label: 'Area', type: 'text', placeholder: 'Bukoto, Kampala' },
       { name: 'websiteUrl', label: "Property's own website", type: 'url', placeholder: 'https://…' },
+      { name: 'latitude', label: 'Latitude', type: 'number', help: 'Where the pin sits on the locations map, e.g. 0.31524.' },
+      { name: 'longitude', label: 'Longitude', type: 'number', help: 'e.g. 32.58289.' },
       { name: 'bookingUrl', label: "Property's booking engine", type: 'url', placeholder: 'https://…', help: 'Where CHECK AVAILABILITY sends a guest who picks this property. Leave empty to send them to the enquiry form instead.' },
       { name: 'imageUrl', label: 'Photo', type: 'image' },
       { name: 'imageAlt', label: 'Photo description', type: 'text', help: 'Describes the photo for screen readers and search engines.' },
@@ -116,6 +118,50 @@ export const COLLECTIONS: CollectionConfig[] = [
       { name: 'imageUrl', label: 'Photo', type: 'image' },
       { name: 'imageAlt', label: 'Photo description', type: 'text' },
       SORT_FIELD, STATUS_FIELD,
+    ],
+  },
+  {
+    slug: 'awards',
+    label: 'Awards & recognition',
+    singular: 'Award',
+    description: 'The awards strip on the homepage.',
+    table: awards,
+    icon: 'trophy',
+    defaultSort: 'sortOrder',
+    hasStatus: true,
+    propertyField: 'propertyId',
+    listFields: ['title', 'organisation', 'year', 'status'],
+    fields: [
+      { name: 'title', label: 'Award', type: 'text', required: true },
+      { name: 'slug', label: 'Slug', type: 'text', required: true },
+      { name: 'organisation', label: 'Awarded by', type: 'text' },
+      { name: 'year', label: 'When', type: 'text', placeholder: '2026', help: 'Shown as you write it, e.g. "2026" or "July 2026".' },
+      { name: 'propertyId', label: 'Property', type: 'property', help: 'Which property it was awarded to. Leave as group-wide if it covers the Group.' },
+      { name: 'description', label: 'Description', type: 'textarea' },
+      { name: 'linkUrl', label: 'Read more', type: 'url' },
+      { name: 'sortOrder', label: 'Order', type: 'number' },
+    ],
+  },
+  {
+    slug: 'faqs',
+    label: 'Questions & answers',
+    singular: 'Question',
+    description: 'The FAQ page. Answers should only state what we can stand behind.',
+    table: faqs,
+    icon: 'help-circle',
+    defaultSort: 'sortOrder',
+    hasStatus: true,
+    listFields: ['question', 'category', 'status'],
+    fields: [
+      { name: 'question', label: 'Question', type: 'text', required: true },
+      { name: 'answer', label: 'Answer', type: 'textarea', required: true },
+      { name: 'category', label: 'Section', type: 'select', required: true, options: [
+        { value: 'booking', label: 'Booking' },
+        { value: 'stay', label: 'Your stay' },
+        { value: 'events', label: 'Events & meetings' },
+        { value: 'group', label: 'About the Group' },
+      ] },
+      { name: 'sortOrder', label: 'Order', type: 'number' },
     ],
   },
   {

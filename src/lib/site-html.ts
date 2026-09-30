@@ -220,6 +220,8 @@ export function footer(s: SettingsMap): string {
         <div class="col-title">Information</div>
         <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
           <a href="/about">About Us</a>
+          <a href="/faq">Questions &amp; Answers</a>
+          <a href="/#locations">Find Us</a>
           <a href="https://spekegroup.com/contact/">Careers</a>
           <a href="https://spekegroup.com/contact/">SOPs</a>
           <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
@@ -327,4 +329,119 @@ export function offerHref(
     if (match) return match.websiteUrl || `https://spekegroup.com/${match.slug}/`;
   }
   return GROUP_WIDE_TARGETS[offer.category] ?? '/contact';
+}
+
+/* ------------------------------------------------------------------
+   Locations map
+   ------------------------------------------------------------------ */
+
+type MapProperty = {
+  id: number; name: string; slug: string; area: string | null;
+  categoryLabel: string; latitude: number | null; longitude: number | null;
+};
+
+/** Web Mercator: longitude/latitude to fractional tile coordinates. */
+const tileX = (lng: number, z: number) => ((lng + 180) / 360) * 2 ** z;
+const tileY = (lat: number, z: number) => {
+  const r = (lat * Math.PI) / 180;
+  return ((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2) * 2 ** z;
+};
+
+/**
+ * A still map of every property, drawn as a grid of OpenStreetMap tiles with
+ * a numbered pin on each one. No map library and no third-party script: the
+ * tiles are plain images, and each pin links out to directions.
+ */
+export function locationsMap(properties: MapProperty[], opts: { title: string; body: string }): string {
+  const pinned = properties.filter((p) => p.latitude != null && p.longitude != null);
+  if (!pinned.length) return '';
+
+  const TILE = 256;
+  /* Zoom so the spread of properties fills roughly 700px of map. */
+  const lats = pinned.map((p) => p.latitude!);
+  const lngs = pinned.map((p) => p.longitude!);
+  const span = Math.max(
+    (tileY(Math.min(...lats), 0) - tileY(Math.max(...lats), 0)) * TILE,
+    ((tileX(Math.max(...lngs), 0) - tileX(Math.min(...lngs), 0)) * TILE) / 1.5,
+  );
+  const zoom = Math.max(10, Math.min(15, Math.floor(Math.log2(700 / Math.max(span, 0.0001)))));
+
+  const px = (p: MapProperty) => ({ x: tileX(p.longitude!, zoom) * TILE, y: tileY(p.latitude!, zoom) * TILE });
+  const points = pinned.map(px);
+  const minX = Math.min(...points.map((p) => p.x));
+  const maxX = Math.max(...points.map((p) => p.x));
+  const minY = Math.min(...points.map((p) => p.y));
+  const maxY = Math.max(...points.map((p) => p.y));
+
+  /* Crop to the properties with room around them, in a 3:2 frame. */
+  const RATIO = 1.5;
+  const cropH = (maxY - minY) * 1.22 + 90;
+  const cropW = Math.max((maxX - minX) * 1.22 + 90, cropH * RATIO);
+  const left = (minX + maxX) / 2 - cropW / 2;
+  const top = (minY + maxY) / 2 - cropH / 2;
+
+  /* Whole tiles covering that crop. */
+  const tx0 = Math.floor(left / TILE);
+  const tx1 = Math.ceil((left + cropW) / TILE);
+  const ty0 = Math.floor(top / TILE);
+  const ty1 = Math.ceil((top + cropH) / TILE);
+  const cols = tx1 - tx0;
+  const rows = ty1 - ty0;
+
+  const tiles: string[] = [];
+  for (let y = ty0; y < ty1; y++) {
+    for (let x = tx0; x < tx1; x++) {
+      tiles.push(`<img class="map-tile" src="https://tile.openstreetmap.org/${zoom}/${x}/${y}.png" alt="" aria-hidden="true" loading="lazy" decoding="async">`);
+    }
+  }
+  /* The tile sheet is sized and offset as a share of the crop, so it lines up
+     with the pins at any width the layout gives us. */
+  const sheet = [
+    `grid-template-columns:repeat(${cols},1fr)`,
+    `width:${((cols * TILE) / cropW) * 100}%`,
+    `height:${((rows * TILE) / cropH) * 100}%`,
+    `left:${((tx0 * TILE - left) / cropW) * 100}%`,
+    `top:${((ty0 * TILE - top) / cropH) * 100}%`,
+  ].join(';');
+
+  const directions = (p: MapProperty) =>
+    `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.name}, Kampala, Uganda`)}`;
+
+  const pins = pinned.map((p, i) => {
+    const point = px(p);
+    return `
+        <a class="map-pin" href="${safeUrl(directions(p), '#')}" style="left:${(((point.x - left) / cropW) * 100).toFixed(3)}%;top:${(((point.y - top) / cropH) * 100).toFixed(3)}%" aria-label="Directions to ${esc(p.name)}">
+          <span class="map-pin-no">${i + 1}</span>
+          <span class="map-pin-name">${esc(p.name)}</span>
+        </a>`;
+  }).join('');
+
+  const list = pinned.map((p, i) => `
+        <a class="map-row" href="${safeUrl(directions(p), '#')}">
+          <span class="map-row-no">${i + 1}</span>
+          <span>
+            <span class="map-row-name">${esc(p.name)}</span>
+            <span class="map-row-area">${esc(p.area || p.categoryLabel)}</span>
+          </span>
+          <span class="map-row-go">DIRECTIONS &#8599;</span>
+        </a>`).join('');
+
+  return `
+  <div id="locations" style="padding:52px var(--gut)">
+    <div style="text-align:center;max-width:680px;margin:0 auto 30px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">Our Locations</div>
+      <h2 class="h-sec">${esc(opts.title)}</h2>
+      <p style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(opts.body)}</p>
+    </div>
+    <div class="map-wrap" data-reveal>
+      <div class="map-canvas" style="aspect-ratio:${cropW} / ${cropH}">
+        <div class="map-tiles" style="${sheet}">${tiles.join('')}
+        </div>
+        ${pins}
+      </div>
+      <div class="map-list">${list}
+      </div>
+    </div>
+    <p class="map-credit">Map data &copy; <a href="https://www.openstreetmap.org/copyright" rel="nofollow">OpenStreetMap</a> contributors</p>
+  </div>`;
 }
