@@ -195,7 +195,7 @@ export default async function HomePage() {
   <div id="wellness" style="background:#efe6d6;padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:26px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">Wellness</div>
-      <h2 class="h-sec">${esc(setting(s, 'wellness_title', 'Spas & Salons Across Our Hotels and Apartments'))}</h2>
+      <h2 class="h-sec">${esc(setting(s, 'wellness_title', 'Spa, Experience & Wellness'))}</h2>
       <p style="font-size:14px;color:#5a4a3a;max-width:660px;margin:12px auto 0;line-height:1.7">${esc(setting(s, 'wellness_body', 'Massages, facials and steam baths, hair and beauty salons, gyms and pools — choose a location to see what is on offer there.'))}</p>
     </div>
 
