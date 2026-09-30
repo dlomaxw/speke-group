@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getAwards, getChrome, getHighlights, getOffers, getWellness, setting, splitHighlights } from '@/lib/site-data';
-import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones, locationsMap } from '@/lib/site-html';
+import { getAwards, getChrome, getHighlights, getOffers, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
+import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones, locationsMap, filmGallery } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -25,8 +25,8 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, offers, spas, occasions, honours] = await Promise.all([
-    getChrome(), getOffers(), getWellness(), getHighlights('occasions'), getAwards(),
+  const [chrome, offers, spas, occasions, honours, films] = await Promise.all([
+    getChrome(), getOffers(), getWellness(), getHighlights('occasions'), getAwards(), getVideos(),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
@@ -238,7 +238,7 @@ export default async function HomePage() {
   </div>` : ''}
 
   <!-- ================= WELLNESS ================= -->
-  <div id="wellness" style="background:#efe6d6;padding:50px var(--gut)">
+  <div id="wellness" style="background:var(--cream-2);padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:26px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">Wellness</div>
       <h2 class="h-sec">${esc(setting(s, 'wellness_title', 'Spa, Experience & Wellness'))}</h2>
@@ -273,6 +273,9 @@ export default async function HomePage() {
     <div class="g-2" style="gap:24px">${eventCards}
     </div>
   </div>
+
+  <!-- ================= FILMS ================= -->
+  ${filmGallery(films, { eyebrow: 'Films', title: setting(s, 'home_films_title', 'See Us for Yourself'), body: setting(s, 'home_films_body', 'Short films from across the Group.') })}
 
   <!-- ================= PACKAGES & OFFERS ================= -->
   <div style="padding:50px var(--gut)">

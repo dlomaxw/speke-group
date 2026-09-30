@@ -10,8 +10,9 @@
   --gold:#c9a227;
   --gold-soft:#d4af6a;
   --gold-pale:#b8935a;
-  --cream:#f7f2e9;
-  --cream-2:#efe6d6;
+  --cream:#fbfbfc;       /* soft white page */
+  --cream-2:#f1f2f5;     /* the quiet bands between sections */
+  --cream-3:#e7e9ee;     /* hairlines and empty media wells */
   --sand:#dcc0a8;
   --body:#5a4a3a;
   --muted:#7a6a5a;
@@ -26,7 +27,9 @@
 
 body{
   margin:0;
-  background:var(--cream);
+  /* A little light off the top, so the white reads as polished rather than flat. */
+  background:linear-gradient(180deg,#ffffff 0%,var(--cream) 38%,#f6f7f9 100%);
+  background-attachment:fixed;
   font-family:'Inter',system-ui,-apple-system,sans-serif;
   color:#2a1e1e;
   -webkit-font-smoothing:antialiased;
@@ -284,9 +287,18 @@ a{color:var(--maroon);text-decoration:none}
    =========================================================== */
 .card{
   display:flex;flex-direction:column;
-  background:#fff;border:1px solid var(--line);border-radius:10px;
+  background:#fff;border:1px solid rgba(58,32,32,.07);border-radius:14px;
   overflow:hidden;position:relative;
+  /* Two shadows: a close one for the edge, a wide soft one for the lift.
+     On a near-white page a single heavy shadow reads as dirt. */
+  box-shadow:0 1px 2px rgba(30,20,24,.05),0 10px 26px -14px rgba(30,20,24,.22);
   transition:transform .5s var(--ease-out),box-shadow .5s var(--ease),border-color .4s var(--ease);
+}
+/* A hairline of light along the top edge, so the card catches the page. */
+.card::before{
+  content:"";position:absolute;left:14px;right:14px;top:0;height:1px;z-index:3;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.9),transparent);
+  pointer-events:none;
 }
 /* Promote to its own layer only while the pointer is on it. Leaving
    will-change on every card costs a compositor layer each and stalls
@@ -299,13 +311,13 @@ a{color:var(--maroon);text-decoration:none}
   transition:transform .55s var(--ease-out);
 }
 .card:hover{
-  transform:translateY(-9px);
-  box-shadow:0 26px 52px rgba(58,32,32,.17);
-  border-color:rgba(201,162,39,.45);
+  transform:translateY(-7px);
+  box-shadow:0 2px 4px rgba(30,20,24,.06),0 30px 56px -20px rgba(30,20,24,.34);
+  border-color:rgba(201,162,39,.4);
 }
 .card:hover::after{transform:scaleX(1)}
 
-.card .media{position:relative;overflow:hidden;background:var(--cream-2)}
+.card .media{position:relative;overflow:hidden;background:var(--cream-3)}
 .card .media image-slot{
   display:block;width:100%;height:100%;
   transition:transform 1.05s var(--ease-out);
@@ -344,9 +356,10 @@ a{color:var(--maroon);text-decoration:none}
 
 /* tile — flat card used for experiences/occasions */
 .tile{
-  position:relative;padding:24px 22px;border-radius:10px;
-  background:#fff;border:1px solid var(--line);
+  position:relative;padding:24px 22px;border-radius:14px;
+  background:#fff;border:1px solid rgba(58,32,32,.07);
   overflow:hidden;
+  box-shadow:0 1px 2px rgba(30,20,24,.05),0 8px 22px -14px rgba(30,20,24,.2);
   transition:transform .45s var(--ease-out),box-shadow .45s var(--ease),border-color .4s var(--ease);
 }
 .tile::before{
@@ -355,7 +368,7 @@ a{color:var(--maroon);text-decoration:none}
   opacity:0;transition:opacity .45s var(--ease);
 }
 .tile > *{position:relative;z-index:1}
-.tile:hover{transform:translateY(-6px);box-shadow:0 20px 40px rgba(58,32,32,.13);border-color:rgba(201,162,39,.45)}
+.tile:hover{transform:translateY(-5px);box-shadow:0 2px 4px rgba(30,20,24,.06),0 26px 48px -20px rgba(30,20,24,.3);border-color:rgba(201,162,39,.4)}
 .tile:hover::before{opacity:1}
 
 /* ===========================================================
@@ -513,7 +526,7 @@ a{color:var(--maroon);text-decoration:none}
 .awards-band{background:var(--maroon-deep);color:#f2e2c8;padding:46px var(--gut)}
 .award-card{
   display:flex;flex-direction:column;gap:8px;
-  padding:24px 24px 22px;border-radius:3px;
+  padding:24px 24px 22px;border-radius:12px;
   background:rgba(242,226,200,.06);
   border:1px solid rgba(242,226,200,.18);
   transition:border-color .35s var(--ease),background .35s var(--ease);
@@ -534,8 +547,9 @@ a{color:var(--maroon);text-decoration:none}
 /* The map is a grid of tiles with pins placed over it. */
 .map-wrap{display:grid;grid-template-columns:1.55fr 1fr;gap:26px;align-items:start}
 .map-canvas{
-  position:relative;overflow:hidden;border-radius:4px;
-  border:1px solid var(--line);background:var(--cream-2);
+  position:relative;overflow:hidden;border-radius:14px;
+  border:1px solid rgba(58,32,32,.07);background:var(--cream-3);
+  box-shadow:0 1px 2px rgba(30,20,24,.05),0 12px 30px -16px rgba(30,20,24,.24);
 }
 .map-tiles{position:absolute;display:grid}
 .map-tile{width:100%;height:100%;display:block;object-fit:cover}
@@ -589,7 +603,8 @@ a{color:var(--maroon);text-decoration:none}
 .film{margin:0;display:flex;flex-direction:column}
 .film-play{
   position:relative;display:block;width:100%;padding:0;cursor:pointer;
-  border:1px solid var(--line);border-radius:6px;overflow:hidden;
+  border:1px solid rgba(58,32,32,.07);border-radius:14px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(30,20,24,.05),0 10px 26px -14px rgba(30,20,24,.22);
   background:var(--cream-2);aspect-ratio:16/9;
   transition:border-color .35s var(--ease),box-shadow .35s var(--ease),transform .4s var(--ease-out);
 }
@@ -621,7 +636,7 @@ a{color:var(--maroon);text-decoration:none}
   font-size:11px;letter-spacing:.04em;color:#fff;
   background:rgba(12,6,8,.6);border-radius:3px;padding:2px 7px;
 }
-.film video{width:100%;display:block;border-radius:6px;border:1px solid var(--line)}
+.film video{width:100%;display:block;border-radius:14px;border:1px solid rgba(58,32,32,.07)}
 .film-caption{padding:14px 2px 0}
 .film-title{
   font-family:'Playfair Display',Georgia,serif;
@@ -1208,7 +1223,7 @@ img,video{max-width:100%}
 
 /* <image-slot> was a canvas web component; here it is a plain wrapper
    around a real <img>, so every rule above that targets it still applies. */
-image-slot{display:block;position:relative;overflow:hidden;width:100%;height:100%;aspect-ratio:3/2;background:var(--cream-2)}
+image-slot{display:block;position:relative;overflow:hidden;width:100%;height:100%;aspect-ratio:3/2;background:var(--cream-3)}
 image-slot > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
 
 /* The loader and the hidden-until-revealed states are rendered by the server.

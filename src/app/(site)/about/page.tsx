@@ -116,7 +116,7 @@ export default async function AboutPage() {
   </div>
 
   <!-- ================= MILESTONES ================= -->
-  <div style="background:#efe6d6;padding:50px var(--gut)">
+  <div style="background:var(--cream-2);padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:32px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">Our Journey</div>
       <h2 class="h-sec">Milestones in the Speke Story</h2>

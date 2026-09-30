@@ -132,7 +132,7 @@ export default async function ExperiencesPage() {
   </div>
 
   <!-- ================= LEISURE & WELLNESS ================= -->
-  <div id="leisure" style="background:#efe6d6;padding:50px var(--gut);margin-top:34px">
+  <div id="leisure" style="background:var(--cream-2);padding:50px var(--gut);margin-top:34px">
     <div style="text-align:center;margin-bottom:30px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">Experiences</div>
       <h2 class="h-sec">Relax or Enjoy Memorable Breathtaking Thrills</h2>

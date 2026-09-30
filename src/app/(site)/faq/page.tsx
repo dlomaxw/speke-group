@@ -64,7 +64,7 @@ export default async function FaqPage() {
   </div>
 
   <!-- ================= STILL ASKING ================= -->
-  <div style="background:#efe6d6;padding:44px var(--gut);text-align:center" data-reveal>
+  <div style="background:var(--cream-2);padding:44px var(--gut);text-align:center" data-reveal>
     <h2 class="h-sec" style="margin-bottom:10px">Still have a question?</h2>
     <div style="max-width:620px;margin:0 auto">
       ${paragraphs('Our reservations team answers enquiries every day, and can arrange stays, events and longer bookings across the Group.', 'font-size:14px;line-height:1.72;color:#5a4a3a;margin:0 0 18px')}

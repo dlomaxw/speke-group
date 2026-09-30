@@ -445,3 +445,45 @@ export function locationsMap(properties: MapProperty[], opts: { title: string; b
     <p class="map-credit">Map data &copy; <a href="https://www.openstreetmap.org/copyright" rel="nofollow">OpenStreetMap</a> contributors</p>
   </div>`;
 }
+
+/* ------------------------------------------------------------------
+   Film gallery
+   ------------------------------------------------------------------ */
+
+type Film = {
+  slug: string; title: string; description: string | null;
+  videoUrl: string; posterUrl: string | null; durationLabel: string | null;
+};
+
+/**
+ * Posters that turn into players. Nothing is fetched until a visitor presses
+ * play, so a page carrying films costs no more to open than one without.
+ */
+export function filmGallery(films: Film[], opts: { eyebrow: string; title: string; body: string; limit?: number }): string {
+  const rows = opts.limit ? films.slice(0, opts.limit) : films;
+  if (!rows.length) return '';
+
+  const cards = rows.map((f) => `
+        <figure class="film" data-film data-reveal>
+          <button class="film-play" type="button" data-film-src="${safeUrl(f.videoUrl, '')}" aria-label="Play ${esc(f.title)}">
+            ${slot(f.posterUrl, f.title, 'width:100%;height:100%')}
+            <span class="film-icon" aria-hidden="true"></span>
+            ${f.durationLabel ? `<span class="film-length">${esc(f.durationLabel)}</span>` : ''}
+          </button>
+          <figcaption class="film-caption">
+            <div class="film-title">${esc(f.title)}</div>
+            <p class="film-desc">${esc(f.description)}</p>
+          </figcaption>
+        </figure>`).join('');
+
+  return `
+  <div id="films" style="padding:50px var(--gut)">
+    <div style="text-align:center;max-width:680px;margin:0 auto 28px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">${esc(opts.eyebrow)}</div>
+      <h2 class="h-sec">${esc(opts.title)}</h2>
+      <p style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(opts.body)}</p>
+    </div>
+    <div class="${rows.length === 2 ? 'g-2' : 'g-3'}" style="gap:22px" data-stagger="0.08">${cards}
+    </div>
+  </div>`;
+}

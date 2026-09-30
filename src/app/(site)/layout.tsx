@@ -51,7 +51,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
       />
 
-      <div className="page-shell" style={{ margin: '0 auto', background: '#f7f2e9' }}>
+      <div className="page-shell" style={{ margin: '0 auto', background: 'transparent' }}>
         {children}
       </div>
 
