@@ -13,7 +13,7 @@ import { getDb, usingD1 } from '../src/db';
 import { settings, wellness, properties } from '../src/db/schema';
 
 const COPY = [
-  { key: 'wellness_title', value: 'Spa, Experience & Wellness',
+  { key: 'wellness_title', value: 'Spa & Wellness',
     label: 'Wellness heading', valueType: 'text', sortOrder: 1 },
   { key: 'wellness_body', value: 'Massages, facials and steam baths, hair and beauty salons, gyms and pools — choose a location to see what is on offer there.',
     label: 'Wellness paragraph', valueType: 'textarea', sortOrder: 2 },
