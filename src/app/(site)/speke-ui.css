@@ -985,8 +985,12 @@ body.sg-bm-docked.sg-bm-open .bm-close{display:flex}
    breakpoints below can restyle them reliably.
    =========================================================== */
 :root{--gut:44px}
+@media (min-width:1600px){:root{--gut:64px}}
+@media (min-width:2000px){:root{--gut:96px}}
 
-.page-shell{width:100%;max-width:1536px}
+/* Edge to edge: the hero, the booking bar and the bands run the full width
+   of the screen. The gutter grows with it so nothing hugs the glass. */
+.page-shell{width:100%;max-width:none}
 img,video{max-width:100%}
 
 .g-hero,.g-5,.g-4,.g-3,.g-2,.g-split-a,.g-split-b,.g-split-c,.g-footer{display:grid}
