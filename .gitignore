@@ -49,3 +49,6 @@ api.txt
 # local SQLite database
 local.db
 local.db-*
+
+# Video masters. The web-ready cuts live in public/assets.
+/public/video/

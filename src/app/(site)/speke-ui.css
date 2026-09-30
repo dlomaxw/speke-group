@@ -583,6 +583,53 @@ a{color:var(--maroon);text-decoration:none}
 }
 
 /* ===========================================================
+   10i. FILM GALLERY
+   Poster first; the file is only fetched when play is pressed.
+   =========================================================== */
+.film{margin:0;display:flex;flex-direction:column}
+.film-play{
+  position:relative;display:block;width:100%;padding:0;cursor:pointer;
+  border:1px solid var(--line);border-radius:6px;overflow:hidden;
+  background:var(--cream-2);aspect-ratio:16/9;
+  transition:border-color .35s var(--ease),box-shadow .35s var(--ease),transform .4s var(--ease-out);
+}
+.film-play:hover{
+  transform:translateY(-4px);border-color:rgba(201,162,39,.5);
+  box-shadow:0 20px 40px rgba(58,32,32,.16);
+}
+.film-play image-slot{width:100%;height:100%;display:block}
+.film-play::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(30,14,18,.45),rgba(30,14,18,.05) 60%);
+  pointer-events:none;
+}
+.film-icon{
+  position:absolute;left:50%;top:50%;z-index:2;
+  width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:50%;
+  background:rgba(111,32,51,.9);border:1px solid rgba(242,233,219,.6);
+  transition:background .3s var(--ease),transform .3s var(--ease-out);
+}
+.film-icon::before{
+  content:"";position:absolute;left:52%;top:50%;
+  transform:translate(-50%,-50%);
+  border-left:16px solid #fff;
+  border-top:10px solid transparent;border-bottom:10px solid transparent;
+}
+.film-play:hover .film-icon{background:var(--maroon);transform:scale(1.08)}
+.film-length{
+  position:absolute;right:10px;bottom:10px;z-index:2;
+  font-size:11px;letter-spacing:.04em;color:#fff;
+  background:rgba(12,6,8,.6);border-radius:3px;padding:2px 7px;
+}
+.film video{width:100%;display:block;border-radius:6px;border:1px solid var(--line)}
+.film-caption{padding:14px 2px 0}
+.film-title{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:18px;font-weight:600;color:var(--maroon-ink);margin-bottom:6px;
+}
+.film-desc{font-size:12.8px;line-height:1.7;color:var(--body);margin:0}
+
+/* ===========================================================
    10h. FAQ
    =========================================================== */
 .faq-group{margin-bottom:34px}
@@ -815,6 +862,49 @@ body.sg-bm-docked.sg-bm-open .bm-close{display:flex}
   width:100%;
   padding:0 var(--gut) 64px;
   pointer-events:none;
+}
+
+/* ---- the hero copy cycles through the collection ---- */
+.hero-rotator{position:relative;min-height:290px}
+.hero-slide{
+  position:absolute;left:0;top:0;right:0;
+  opacity:0;visibility:hidden;transform:translateY(14px);
+  transition:opacity .7s var(--ease),transform .7s var(--ease-out),visibility .7s;
+  pointer-events:none;
+}
+.hero-slide.is-on{opacity:1;visibility:visible;transform:none;pointer-events:auto}
+.hero-h{
+  color:#fff;font-size:56px;line-height:1.06;font-weight:600;
+  margin:0 0 18px;letter-spacing:-0.015em;
+}
+.hero-p{color:#f2e9db;font-size:16px;line-height:1.62;max-width:540px;margin:0 0 26px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;pointer-events:auto}
+.hero-dots{
+  display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;
+  pointer-events:auto;max-width:420px;
+}
+.hero-dots button{
+  width:22px;height:3px;border:0;padding:0;cursor:pointer;border-radius:2px;
+  background:rgba(242,233,219,.32);
+  transition:background .35s var(--ease),width .35s var(--ease-out);
+}
+.hero-dots button:hover{background:rgba(242,233,219,.6)}
+.hero-dots button.active{background:var(--gold);width:34px}
+
+@media (max-width:900px){
+  .hero-rotator{min-height:0;display:block}
+  /* Stacked slides cannot be absolute when the hero grows with its content. */
+  .hero-slide{position:absolute}
+  .hero-rotator{min-height:330px}
+}
+@media (max-width:560px){
+  .hero-h{font-size:29px!important}
+  .hero-rotator{min-height:310px}
+}
+
+/* Someone who asked for less motion gets the first panel, still. */
+@media (prefers-reduced-motion:reduce){
+  .hero-slide{transition:opacity .2s linear,visibility .2s linear;transform:none}
 }
 
 /* pause / play control, bottom-right */

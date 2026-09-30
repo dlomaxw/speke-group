@@ -30,6 +30,23 @@ export default async function HomePage() {
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
+  /* The hero cycles through the collection: one property at a time, each with
+     its own line and a way straight into it. */
+  const heroSlides = allProperties.map((p) => {
+    const where = [p.categoryLabel, p.area].filter(Boolean).join(' · ');
+    const go = p.bookingUrl || p.websiteUrl || `https://spekegroup.com/${p.slug}/`;
+    return `
+        <div class="hero-slide">
+          <div class="eyebrow-line" style="color:#d4af6a">${esc(where)}</div>
+          <div class="serif hero-h">${esc(p.name)}</div>
+          <p class="hero-p">${esc(p.description)}</p>
+          <div class="hero-actions">
+            <a class="btn btn-solid" href="${safeUrl(go, '/contact')}"><span>${p.bookingUrl ? 'BOOK THIS PROPERTY' : 'VIEW PROPERTY'}</span></a>
+            <a class="btn btn-light" href="#portfolio"><span>VIEW OUR COLLECTION</span></a>
+          </div>
+        </div>`;
+  }).join('');
+
   const portfolio = allProperties.map((p) => `
         <a class="card" href="${safeUrl(p.websiteUrl, `https://spekegroup.com/${esc(p.slug)}/`)}" data-reveal data-filter-item="portfolio" data-tags="${esc(p.kind)}">
           <div class="media" style="aspect-ratio:1/1">
@@ -120,22 +137,27 @@ export default async function HomePage() {
 
   <!-- ================= HERO (video) ================= -->
   <div class="hero-video">
-    <video class="hero-media" poster="${safeUrl(setting(s, 'hero_poster_url', '/assets/hero-properties-poster.webp'), '')}"
-           data-mobile-src="${safeUrl(setting(s, 'hero_video_mobile_url', '/assets/hero-properties-mobile.mp4'), '')}"
-           data-mobile-poster="${safeUrl(setting(s, 'hero_poster_mobile_url', '/assets/hero-properties-mobile-poster.webp'), '')}"
+    <video class="hero-media" poster="${safeUrl(setting(s, 'hero_poster_url', '/assets/hero-paradise-poster.webp'), '')}"
+           data-mobile-src="${safeUrl(setting(s, 'hero_video_mobile_url', '/assets/hero-paradise-mobile.mp4'), '')}"
+           data-mobile-poster="${safeUrl(setting(s, 'hero_poster_mobile_url', '/assets/hero-paradise-mobile-poster.webp'), '')}"
            autoplay muted loop playsinline preload="metadata"
            aria-hidden="true" tabindex="-1">
-      <source src="${safeUrl(setting(s, 'hero_video_url', '/assets/hero-properties.mp4'), '')}" type="video/mp4">
+      <source src="${safeUrl(setting(s, 'hero_video_url', '/assets/hero-paradise.mp4'), '')}" type="video/mp4">
     </video>
     <div class="scrim"></div>
     <div class="hero-copy">
-      <div class="eyebrow-line" style="color:#d4af6a">${esc(setting(s, 'hero_eyebrow', 'Speke Group of Hotels'))}</div>
-      <h1 class="serif" style="color:#fff;font-size:56px;line-height:1.06;font-weight:600;margin:0 0 18px;letter-spacing:-0.015em">${esc(setting(s, 'hero_title', 'Distinctive Places Across Uganda'))}<br><span style="color:#d4af6a">${esc(setting(s, 'hero_title_accent', 'One Warm Welcome'))}</span></h1>
-      <p style="color:#f2e9db;font-size:16px;line-height:1.62;max-width:540px;margin:0 0 26px">${esc(setting(s, 'hero_body'))}</p>
-      <div style="display:flex;gap:12px;pointer-events:auto">
-        <a class="btn btn-solid" href="#our-group"><span>DISCOVER SPEKE GROUP</span></a>
-        <a class="btn btn-light" href="#portfolio"><span>VIEW OUR COLLECTION</span></a>
+      <div class="hero-rotator" data-hero-rotator>
+        <div class="hero-slide is-on">
+          <div class="eyebrow-line" style="color:#d4af6a">${esc(setting(s, 'hero_eyebrow', 'Speke Group of Hotels'))}</div>
+          <h1 class="serif hero-h">${esc(setting(s, 'hero_title', 'Distinctive Places Across Uganda'))}<br><span style="color:#d4af6a">${esc(setting(s, 'hero_title_accent', 'One Warm Welcome'))}</span></h1>
+          <p class="hero-p">${esc(setting(s, 'hero_body'))}</p>
+          <div class="hero-actions">
+            <a class="btn btn-solid" href="#our-group"><span>DISCOVER SPEKE GROUP</span></a>
+            <a class="btn btn-light" href="#portfolio"><span>VIEW OUR COLLECTION</span></a>
+          </div>
+        </div>${heroSlides}
       </div>
+      <div class="hero-dots" data-hero-dots aria-hidden="true"></div>
     </div>
     <button class="video-toggle" type="button" aria-label="Pause background video" aria-pressed="false">
       <span class="bars"></span>

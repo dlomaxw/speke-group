@@ -1,6 +1,6 @@
 import {
   properties, venues, restaurants, experiences, newsPosts,
-  offers, milestones, highlightBlocks, venueGroups, wellness, awards, faqs,
+  offers, milestones, highlightBlocks, venueGroups, wellness, awards, faqs, videos,
 } from '@/db/schema';
 
 export type FieldType =
@@ -118,6 +118,28 @@ export const COLLECTIONS: CollectionConfig[] = [
       { name: 'imageUrl', label: 'Photo', type: 'image' },
       { name: 'imageAlt', label: 'Photo description', type: 'text' },
       SORT_FIELD, STATUS_FIELD,
+    ],
+  },
+  {
+    slug: 'videos',
+    label: 'Films',
+    singular: 'Film',
+    description: 'The video gallery on the events page.',
+    table: videos,
+    icon: 'video',
+    defaultSort: 'sortOrder',
+    hasStatus: true,
+    propertyField: 'propertyId',
+    listFields: ['title', 'propertyId', 'status'],
+    fields: [
+      { name: 'title', label: 'Title', type: 'text', required: true },
+      { name: 'slug', label: 'Slug', type: 'text', required: true },
+      { name: 'description', label: 'Description', type: 'textarea' },
+      { name: 'propertyId', label: 'Property', type: 'property' },
+      { name: 'videoUrl', label: 'Video file', type: 'image', required: true, help: 'MP4. Plays when a visitor presses play, so it costs them nothing until then.' },
+      { name: 'posterUrl', label: 'Poster image', type: 'image', help: 'Shown before the film starts.' },
+      { name: 'durationLabel', label: 'Length', type: 'text', placeholder: '0:48' },
+      { name: 'sortOrder', label: 'Order', type: 'number' },
     ],
   },
   {

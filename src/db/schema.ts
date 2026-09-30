@@ -245,6 +245,22 @@ export const awards = sqliteTable('awards', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, (t) => [uniqueIndex('awards_slug_idx').on(t.slug)]);
 
+/** Films shown in the video gallery. */
+export const videos = sqliteTable('videos', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug', { length: 120 }).notNull(),
+  title: text('title', { length: 200 }).notNull(),
+  description: text('description'),
+  propertyId: integer('property_id').references(() => properties.id, { onDelete: 'set null' }),
+  videoUrl: text('video_url').notNull(),
+  posterUrl: text('poster_url'),
+  /** Shown on the card, e.g. "0:48". */
+  durationLabel: text('duration_label', { length: 20 }),
+  sortOrder: integer('sort_order').notNull().default(0),
+  status: text('status', { enum: statusEnum }).notNull().default('published'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
+}, (t) => [uniqueIndex('videos_slug_idx').on(t.slug)]);
+
 export const faqCategoryEnum = ['booking', 'stay', 'events', 'group'] as const;
 
 export const faqs = sqliteTable('faqs', {

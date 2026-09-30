@@ -757,6 +757,90 @@
   }
 
 
+
+  /* ---------- 9e. Film gallery --------------------------- */
+  /* The poster is a button; pressing it swaps in a real player, so nothing
+     downloads until someone asks to watch. */
+  function initFilms() {
+    var buttons = document.querySelectorAll('[data-film-src]');
+    Array.prototype.forEach.call(buttons, function (button) {
+      if (button.dataset.sgWired === '1') return;
+      button.dataset.sgWired = '1';
+      button.addEventListener('click', function () {
+        var src = button.getAttribute('data-film-src');
+        if (!src) return;
+        var video = document.createElement('video');
+        video.src = src;
+        video.controls = true;
+        video.autoplay = true;
+        video.playsInline = true;
+        video.setAttribute('playsinline', '');
+        video.preload = 'auto';
+        button.parentNode.replaceChild(video, button);
+        var playing = video.play();
+        if (playing && typeof playing.catch === 'function') playing.catch(function () {});
+      });
+    });
+  }
+
+
+  /* ---------- 9f. Hero rotator --------------------------- */
+  /* The hero copy moves through the collection, a property at a time. The
+     markup carries every panel, so without this the first one simply stays. */
+  function initHeroRotator() {
+    var rotator = document.querySelector('[data-hero-rotator]');
+    if (!rotator || rotator.dataset.sgWired === '1') return;
+    rotator.dataset.sgWired = '1';
+    var slides = rotator.querySelectorAll('.hero-slide');
+    if (slides.length < 2) return;
+    var dots = document.querySelector('[data-hero-dots]');
+    var at = 0;
+    var timer = null;
+    var HOLD = 6500;
+
+    function show(next) {
+      slides[at].classList.remove('is-on');
+      at = (next + slides.length) % slides.length;
+      slides[at].classList.add('is-on');
+      if (!dots) return;
+      Array.prototype.forEach.call(dots.children, function (d, i) {
+        d.classList.toggle('active', i === at);
+      });
+    }
+    function start() { if (!reduced && !timer) timer = window.setInterval(function () { show(at + 1); }, HOLD); }
+    function stop() { if (timer) { window.clearInterval(timer); timer = null; } }
+
+    if (dots && !dots.children.length) {
+      for (var i = 0; i < slides.length; i++) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.dataset.index = String(i);
+        b.setAttribute('aria-label', i === 0 ? 'Speke Group' : 'Property ' + i);
+        if (i === 0) b.className = 'active';
+        dots.appendChild(b);
+      }
+      dots.removeAttribute('aria-hidden');
+      dots.addEventListener('click', function (e) {
+        var b = e.target.closest ? e.target.closest('button') : null;
+        if (!b) return;
+        stop();
+        show(Number(b.dataset.index));
+        start();
+      });
+    }
+
+    /* Reading or reaching for a button should not be interrupted. */
+    var hero = rotator.closest('.hero-video') || rotator;
+    hero.addEventListener('mouseenter', stop);
+    hero.addEventListener('mouseleave', start);
+    hero.addEventListener('focusin', stop);
+    hero.addEventListener('focusout', start);
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop(); else start();
+    });
+    start();
+  }
+
   /* ---------- boot --------------------------------------- */
   function boot() {
     buildLoader();
@@ -771,6 +855,8 @@
     initHeroVideo();
     initBookingBar();
     initCarousel();
+    initFilms();
+    initHeroRotator();
     initWovenBand();
     initEnquiryForm();
     initCardReveal();
@@ -793,7 +879,9 @@
       initHeroVideo();
       initBookingBar();
       initCarousel();
-        initWovenBand();
+      initFilms();
+      initHeroRotator();
+      initWovenBand();
     }
     if ('MutationObserver' in window) {
       new MutationObserver(function () {

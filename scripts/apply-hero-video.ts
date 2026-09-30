@@ -10,16 +10,16 @@ import { getDb, usingD1 } from '../src/db';
 import { settings } from '../src/db/schema';
 
 const HERO = [
-  { key: 'hero_video_url', value: '/assets/hero-properties.mp4',
+  { key: 'hero_video_url', value: '/assets/hero-paradise.mp4',
     label: 'Hero video', valueType: 'video', sortOrder: 1,
-    helpText: 'The looping film behind the homepage headline, shown on tablets and desktops. MP4, 16:9.' },
-  { key: 'hero_poster_url', value: '/assets/hero-properties-poster.webp',
+    helpText: 'The looping film behind the homepage headline, shown on tablets and desktops. MP4, 16:9, no sound.' },
+  { key: 'hero_poster_url', value: '/assets/hero-paradise-poster.webp',
     label: 'Hero poster image', valueType: 'image', sortOrder: 2,
     helpText: 'Shown while the video loads.' },
-  { key: 'hero_video_mobile_url', value: '/assets/hero-properties-mobile.mp4',
+  { key: 'hero_video_mobile_url', value: '/assets/hero-paradise-mobile.mp4',
     label: 'Hero video (phones)', valueType: 'video', sortOrder: 3,
     helpText: 'The vertical cut, used on screens under 768px. Leave empty to use the landscape film everywhere.' },
-  { key: 'hero_poster_mobile_url', value: '/assets/hero-properties-mobile-poster.webp',
+  { key: 'hero_poster_mobile_url', value: '/assets/hero-paradise-mobile-poster.webp',
     label: 'Hero poster image (phones)', valueType: 'image', sortOrder: 4,
     helpText: 'Shown while the vertical video loads.' },
 ];

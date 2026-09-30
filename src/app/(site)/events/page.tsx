@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getChrome, getHighlights, getVenues, setting } from '@/lib/site-data';
-import { esc, slot, header, footer, countUp, phones, bookingBar, BOOKING_ANCHOR } from '@/lib/site-html';
+import { getChrome, getHighlights, getVenues, getVideos, setting } from '@/lib/site-data';
+import { esc, slot, header, footer, countUp, phones, bookingBar, BOOKING_ANCHOR, safeUrl } from '@/lib/site-html';
 import { VENUE_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -18,8 +18,8 @@ function bookingDates() {
 }
 
 export default async function EventsPage() {
-  const [chrome, venues, occasions] = await Promise.all([
-    getChrome(), getVenues(), getHighlights('occasions'),
+  const [chrome, venues, occasions, films] = await Promise.all([
+    getChrome(), getVenues(), getHighlights('occasions'), getVideos(),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
   const email = setting(s, 'contact_email');
@@ -46,6 +46,20 @@ export default async function EventsPage() {
             <a class="link-arrow" href="/contact">VIEW VENUE <i>&rarr;</i></a>
           </div>
         </div>`).join('');
+
+  /* Nothing downloads until a visitor presses play. */
+  const filmCards = films.map((f) => `
+        <figure class="film" data-film data-reveal>
+          <button class="film-play" type="button" data-film-src="${safeUrl(f.videoUrl, '')}" aria-label="Play ${esc(f.title)}">
+            ${slot(f.posterUrl, f.title, 'width:100%;height:100%')}
+            <span class="film-icon" aria-hidden="true"></span>
+            ${f.durationLabel ? `<span class="film-length">${esc(f.durationLabel)}</span>` : ''}
+          </button>
+          <figcaption class="film-caption">
+            <div class="film-title">${esc(f.title)}</div>
+            <p class="film-desc">${esc(f.description)}</p>
+          </figcaption>
+        </figure>`).join('');
 
   const occasionTiles = occasions.map((o) => `
         <div class="tile" data-reveal>
@@ -114,6 +128,18 @@ export default async function EventsPage() {
     </div>
     <p class="wellness-none" data-filter-none="venues" hidden>No venue at that location takes a party of this size. <a href="/contact">Tell us what you need</a> and we will find the right room.</p>
   </div>
+
+  <!-- ================= FILMS ================= -->
+  ${films.length ? `
+  <div id="films" style="padding:50px var(--gut)">
+    <div style="text-align:center;max-width:680px;margin:0 auto 28px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">Films</div>
+      <h2 class="h-sec">${esc(setting(s, 'films_title', 'See the Venue for Yourself'))}</h2>
+      <p style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'films_body'))}</p>
+    </div>
+    <div class="g-3" style="gap:22px" data-stagger="0.08">${filmCards}
+    </div>
+  </div>` : ''}
 
   <!-- ================= OCCASIONS ================= -->
   <div id="occasions" style="background:#efe6d6;padding:50px var(--gut)">
