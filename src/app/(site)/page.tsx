@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getAwards, getChrome, getHighlights, getOffers, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
-import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones, locationsMap, filmGallery } from '@/lib/site-html';
+import { getAwards, getChrome, getHeroSlides, getHighlights, getImpact, getOffers, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
+import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones, locationsMap, filmGallery, icon } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -25,27 +25,55 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, offers, spas, occasions, honours, films] = await Promise.all([
-    getChrome(), getOffers(), getWellness(), getHighlights('occasions'), getAwards(), getVideos(),
+  const [chrome, offers, spas, occasions, honours, films, green, panels] = await Promise.all([
+    getChrome(), getOffers(), getWellness(), getHighlights('occasions'), getAwards(), getVideos(), getImpact(),
+    getHeroSlides(),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
-  /* The hero cycles through the collection: one property at a time, each with
-     its own line and a way straight into it. */
-  const heroSlides = allProperties.map((p) => {
-    const where = [p.categoryLabel, p.area].filter(Boolean).join(' · ');
-    const go = p.bookingUrl || p.websiteUrl || `https://spekegroup.com/${p.slug}/`;
+  /* The hero's panels come from the dashboard. A panel pointed at a property
+     falls back to that property's own name, description and booking link for
+     anything left blank, so the two never drift apart. With no panels set up,
+     the hero runs the Group's line followed by the whole collection. */
+  const heroPanel = (o: {
+    eyebrow?: string | null; title?: string | null; titleAccent?: string | null; body?: string | null;
+    ctaLabel?: string | null; ctaUrl?: string | null; cta2Label?: string | null; cta2Url?: string | null;
+    propertyId?: number | null;
+  }, first = false) => {
+    const at = o.propertyId ? allProperties.find((p) => p.id === o.propertyId) : undefined;
+    const eyebrow = o.eyebrow || (at ? [at.categoryLabel, at.area].filter(Boolean).join(' · ') : '');
+    const title = o.title || at?.name || '';
+    const body = o.body || at?.description || '';
+    const href = o.ctaUrl || at?.bookingUrl || at?.websiteUrl || '/#portfolio';
+    const label = o.ctaLabel || (at?.bookingUrl ? 'BOOK THIS PROPERTY' : 'VIEW PROPERTY');
+    const Heading = first ? 'h1' : 'div';
     return `
-        <div class="hero-slide">
-          <div class="eyebrow-line" style="color:#d4af6a">${esc(where)}</div>
-          <div class="serif hero-h">${esc(p.name)}</div>
-          <p class="hero-p">${esc(p.description)}</p>
+        <div class="hero-slide${first ? ' is-on' : ''}">
+          ${eyebrow ? `<div class="eyebrow-line" style="color:#d4af6a">${esc(eyebrow)}</div>` : ''}
+          <${Heading} class="serif hero-h">${esc(title)}${o.titleAccent ? `<br><span style="color:#d4af6a">${esc(o.titleAccent)}</span>` : ''}</${Heading}>
+          ${body ? `<p class="hero-p">${esc(body)}</p>` : ''}
           <div class="hero-actions">
-            <a class="btn btn-solid" href="${safeUrl(go, '/contact')}"><span>${p.bookingUrl ? 'BOOK THIS PROPERTY' : 'VIEW PROPERTY'}</span></a>
-            <a class="btn btn-light" href="#portfolio"><span>VIEW OUR COLLECTION</span></a>
+            <a class="btn btn-solid" href="${safeUrl(href, '/contact')}"><span>${esc(label)}</span></a>
+            ${o.cta2Label ? `<a class="btn btn-light" href="${safeUrl(o.cta2Url, '/#portfolio')}"><span>${esc(o.cta2Label)}</span></a>` : ''}
           </div>
         </div>`;
-  }).join('');
+  };
+
+  const groupPanel = {
+    eyebrow: setting(s, 'hero_eyebrow', 'Speke Group of Hotels'),
+    title: setting(s, 'hero_title', 'Distinctive Places Across Uganda'),
+    titleAccent: setting(s, 'hero_title_accent', 'One Warm Welcome'),
+    body: setting(s, 'hero_body'),
+    ctaLabel: setting(s, 'home_hero_cta_1', 'DISCOVER SPEKE GROUP'),
+    ctaUrl: '#our-group',
+    cta2Label: setting(s, 'home_hero_cta_2', 'VIEW OUR COLLECTION'),
+    cta2Url: '#portfolio',
+  };
+  const heroHtml = panels.length
+    ? panels.map((o, i) => heroPanel(o, i === 0)).join('')
+    : [heroPanel(groupPanel, true), ...allProperties.map((p) => heroPanel({
+        propertyId: p.id, cta2Label: setting(s, 'home_hero_cta_2', 'VIEW OUR COLLECTION'), cta2Url: '#portfolio',
+      }))].join('');
 
   const portfolio = allProperties.map((p) => `
         <a class="card" href="${safeUrl(p.websiteUrl, `https://spekegroup.com/${esc(p.slug)}/`)}" data-reveal data-filter-item="portfolio" data-tags="${esc(p.kind)}">
@@ -115,6 +143,29 @@ export default async function HomePage() {
         </a>`;
   }).join('');
 
+  /* Three initiatives for the homepage, one per property, so the strip reads
+     across the collection rather than three times over one resort. Only what
+     a property already publishes — anything still being assessed waits for
+     the Our Impact page, where the caveats sit beside it. */
+  const IMPACT_AREA: Record<string, string> = {
+    energy: 'Energy', water: 'Water', waste: 'Waste',
+    sourcing: 'Purchasing', nature: 'Nature', community: 'Community',
+  };
+  const seenProperty = new Set<number | null>();
+  const greenPicks = green
+    .filter((i) => i.evidence === 'published' && i.propertyId)
+    .filter((i) => (seenProperty.has(i.propertyId) ? false : seenProperty.add(i.propertyId)))
+    .slice(0, 3);
+  const greenCards = greenPicks.map((i) => {
+    const at = allProperties.find((p) => p.id === i.propertyId);
+    return `
+        <a class="tile green-card" href="/impact" data-reveal>
+          <span class="green-area">${icon(i.area === 'energy' ? 'leaf' : i.area, 14)}${esc(IMPACT_AREA[i.area] ?? i.area)}</span>
+          <span class="green-title">${esc(i.title)}</span>
+          <span class="green-where">${esc(at?.name ?? 'Across the Group')}</span>
+        </a>`;
+  }).join('');
+
   const tabs = OFFER_TABS.filter((t) => offers.some((o) => o.category === t.key));
   const offerPanels = tabs.map((t, i) => {
     const first = i === 0;
@@ -146,16 +197,7 @@ export default async function HomePage() {
     </video>
     <div class="scrim"></div>
     <div class="hero-copy">
-      <div class="hero-rotator" data-hero-rotator>
-        <div class="hero-slide is-on">
-          <div class="eyebrow-line" style="color:#d4af6a">${esc(setting(s, 'hero_eyebrow', 'Speke Group of Hotels'))}</div>
-          <h1 class="serif hero-h">${esc(setting(s, 'hero_title', 'Distinctive Places Across Uganda'))}<br><span style="color:#d4af6a">${esc(setting(s, 'hero_title_accent', 'One Warm Welcome'))}</span></h1>
-          <p class="hero-p">${esc(setting(s, 'hero_body'))}</p>
-          <div class="hero-actions">
-            <a class="btn btn-solid" href="#our-group"><span>DISCOVER SPEKE GROUP</span></a>
-            <a class="btn btn-light" href="#portfolio"><span>VIEW OUR COLLECTION</span></a>
-          </div>
-        </div>${heroSlides}
+      <div class="hero-rotator" data-hero-rotator>${heroHtml}
       </div>
       <div class="hero-dots" data-hero-dots aria-hidden="true"></div>
     </div>
@@ -174,25 +216,24 @@ export default async function HomePage() {
   <div id="our-group" style="padding:54px var(--gut) 44px;text-align:center" data-reveal>
     <div class="eyebrow-line" style="justify-content:center">Our Group</div>
     <h2 class="h-sec" style="max-width:820px;margin:0 auto">${esc(setting(s, 'group_title', 'Thirteen Places to Stay, Meet and Celebrate'))}</h2>
-    <p style="font-size:15px;color:#5a4a3a;line-height:1.8;max-width:760px;margin:16px auto 0">${esc(setting(s, 'group_body', 'Speke Group brings together city hotels, lakeside resorts, serviced apartments and a convention centre across Uganda — each with its own character, and the same attentive welcome.'))}</p>
+    <p style="font-size:15px;color:#5a4a3a;line-height:1.8;max-width:760px;margin:16px auto 0">${esc(setting(s, 'group_body', 'Discover Speke Group’s collection of hotels, apartments and resorts — where warm Ugandan hospitality meets comfort and style. Whether you’re planning a relaxing escape, a business stay, a new place to call home or a memorable celebration, find your perfect destination with us.'))}</p>
   </div>
 
   <!-- ================= OUR STORY + STATS ================= -->
-  <div id="our-story" class="row-split" style="display:flex;align-items:center;justify-content:space-between;padding:46px var(--gut);border-bottom:1px solid rgba(111,32,51,0.12);gap:50px">
-    <div style="max-width:560px" data-reveal>
-      <div class="eyebrow-line">Our Story</div>
-      <h2 class="h-sec" style="margin-bottom:12px">${esc(setting(s, 'story_title', 'A Collection Built on Ugandan Hospitality'))}</h2>
-      <p style="font-size:14px;line-height:1.72;color:#5a4a3a;margin:0 0 14px">${esc(setting(s, 'story_body'))}</p>
-      <a class="link-arrow" href="/about">READ OUR FULL STORY <i>&rarr;</i></a>
-    </div>
-    <div style="display:flex;align-items:center;gap:30px;flex:none" data-reveal data-reveal-delay="0.12">
-      <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_properties', '13'))}</div><div class="lbl">Properties</div></div>
-      <div class="rule-v"></div>
-      <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Guest Rooms &amp; Apartments</div></div>
-      <div class="rule-v"></div>
-      <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_conference_rooms', '45'))}</div><div class="lbl">Conference Rooms</div></div>
-      <div class="rule-v"></div>
-      <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_years', '25'), '+')}</div><div class="lbl">Years of Service</div></div>
+  <div style="padding:34px var(--gut) 44px">
+    <div id="our-story" class="story-card" data-reveal>
+      <div class="story-copy">
+        <div class="eyebrow-line">${esc(setting(s, 'home_story_eyebrow', "Our Story"))}</div>
+        <h2 class="h-sec" style="margin-bottom:12px">${esc(setting(s, 'story_title', 'A Collection Built on Ugandan Hospitality'))}</h2>
+        <p style="font-size:14px;line-height:1.75;color:#5a4a3a;margin:0 0 16px">${esc(setting(s, 'story_body'))}</p>
+        <a class="link-arrow" href="/about">READ OUR FULL STORY <i>&rarr;</i></a>
+      </div>
+      <div class="story-stats">
+        <div class="stat"><div class="num">${countUp(setting(s, 'stat_properties', '13'))}</div><div class="lbl">Properties</div></div>
+        <div class="stat"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Guest Rooms &amp; Apartments</div></div>
+        <div class="stat"><div class="num">${countUp(setting(s, 'stat_conference_rooms', '45'))}</div><div class="lbl">Conference Rooms</div></div>
+        <div class="stat"><div class="num">${countUp(setting(s, 'stat_years', '25'), '+')}</div><div class="lbl">Years of Service</div></div>
+      </div>
     </div>
   </div>
 
@@ -200,8 +241,8 @@ export default async function HomePage() {
   <div id="portfolio" style="padding:48px var(--gut) 54px">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:16px" data-reveal>
       <div>
-        <div class="eyebrow-line">Find &amp; Book</div>
-        <h2 class="h-sec">Our Collection</h2>
+        <div class="eyebrow-line">${esc(setting(s, 'home_portfolio_eyebrow', "Find & Book"))}</div>
+        <h2 class="h-sec">${esc(setting(s, 'home_portfolio_title', "Our Collection"))}</h2>
       </div>
       <div data-filter-group="portfolio" style="display:flex;gap:9px">
         <button class="chip active" data-filter="all">All</button>
@@ -229,7 +270,7 @@ export default async function HomePage() {
   ${honours.length ? `
   <div class="awards-band">
     <div style="text-align:center;max-width:680px;margin:0 auto 28px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center;color:#d4af6a">Recognition</div>
+      <div class="eyebrow-line" style="justify-content:center;color:#d4af6a">${esc(setting(s, 'home_awards_eyebrow', "Recognition"))}</div>
       <h2 class="serif" style="font-size:30px;font-weight:600;color:#fff;margin:0">${esc(setting(s, 'awards_title', 'Recognised Beyond Our Borders'))}</h2>
       <p style="font-size:14px;color:#e9dccb;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'awards_body'))}</p>
     </div>
@@ -240,7 +281,7 @@ export default async function HomePage() {
   <!-- ================= WELLNESS ================= -->
   <div id="wellness" style="background:var(--cream-2);padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:26px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">Experience</div>
+      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'home_wellness_eyebrow', "Experience"))}</div>
       <h2 class="h-sec">${esc(setting(s, 'wellness_title', 'Spa & Wellness'))}</h2>
       <p style="font-size:14px;color:#5a4a3a;max-width:660px;margin:12px auto 0;line-height:1.7">${esc(setting(s, 'wellness_body', 'Massages, facials and steam baths, hair and beauty salons, gyms and pools — choose a location to see what is on offer there.'))}</p>
     </div>
@@ -252,7 +293,7 @@ export default async function HomePage() {
       </select>
     </div>
 
-    <div class="g-3" style="gap:22px" data-stagger="0.08" data-filter-empty="wellness">${wellnessCards}
+    <div class="g-3${spas.length < 3 ? ' g-centered' : ''}" style="gap:22px" data-stagger="0.08" data-filter-empty="wellness">${wellnessCards}
     </div>
     <p class="wellness-none" data-filter-none="wellness" hidden>We have nothing listed here yet. <a href="/contact">Ask our team</a> and we will point you to the nearest spa or salon.</p>
   </div>
@@ -274,14 +315,28 @@ export default async function HomePage() {
     </div>
   </div>
 
+  <!-- ================= SUSTAINABILITY ================= -->
+  <div id="sustainability" style="padding:50px var(--gut)">
+    <div class="impact-standing impact-home" style="max-width:none" data-reveal>
+      <div>
+        <div class="eyebrow-line">${esc(setting(s, 'home_impact_eyebrow', "Sustainability"))}</div>
+        <h2 class="h-sec" style="margin-bottom:10px">${esc(setting(s, 'impact_home_title', 'A Warm Welcome. A Thought for Tomorrow.'))}</h2>
+        <p style="font-size:14px;line-height:1.75;color:#5a4a3a;margin:0;max-width:760px">${esc(setting(s, 'impact_home_body'))}</p>
+      </div>
+      <a class="btn btn-ghost" href="/impact"><span>${esc(setting(s, 'home_impact_cta', "SEE WHAT WE DO"))}</span></a>
+    </div>
+    ${greenCards ? `<div class="g-3" style="gap:18px;margin-top:20px" data-stagger="0.07">${greenCards}
+    </div>` : ''}
+  </div>
+
   <!-- ================= FILMS ================= -->
   ${filmGallery(films, { eyebrow: 'Films', title: setting(s, 'home_films_title', 'See Us for Yourself'), body: setting(s, 'home_films_body', 'Short films from across the Group.') })}
 
   <!-- ================= PACKAGES & OFFERS ================= -->
   <div style="padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:28px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">Our Specials</div>
-      <h2 class="h-sec">Enjoy Packages &amp; Offers</h2>
+      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'home_offers_eyebrow', "Our Specials"))}</div>
+      <h2 class="h-sec">${esc(setting(s, 'home_offers_title', "Enjoy Packages & Offers"))}</h2>
     </div>
     <div data-tabs="offers" style="display:flex;justify-content:center;gap:9px;margin-bottom:28px" data-reveal>
       ${tabs.map((t, i) => `<button class="chip${i === 0 ? ' active' : ''}" data-tab="${t.key}">${t.label}</button>`).join('\n      ')}

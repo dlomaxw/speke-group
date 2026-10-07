@@ -68,6 +68,7 @@ export function header(opts: {
           <a href="/about">About Us</a>
           <a href="/about#chairman">Our Chairman</a>
           <a href="/about#history">Our History</a>
+          <a href="/impact">Sustainability</a>
           <a href="/#portfolio">Our Properties</a>
         </div>
       </div>
@@ -205,36 +206,40 @@ export function footer(s: SettingsMap): string {
         <div style="font-size:12px;line-height:1.8;color:#c8a888;max-width:230px">${esc(setting(s, 'site_tagline', 'Hotels, resorts, serviced apartments and event venues across Uganda.'))}</div>
       </div>
       <div>
-        <div class="col-title">Address</div>
-        <div style="font-size:12.5px;line-height:2;color:#dcc0a8">
+        <div class="col-title">${icon('pin', 14)}Address</div>
+        <div class="foot-lines">
           <div>${esc(setting(s, 'contact_address_1'))}</div>
           <div>${esc(setting(s, 'contact_address_2'))}</div>
+          <a class="foot-go" href="/#locations">Find us on the map &#8599;</a>
         </div>
-        <div class="col-title" style="margin-top:20px">Reservations</div>
-        <div style="font-size:12.5px;line-height:2;color:#dcc0a8;display:flex;flex-direction:column">${phones(s)
-          .map((p) => `\n          <a href="${esc(telHref(p))}">${esc(p)}</a>`).join('')}${email ? `
+      </div>
+      <div>
+        <div class="col-title">${icon('phone', 14)}Contact</div>
+        <div class="foot-lines foot-links">${phones(s)
+          .map((p) => `
+          <a href="${esc(telHref(p))}">${esc(p)}</a>`).join('')}${email ? `
           <a href="mailto:${esc(email)}">${esc(email)}</a>` : ''}
         </div>
       </div>
       <div>
         <div class="col-title">Information</div>
-        <div style="font-size:12.5px;line-height:2.05;color:#dcc0a8;display:flex;flex-direction:column">
+        <div class="foot-lines foot-links">
           <a href="/about">About Us</a>
+          <a href="/impact">Our Impact</a>
           <a href="/faq">Questions &amp; Answers</a>
-          <a href="/#locations">Find Us</a>
-          <a href="https://spekegroup.com/contact/">Careers</a>
-          <a href="https://spekegroup.com/contact/">SOPs</a>
-          <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
           <a href="/events">Events &amp; Meetings</a>
           <a href="/experiences">Experiences</a>
+          <a href="https://spekegroup.com/contact/">Careers</a>
+          <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
         </div>
       </div>
       <div>
         <div class="col-title">Socials</div>
         <div style="display:flex;gap:10px">${facebook ? `
-          <a class="social" href="${safeUrl(facebook)}">f</a>` : ''}${twitter ? `
-          <a class="social" href="${safeUrl(twitter)}">X</a>` : ''}
+          <a class="social" href="${safeUrl(facebook)}" aria-label="Speke Group on Facebook">${icon('facebook', 17)}</a>` : ''}${twitter ? `
+          <a class="social" href="${safeUrl(twitter)}" aria-label="Speke Group on X">${icon('x', 17)}</a>` : ''}
         </div>
+        <a class="btn btn-ghost foot-cta" href="/contact"><span>CONTACT US</span></a>
       </div>
     </div>
     <div style="border-top:1px solid rgba(242,226,200,0.2);padding-top:20px;font-size:11.5px;color:#c8a888;text-align:center">${esc(setting(s, 'footer_copyright', 'Copyright © 2026. All Rights Reserved to Speke Group of Hotels.'))}</div>
@@ -373,10 +378,11 @@ export function locationsMap(properties: MapProperty[], opts: { title: string; b
   const minY = Math.min(...points.map((p) => p.y));
   const maxY = Math.max(...points.map((p) => p.y));
 
-  /* Crop to the properties with room around them, in a 3:2 frame. */
-  const RATIO = 1.5;
-  const cropH = (maxY - minY) * 1.22 + 90;
-  const cropW = Math.max((maxX - minX) * 1.22 + 90, cropH * RATIO);
+  /* Crop close to the properties. The spread is tall and narrow, so a wide
+     frame would be mostly empty map either side. */
+  const RATIO = 1.28;
+  const cropH = (maxY - minY) * 1.1 + 64;
+  const cropW = Math.max((maxX - minX) * 1.1 + 64, cropH * RATIO);
   const left = (minX + maxX) / 2 - cropW / 2;
   const top = (minY + maxY) / 2 - cropH / 2;
 
@@ -407,17 +413,36 @@ export function locationsMap(properties: MapProperty[], opts: { title: string; b
   const directions = (p: MapProperty) =>
     `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.name}, Kampala, Uganda`)}`;
 
+  /* Properties sharing a point — the three at Munyonyo — are spread into a
+     small fan so each one can be seen and clicked. */
+  const atPoint = new Map<string, number[]>();
+  points.forEach((pt, i) => {
+    const key = `${Math.round(pt.x)}:${Math.round(pt.y)}`;
+    atPoint.set(key, [...(atPoint.get(key) ?? []), i]);
+  });
+  const nudge = (i: number) => {
+    const key = `${Math.round(points[i].x)}:${Math.round(points[i].y)}`;
+    const group = atPoint.get(key) ?? [i];
+    if (group.length < 2) return { dx: 0, dy: 0 };
+    const seat = group.indexOf(i);
+    const angle = (seat / group.length) * Math.PI * 2 - Math.PI / 2;
+    return { dx: Math.cos(angle) * 17, dy: Math.sin(angle) * 17 };
+  };
+
   const pins = pinned.map((p, i) => {
-    const point = px(p);
+    const point = points[i];
+    const { dx, dy } = nudge(i);
+    const x = (((point.x + dx - left) / cropW) * 100).toFixed(3);
+    const y = (((point.y + dy - top) / cropH) * 100).toFixed(3);
     return `
-        <a class="map-pin" href="${safeUrl(directions(p), '#')}" style="left:${(((point.x - left) / cropW) * 100).toFixed(3)}%;top:${(((point.y - top) / cropH) * 100).toFixed(3)}%" aria-label="Directions to ${esc(p.name)}">
+        <a class="map-pin" href="${safeUrl(directions(p), '#')}" data-pin="${i + 1}" style="left:${x}%;top:${y}%" aria-label="Directions to ${esc(p.name)}">
           <span class="map-pin-no">${i + 1}</span>
           <span class="map-pin-name">${esc(p.name)}</span>
         </a>`;
   }).join('');
 
   const list = pinned.map((p, i) => `
-        <a class="map-row" href="${safeUrl(directions(p), '#')}">
+        <a class="map-row" href="${safeUrl(directions(p), '#')}" data-pin-row="${i + 1}">
           <span class="map-row-no">${i + 1}</span>
           <span>
             <span class="map-row-name">${esc(p.name)}</span>
@@ -486,4 +511,71 @@ export function filmGallery(films: Film[], opts: { eyebrow: string; title: strin
     <div class="${rows.length === 2 ? 'g-2' : 'g-3'}" style="gap:22px" data-stagger="0.08">${cards}
     </div>
   </div>`;
+}
+
+/* ------------------------------------------------------------------
+   Icons
+   ------------------------------------------------------------------ */
+
+/**
+ * One line-drawn set for the whole site, in the weight the brand's rules and
+ * hairlines already use: a single stroke, rounded ends, no fill. They take
+ * their colour from the text around them, so gold on cream and cream on
+ * maroon both work without a second copy.
+ */
+const ICON_PATHS: Record<string, string> = {
+  /* A round table seen from above: four seats around it reads as a meeting
+     at any size, where two half-drawn figures did not. */
+  conference: '<circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="4.4" r="1.7"/><circle cx="12" cy="19.6" r="1.7"/><circle cx="4.4" cy="12" r="1.7"/><circle cx="19.6" cy="12" r="1.7"/>',
+  spa: '<path d="M12 21c0-5 2.5-8 7-9-1 5-3.5 8-7 9Z"/><path d="M12 21c0-5-2.5-8-7-9 1 5 3.5 8 7 9Z"/><path d="M12 21c0-4 1-7 3-9.5C13.5 8 12.5 5.5 12 3c-.5 2.5-1.5 5-3 8.5C11 14 12 17 12 21Z"/>',
+  salon: '<circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><path d="M8 7.5 19 18"/><path d="M8 16.5 19 6"/>',
+  gym: '<path d="M4 9v6"/><path d="M20 9v6"/><path d="M7 7v10"/><path d="M17 7v10"/><path d="M7 12h10"/>',
+  pool: '<path d="M3 17c1.5 0 1.5 1.2 3 1.2s1.5-1.2 3-1.2 1.5 1.2 3 1.2 1.5-1.2 3-1.2 1.5 1.2 3 1.2 1.5-1.2 3-1.2"/><path d="M7 15V6a2 2 0 0 1 4 0"/><path d="M15 15V6a2 2 0 0 1 4 0"/><path d="M7 10h4"/>',
+  dining: '<path d="M6 3v8a2 2 0 0 0 4 0V3"/><path d="M8 11v10"/><path d="M17 3c-1.5 1.5-2 3-2 5s.5 2.5 2 2.5V3Z"/><path d="M17 10.5V21"/>',
+  wedding: '<circle cx="9" cy="14" r="4.5"/><circle cx="15" cy="14" r="4.5"/><path d="m12 6 1.6-2.2h-3.2L12 6Z"/>',
+  bed: '<path d="M3 18V7"/><path d="M3 12h18v6"/><path d="M21 18v-3"/><circle cx="7.5" cy="9.5" r="1.8"/><path d="M11 12V9.5a.5.5 0 0 1 .5-.5H19a2 2 0 0 1 2 2V12"/>',
+  marina: '<path d="M12 3v15"/><path d="M8.5 6.5h7"/><path d="M4 13c0 4.4 3.6 8 8 8s8-3.6 8-8"/><path d="M4 13l3-1.5"/><path d="M20 13l-3-1.5"/>',
+  equestrian: '<path d="M5 20c0-4 2-6 5-7l2-4 3-4 2 2-1.5 2.5L19 10c1 4-1 8-4 10"/><path d="M10 13 7 20"/>',
+  leaf: '<path d="M5 19c0-8 5-13 14-14 1 9-4 14-11 14H5Z"/><path d="M5 19c4-5 7-7 11-9"/>',
+  trophy: '<path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 6H4.5A2.5 2.5 0 0 0 7 9.5"/><path d="M17 6h2.5A2.5 2.5 0 0 1 17 9.5"/><path d="M12 14v3"/><path d="M8.5 20h7"/><path d="M9.5 20c0-1.6 1-3 2.5-3s2.5 1.4 2.5 3"/>',
+  water: '<path d="M12 3s6 6.4 6 10.4A6 6 0 0 1 6 13.4C6 9.4 12 3 12 3Z"/><path d="M9.5 14a2.5 2.5 0 0 0 2.5 2.5"/>',
+  waste: '<path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6"/><path d="M14 11v6"/>',
+  sourcing: '<path d="M4 7h16l-1.2 12.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/>',
+  community: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a5 5 0 0 1 10 0v1"/><circle cx="17" cy="9" r="2.5"/><path d="M15 20v-1a4 4 0 0 1 6-3.4"/>',
+  pin: '<path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M3.5 10h17"/><path d="M8 3v4"/><path d="M16 3v4"/>',
+  guests: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20v-.8A5.2 5.2 0 0 1 10.2 14h3.6A5.2 5.2 0 0 1 19 19.2V20"/>',
+  phone: '<path d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7 2 2 0 0 1 6.5 3.5Z"/>',
+  mail: '<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m3.8 7 7.1 5.4a2 2 0 0 0 2.2 0L20.2 7"/>',
+  /* Drawn in the same single stroke as the rest, rather than the solid mark
+     outlined, which reads as a hollow letter at this size. */
+  facebook: '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M14.6 8.2h-1.3c-.9 0-1.4.5-1.4 1.4v1.5h2.6l-.4 2.7h-2.2v4.9"/><path d="M9.6 11.1h2.3"/>',
+  x: '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 8l8 8"/><path d="M16 8l-8 8"/>',
+};
+
+export function icon(name: string, size = 22): string {
+  const body = ICON_PATHS[name];
+  if (!body) return '';
+  return `<svg class="sg-icon" viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${body}</svg>`;
+}
+
+/** Content names an icon by what it is; this maps those names onto the set. */
+const ICON_BY_SUBJECT: Record<string, string> = {
+  conferences: 'conference', meetings: 'conference', 'meeting venues': 'conference',
+  'spas & salons': 'spa', spas: 'spa', salon: 'salon', spa: 'spa',
+  restaurants: 'dining', dining: 'dining', 'world-class catering': 'dining',
+  'fitness centres': 'gym', gyms: 'gym', gym: 'gym',
+  'swimming pools': 'pool', pool: 'pool',
+  weddings: 'wedding', 'marina experience': 'marina', equestrian: 'equestrian',
+  lakeside: 'water', energy: 'leaf', water: 'water', waste: 'waste',
+  sourcing: 'sourcing', purchasing: 'sourcing', nature: 'leaf', community: 'community',
+};
+
+/** The icon for a block, by its title. Falls back to the decorative character
+ *  the editor typed, so nothing disappears if a name is not in the map. */
+export function subjectIcon(name: string, fallback?: string | null, size = 26): string {
+  const key = String(name || '').trim().toLowerCase();
+  const found = ICON_BY_SUBJECT[key];
+  if (found) return icon(found, size);
+  return fallback ? `<span class="sg-icon-glyph">${esc(fallback)}</span>` : '';
 }

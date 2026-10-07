@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
 import { getChrome, getDining, getExperiences, setting, splitHighlights } from '@/lib/site-data';
-import { esc, slot, header, footer, phones, bookingBar, BOOKING_ANCHOR } from '@/lib/site-html';
+import { esc, slot, header, footer, phones, bookingBar, BOOKING_ANCHOR, icon } from '@/lib/site-html';
 import { DINING_IMAGES, EXPERIENCE_ANCHORS, EXPERIENCE_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -92,19 +92,19 @@ export default async function ExperiencesPage() {
   <!-- ================= THREE PILLARS ================= -->
   <div style="gap:22px;padding:var(--gut) var(--gut) 10px" data-stagger="0.08" class="g-3">
     <a class="tile" href="#restaurants" data-reveal>
-      <div class="serif" style="font-size:30px;color:#c9a227;margin-bottom:10px">◆</div>
+      <div class="tile-icon">${icon('dining', 26)}</div>
       <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:9px">Restaurants</div>
       <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a;margin-bottom:12px">Explore specially curated menus featuring authentic Asian and Continental specialities with a modern twist. Indulge in seasonal creations that make for an exceptional culinary experience.</div>
       <span class="link-arrow">EXPLORE RESTAURANTS <i>&rarr;</i></span>
     </a>
     <a class="tile" href="#bars" data-reveal>
-      <div class="serif" style="font-size:30px;color:#c9a227;margin-bottom:10px">❖</div>
+      <div class="tile-icon">${icon('conference', 26)}</div>
       <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:9px">Bars</div>
       <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a;margin-bottom:12px">From trendy nightlife hot spots to cool and refined high-class menu-focused bars, you will find one that suits your style. Let our well-trained staff take charge of your palate.</div>
       <span class="link-arrow">EXPLORE BARS <i>&rarr;</i></span>
     </a>
     <a class="tile" href="/events" data-reveal>
-      <div class="serif" style="font-size:30px;color:#c9a227;margin-bottom:10px">◈</div>
+      <div class="tile-icon">${icon('spa', 26)}</div>
       <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:9px">Private Event Spaces</div>
       <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a;margin-bottom:12px">Lounges, decks, pools or unique client setups. Book unique spaces for meetings, events, film and professional photo shoots.</div>
       <span class="link-arrow">EXPLORE SPACES <i>&rarr;</i></span>

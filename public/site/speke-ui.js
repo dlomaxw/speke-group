@@ -798,10 +798,68 @@
     var timer = null;
     var HOLD = 6500;
 
+    /* The headline types itself out when a panel comes up. The words are in
+       the markup already, so this only ever retypes what is there — with the
+       script off, or for anyone who asked for less motion, the panel simply
+       appears. */
+    var typing = null;
+    function typeHeadline(slide) {
+      var head = slide.querySelector('.hero-h');
+      if (!head) return;
+      if (head.dataset.sgFull === undefined) head.dataset.sgFull = head.innerHTML;
+      if (reduced) { slide.classList.add('is-typed'); return; }
+
+      /* The headline is one line, optionally followed by a gold second line. */
+      var parts = head.dataset.sgFull.split(/<br\s*\/?>/i);
+      var lead = parts[0].replace(/<[^>]*>/g, '');
+      var accent = (parts[1] || '').replace(/<[^>]*>/g, '');
+
+      slide.classList.remove('is-typed');
+      head.textContent = '';
+      var leadSpan = document.createElement('span');
+      head.appendChild(leadSpan);
+      var caret = document.createElement('span');
+      caret.className = 'hero-caret';
+      head.appendChild(caret);
+      var tail = null;
+
+      var step = Math.max(12, Math.min(34, 1500 / Math.max(lead.length + accent.length, 1)));
+      var i = 0;
+      function tick() {
+        if (i < lead.length) {
+          leadSpan.textContent += lead.charAt(i);
+          i++;
+        } else if (accent && !tail) {
+          head.insertBefore(document.createElement('br'), caret);
+          tail = document.createElement('span');
+          tail.style.color = '#d4af6a';
+          head.insertBefore(tail, caret);
+        } else if (tail && i - lead.length < accent.length) {
+          tail.textContent += accent.charAt(i - lead.length);
+          i++;
+        } else {
+          caret.remove();
+          slide.classList.add('is-typed');
+          typing = null;
+          return;
+        }
+        head.appendChild(caret);          /* the caret always trails the text */
+        typing = window.setTimeout(tick, step);
+      }
+      /* A beat after the panel has faded in, so the two do not fight. */
+      typing = window.setTimeout(tick, 220);
+    }
+
     function show(next) {
-      slides[at].classList.remove('is-on');
+      if (typing) { window.clearTimeout(typing); typing = null; }
+      var leaving = slides[at];
+      var head = leaving.querySelector('.hero-h');
+      if (head && head.dataset.sgFull !== undefined) head.innerHTML = head.dataset.sgFull;
+      leaving.classList.remove('is-on', 'is-typed');
+
       at = (next + slides.length) % slides.length;
       slides[at].classList.add('is-on');
+      typeHeadline(slides[at]);
       if (!dots) return;
       Array.prototype.forEach.call(dots.children, function (d, i) {
         d.classList.toggle('active', i === at);
@@ -829,6 +887,42 @@
       });
     }
 
+    /* The panels are stacked on top of each other, so the rotator has to be
+       told how tall the tallest one is — otherwise a long panel spills over
+       the dots below it, which is exactly what happens on a phone where the
+       buttons wrap onto two lines. */
+    var fitting = null;
+    function fit() {
+      rotator.style.minHeight = '0px';
+      var tallest = 0;
+      Array.prototype.forEach.call(slides, function (slide) {
+        tallest = Math.max(tallest, slide.offsetHeight);
+      });
+      if (tallest) rotator.style.minHeight = tallest + 'px';
+    }
+    /* Measuring a half-typed headline gives a short answer, so typing is wound
+       back to the full text first and started again afterwards. Fonts land
+       after the first paint, which is why this runs again on load. */
+    function refit() {
+      if (typing) {
+        window.clearTimeout(typing);
+        typing = null;
+        var head = slides[at].querySelector('.hero-h');
+        if (head && head.dataset.sgFull !== undefined) head.innerHTML = head.dataset.sgFull;
+      }
+      fit();
+      typeHeadline(slides[at]);
+    }
+    fit();
+    window.addEventListener('load', refit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+    window.addEventListener('resize', function () {
+      if (fitting) window.clearTimeout(fitting);
+      fitting = window.setTimeout(refit, 180);
+    });
+
+    typeHeadline(slides[at]);
+
     /* Reading or reaching for a button should not be interrupted. */
     var hero = rotator.closest('.hero-video') || rotator;
     hero.addEventListener('mouseenter', stop);
@@ -839,6 +933,87 @@
       if (document.hidden) stop(); else start();
     });
     start();
+  }
+
+
+  /* ---------- 9g. Locations map -------------------------- */
+  /* Hovering a row lights its pin, and the other way round, so a reader can
+     tie the list to the map without hunting. */
+  function initLocations() {
+    var list = document.querySelector('.map-list');
+    var canvas = document.querySelector('.map-canvas');
+    if (!list || !canvas || list.dataset.sgWired === '1') return;
+    list.dataset.sgWired = '1';
+
+    function light(n, on) {
+      var pin = canvas.querySelector('[data-pin="' + n + '"]');
+      var row = list.querySelector('[data-pin-row="' + n + '"]');
+      if (pin) pin.classList.toggle('is-lit', on);
+      if (row) row.classList.toggle('is-lit', on);
+    }
+    function wire(scope, attr) {
+      scope.addEventListener('mouseover', function (e) {
+        var el = e.target.closest ? e.target.closest('[' + attr + ']') : null;
+        if (el) light(el.getAttribute(attr), true);
+      });
+      scope.addEventListener('mouseout', function (e) {
+        var el = e.target.closest ? e.target.closest('[' + attr + ']') : null;
+        if (el) light(el.getAttribute(attr), false);
+      });
+      scope.addEventListener('focusin', function (e) {
+        var el = e.target.closest ? e.target.closest('[' + attr + ']') : null;
+        if (el) light(el.getAttribute(attr), true);
+      });
+      scope.addEventListener('focusout', function (e) {
+        var el = e.target.closest ? e.target.closest('[' + attr + ']') : null;
+        if (el) light(el.getAttribute(attr), false);
+      });
+    }
+    wire(list, 'data-pin-row');
+    wire(canvas, 'data-pin');
+  }
+
+
+  /* ---------- 9h. Section headings type too ---------------- */
+  /* On the homepage every section heading writes itself out as it comes into
+     view, the same way the hero does. The words are in the markup; this only
+     retypes what is already there, once, and never on a page without the
+     hero film. */
+  function initTypeHeadings() {
+    if (reduced || !('IntersectionObserver' in window)) return;
+    if (!document.querySelector('.hero-video')) return;   /* homepage only */
+
+    var heads = document.querySelectorAll('.h-sec');
+    if (!heads.length) return;
+
+    var watcher = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        var head = entry.target;
+        watcher.unobserve(head);
+        if (head.dataset.sgTyped === '1') return;
+        head.dataset.sgTyped = '1';
+
+        var full = head.textContent;
+        var caret = document.createElement('span');
+        caret.className = 'hero-caret head-caret';
+        head.textContent = '';
+        var text = document.createTextNode('');
+        head.appendChild(text);
+        head.appendChild(caret);
+
+        var step = Math.max(14, Math.min(40, 900 / Math.max(full.length, 1)));
+        var i = 0;
+        (function tick() {
+          if (i >= full.length) { caret.remove(); return; }
+          text.textContent += full.charAt(i);
+          i++;
+          window.setTimeout(tick, step);
+        })();
+      });
+    }, { threshold: 0.6, rootMargin: '0px 0px -8% 0px' });
+
+    Array.prototype.forEach.call(heads, function (h) { watcher.observe(h); });
   }
 
   /* ---------- boot --------------------------------------- */
@@ -857,6 +1032,8 @@
     initCarousel();
     initFilms();
     initHeroRotator();
+    initTypeHeadings();
+    initLocations();
     initWovenBand();
     initEnquiryForm();
     initCardReveal();
@@ -881,6 +1058,8 @@
       initCarousel();
       initFilms();
       initHeroRotator();
+      initTypeHeadings();
+      initLocations();
       initWovenBand();
     }
     if ('MutationObserver' in window) {

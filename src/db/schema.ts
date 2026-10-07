@@ -261,6 +261,51 @@ export const videos = sqliteTable('videos', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, (t) => [uniqueIndex('videos_slug_idx').on(t.slug)]);
 
+/**
+ * The panels the homepage hero moves through. A panel may stand on its own,
+ * or point at a property and inherit its name, description and booking link
+ * for any field left blank — so the collection stays in step with the
+ * property record instead of drifting from it.
+ */
+export const heroSlides = sqliteTable('hero_slides', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug', { length: 120 }).notNull(),
+  propertyId: integer('property_id').references(() => properties.id, { onDelete: 'cascade' }),
+  eyebrow: text('eyebrow', { length: 160 }),
+  title: text('title', { length: 200 }),
+  /** The second line, shown in gold under the title. */
+  titleAccent: text('title_accent', { length: 200 }),
+  body: text('body'),
+  ctaLabel: text('cta_label', { length: 60 }),
+  ctaUrl: text('cta_url'),
+  cta2Label: text('cta2_label', { length: 60 }),
+  cta2Url: text('cta2_url'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  status: text('status', { enum: statusEnum }).notNull().default('published'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
+}, (t) => [uniqueIndex('hero_slides_slug_idx').on(t.slug)]);
+
+export const impactAreaEnum = ['energy', 'water', 'waste', 'sourcing', 'nature', 'community'] as const;
+/** How far a claim has been stood up. Nothing reaches the site as "verified"
+ *  until operational records back it. */
+export const impactEvidenceEnum = ['published', 'verified', 'assessing'] as const;
+
+export const impactInitiatives = sqliteTable('impact_initiatives', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  slug: text('slug', { length: 120 }).notNull(),
+  title: text('title', { length: 200 }).notNull(),
+  /** The property it belongs to; empty means the whole Group. */
+  propertyId: integer('property_id').references(() => properties.id, { onDelete: 'set null' }),
+  area: text('area', { enum: impactAreaEnum }).notNull().default('energy'),
+  description: text('description'),
+  /** Where the claim comes from, shown in the note under each card. */
+  source: text('source', { length: 300 }),
+  evidence: text('evidence', { enum: impactEvidenceEnum }).notNull().default('published'),
+  sortOrder: integer('sort_order').notNull().default(0),
+  status: text('status', { enum: statusEnum }).notNull().default('published'),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
+}, (t) => [uniqueIndex('impact_slug_idx').on(t.slug)]);
+
 export const faqCategoryEnum = ['booking', 'stay', 'events', 'group'] as const;
 
 export const faqs = sqliteTable('faqs', {

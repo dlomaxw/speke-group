@@ -61,7 +61,7 @@ export default async function NewsPage() {
 
   <!-- ================= PAGE HEAD ================= -->
   <div style="padding:46px var(--gut) 26px" data-reveal>
-    <div class="eyebrow-line">Newsroom</div>
+    <div class="eyebrow-line">${esc(setting(s, 'news_eyebrow', "Newsroom"))}</div>
     <h1 class="serif" style="font-size:42px;font-weight:600;margin:0 0 12px;color:#3a2020;letter-spacing:-0.015em">Group News &amp; Updates</h1>
     <p style="font-size:14.5px;color:#5a4a3a;margin:0;max-width:640px;line-height:1.7">Announcements, achievements and stories from across our thirteen resorts, hotels and apartments.</p>
   </div>
@@ -70,7 +70,7 @@ ${featuredHtml}
   <!-- ================= STORY GRID ================= -->
   <div id="stories" style="padding:0 var(--gut) 48px">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap" data-reveal>
-      <h2 class="h-sec" style="font-size:26px">Latest Stories</h2>
+      <h2 class="h-sec" style="font-size:26px">${esc(setting(s, 'news_latest_title', "Latest Stories"))}</h2>
       <div data-filter-group="news" style="display:flex;gap:9px">
         <button class="chip active" data-filter="all">All</button>
         <button class="chip" data-filter="group">Group</button>

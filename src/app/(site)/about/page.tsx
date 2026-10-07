@@ -67,7 +67,7 @@ export default async function AboutPage() {
   <div id="story" style="padding:46px var(--gut)">
     <div style="gap:48px;align-items:center" class="g-2">
       <div data-reveal>
-        <div class="eyebrow-line">Our Story</div>
+        <div class="eyebrow-line">${esc(setting(s, 'about_story_eyebrow', "Our Story"))}</div>
         <h2 class="h-sec" style="margin-bottom:18px">${esc(get('about_story_title'))}</h2>
         ${paragraphs(get('about_story_body'), BODY)}
       </div>
@@ -108,7 +108,7 @@ export default async function AboutPage() {
         <figcaption style="font-size:12px;color:#8a7a68;margin-top:10px;letter-spacing:.04em">${esc(get('about_history_caption'))}</figcaption>
       </figure>
       <div data-reveal data-reveal-delay="0.12">
-        <div class="eyebrow-line">Our History</div>
+        <div class="eyebrow-line">${esc(setting(s, 'about_history_eyebrow', "Our History"))}</div>
         <h2 class="h-sec" style="margin-bottom:18px">${esc(get('about_history_title'))}</h2>
         ${paragraphs(get('about_history_body'), BODY)}
       </div>
@@ -118,8 +118,8 @@ export default async function AboutPage() {
   <!-- ================= MILESTONES ================= -->
   <div style="background:var(--cream-2);padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:32px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">Our Journey</div>
-      <h2 class="h-sec">Milestones in the Speke Story</h2>
+      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'about_journey_eyebrow', "Our Journey"))}</div>
+      <h2 class="h-sec">${esc(setting(s, 'about_journey_title', "Milestones in the Speke Story"))}</h2>
     </div>
     <div style="gap:22px" data-stagger="0.08" class="${milestones.length === 5 ? 'g-5' : milestones.length === 6 ? 'g-3' : 'g-4'}">${timeline}
     </div>
@@ -127,7 +127,7 @@ export default async function AboutPage() {
 
   <!-- ================= TODAY ================= -->
   <div style="padding:56px var(--gut);text-align:center" data-reveal>
-    <div class="eyebrow-line" style="justify-content:center">Speke Group Today</div>
+    <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'about_today_eyebrow', "Speke Group Today"))}</div>
     <h2 class="h-sec" style="margin-bottom:18px">${esc(get('about_today_title'))}</h2>
     <div style="max-width:820px;margin:0 auto">
       ${paragraphs(get('about_today_body'), BODY)}

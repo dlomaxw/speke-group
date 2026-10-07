@@ -99,7 +99,7 @@ export default async function ContactPage({
   <div style="padding:30px var(--gut) 48px;gap:48px" class="g-split-c">
     <div data-reveal>
       <div class="eyebrow-line">Enquiries</div>
-      <h2 class="h-sec" style="font-size:24px;margin-bottom:18px">Send a Message</h2>
+      <h2 class="h-sec" style="font-size:24px;margin-bottom:18px">${esc(setting(s, 'contact_form_title', "Send a Message"))}</h2>
       <form class="sg-form" id="enquiry" data-enquiry action="/api/enquiries" method="post" novalidate>
         <input type="hidden" name="idempotencyKey" value="${randomUUID()}">
         <input type="hidden" name="sourcePage" value="/contact">
@@ -179,7 +179,7 @@ export default async function ContactPage({
 
     <div data-reveal data-reveal-delay="0.1">
       <div class="eyebrow-line">Directory</div>
-      <h2 class="h-sec" style="font-size:24px;margin-bottom:18px">Our Thirteen Properties</h2>
+      <h2 class="h-sec" style="font-size:24px;margin-bottom:18px">${esc(setting(s, 'contact_directory_title', "Our Thirteen Properties"))}</h2>
       <div style="gap:14px" data-stagger="0.04" class="g-2">${directory}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import {
   properties, venues, restaurants, experiences, newsPosts,
-  offers, milestones, highlightBlocks, venueGroups, wellness, awards, faqs, videos,
+  offers, milestones, highlightBlocks, venueGroups, wellness, awards, faqs, videos, impactInitiatives, heroSlides,
 } from '@/db/schema';
 
 export type FieldType =
@@ -58,6 +58,31 @@ const SORT_FIELD: Field = {
 };
 
 export const COLLECTIONS: CollectionConfig[] = [
+  {
+    slug: 'hero',
+    label: 'Homepage hero',
+    singular: 'Panel',
+    description: 'The panels the hero moves through. Point one at a property and leave its fields blank to use that property’s own name, description and booking link. The film behind them is under Settings.',
+    table: heroSlides,
+    icon: 'layers',
+    defaultSort: 'sortOrder',
+    hasStatus: true,
+    propertyField: 'propertyId',
+    listFields: ['slug', 'title', 'propertyId', 'status'],
+    fields: [
+      { name: 'slug', label: 'Reference', type: 'text', required: true, help: 'A short name for this panel, used only here.' },
+      { name: 'propertyId', label: 'Property', type: 'property', help: 'Optional. Anything you leave blank below is taken from this property.' },
+      { name: 'eyebrow', label: 'Small line above', type: 'text', placeholder: 'Hotel · Nile Avenue, Kampala' },
+      { name: 'title', label: 'Headline', type: 'text' },
+      { name: 'titleAccent', label: 'Second line (gold)', type: 'text', help: 'Only used on panels without a property.' },
+      { name: 'body', label: 'Paragraph', type: 'textarea' },
+      { name: 'ctaLabel', label: 'Button label', type: 'text', placeholder: 'BOOK THIS PROPERTY' },
+      { name: 'ctaUrl', label: 'Button link', type: 'url', help: 'Blank uses the property’s booking engine.' },
+      { name: 'cta2Label', label: 'Second button label', type: 'text' },
+      { name: 'cta2Url', label: 'Second button link', type: 'url' },
+      { name: 'sortOrder', label: 'Order', type: 'number' },
+    ],
+  },
   {
     slug: 'properties',
     label: 'Portfolio',
@@ -139,6 +164,39 @@ export const COLLECTIONS: CollectionConfig[] = [
       { name: 'videoUrl', label: 'Video file', type: 'image', required: true, help: 'MP4. Plays when a visitor presses play, so it costs them nothing until then.' },
       { name: 'posterUrl', label: 'Poster image', type: 'image', help: 'Shown before the film starts.' },
       { name: 'durationLabel', label: 'Length', type: 'text', placeholder: '0:48' },
+      { name: 'sortOrder', label: 'Order', type: 'number' },
+    ],
+  },
+  {
+    slug: 'impact',
+    label: 'Sustainability',
+    singular: 'Initiative',
+    description: 'What each property does. Nothing here should state a total or a percentage until the records back it.',
+    table: impactInitiatives,
+    icon: 'leaf',
+    defaultSort: 'sortOrder',
+    hasStatus: true,
+    propertyField: 'propertyId',
+    listFields: ['title', 'propertyId', 'area', 'evidence', 'status'],
+    fields: [
+      { name: 'title', label: 'Initiative', type: 'text', required: true },
+      { name: 'slug', label: 'Slug', type: 'text', required: true },
+      { name: 'propertyId', label: 'Property', type: 'property', help: 'Leave as group-wide if it covers the whole collection.' },
+      { name: 'area', label: 'Area', type: 'select', required: true, options: [
+        { value: 'energy', label: 'Energy & carbon' },
+        { value: 'water', label: 'Water' },
+        { value: 'waste', label: 'Waste' },
+        { value: 'sourcing', label: 'Purchasing' },
+        { value: 'nature', label: 'Nature' },
+        { value: 'community', label: 'Community' },
+      ] },
+      { name: 'description', label: 'What we do', type: 'textarea' },
+      { name: 'source', label: 'Where this comes from', type: 'textarea', help: 'Shown under the card. Say where the claim is published and what is still being confirmed.' },
+      { name: 'evidence', label: 'Evidence', type: 'select', required: true, options: [
+        { value: 'published', label: 'Published by us — not yet verified' },
+        { value: 'verified', label: 'Verified against records' },
+        { value: 'assessing', label: 'Being assessed' },
+      ], help: 'Only mark something verified once operational records support it.' },
       { name: 'sortOrder', label: 'Order', type: 'number' },
     ],
   },

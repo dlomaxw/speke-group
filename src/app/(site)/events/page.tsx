@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
 import { getChrome, getHighlights, getVenues, getVideos, setting } from '@/lib/site-data';
-import { esc, slot, header, footer, countUp, phones, bookingBar, BOOKING_ANCHOR, safeUrl, filmGallery } from '@/lib/site-html';
+import { esc, slot, header, footer, countUp, phones, bookingBar, BOOKING_ANCHOR, safeUrl, filmGallery, subjectIcon } from '@/lib/site-html';
 import { VENUE_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -49,7 +49,7 @@ export default async function EventsPage() {
 
   const occasionTiles = occasions.map((o) => `
         <div class="tile" data-reveal>
-          <div class="serif" style="font-size:30px;color:#c9a227;margin-bottom:10px">${esc(o.icon)}</div>
+          <div class="tile-icon">${subjectIcon(o.name, o.icon)}</div>
           <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:10px">${esc(o.name)}</div>
           <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a">${esc(o.description)}</div>
         </div>`).join('');
@@ -89,8 +89,8 @@ export default async function EventsPage() {
   <div id="venues" style="padding:48px var(--gut) 20px">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:16px" data-reveal>
       <div>
-        <div class="eyebrow-line">Explore</div>
-        <h2 class="h-sec">Meeting Venues</h2>
+        <div class="eyebrow-line">${esc(setting(s, 'events_venues_eyebrow', "Explore"))}</div>
+        <h2 class="h-sec">${esc(setting(s, 'events_venues_title', "Meeting Venues"))}</h2>
         <p style="font-size:13.5px;color:#5a4a3a;margin:10px 0 0;max-width:560px;line-height:1.65">Each of our venues is unique in its own way and can be set up to suit your particular needs and requirements.</p>
       </div>
       <div class="venue-filters">
@@ -121,8 +121,8 @@ export default async function EventsPage() {
   <!-- ================= OCCASIONS ================= -->
   <div id="occasions" style="background:var(--cream-2);padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:30px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">What We Host</div>
-      <h2 class="h-sec">Occasions We Host</h2>
+      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'events_occasions_eyebrow', "What We Host"))}</div>
+      <h2 class="h-sec">${esc(setting(s, 'events_occasions_title', "Occasions We Host"))}</h2>
     </div>
     <div style="gap:22px" data-stagger="0.09" class="g-3">${occasionTiles}
     </div>

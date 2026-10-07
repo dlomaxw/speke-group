@@ -54,7 +54,7 @@ export default async function FaqPage() {
 
   <!-- ================= PAGE HEAD ================= -->
   <div style="padding:46px var(--gut) 10px" data-reveal>
-    <div class="eyebrow-line">Help</div>
+    <div class="eyebrow-line">${esc(setting(s, 'faq_eyebrow', "Help"))}</div>
     <h1 class="serif" style="font-size:42px;font-weight:600;margin:0 0 12px;color:#3a2020;letter-spacing:-0.015em">Frequently Asked Questions</h1>
     <p style="font-size:14.5px;color:#5a4a3a;margin:0;max-width:640px;line-height:1.7">Booking, staying, meeting and finding us. If your question is not here, our team will answer it.</p>
   </div>
@@ -65,7 +65,7 @@ export default async function FaqPage() {
 
   <!-- ================= STILL ASKING ================= -->
   <div style="background:var(--cream-2);padding:44px var(--gut);text-align:center" data-reveal>
-    <h2 class="h-sec" style="margin-bottom:10px">Still have a question?</h2>
+    <h2 class="h-sec" style="margin-bottom:10px">${esc(setting(s, 'faq_closing_title', "Still have a question?"))}</h2>
     <div style="max-width:620px;margin:0 auto">
       ${paragraphs('Our reservations team answers enquiries every day, and can arrange stays, events and longer bookings across the Group.', 'font-size:14px;line-height:1.72;color:#5a4a3a;margin:0 0 18px')}
     </div>

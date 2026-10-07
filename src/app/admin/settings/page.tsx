@@ -17,7 +17,23 @@ const GROUP_LABELS: Record<string, { title: string; blurb: string }> = {
   experiences: { title: 'Experiences page', blurb: 'Headline and introduction for dining and leisure.' },
   about:    { title: 'About us page', blurb: 'Story, history, the chairman’s message and photos. Leave a blank line between paragraphs.' },
   general:  { title: 'General', blurb: 'Site name, tagline and where enquiry alerts go. Separate several alert addresses with commas.' },
+  impact:   { title: 'Sustainability page', blurb: 'The Our Impact page and the note on the homepage. Say only what the records support.' },
+  page_home: { title: 'Homepage sections', blurb: 'The small headings and button labels down the homepage.' },
+  page_about: { title: 'About page sections', blurb: 'Headings on the about page.' },
+  page_events: { title: 'Events page sections', blurb: 'Headings on the events and meetings page.' },
+  page_experiences: { title: 'Experiences page sections', blurb: 'Headings on the experiences page.' },
+  page_news: { title: 'News page sections', blurb: 'Headings in the newsroom.' },
+  page_contact: { title: 'Contact page sections', blurb: 'Headings on the contact page.' },
+  page_faq: { title: 'FAQ page sections', blurb: 'Headings on the questions page.' },
+  page_impact: { title: 'Sustainability page sections', blurb: 'Headings on the Our Impact page.' },
 };
+
+/* The groups a reader works through first, then everything else. */
+const GROUP_ORDER = [
+  'general', 'contact', 'homepage', 'about', 'events', 'experiences', 'impact',
+  'page_home', 'page_about', 'page_events', 'page_experiences', 'page_news',
+  'page_contact', 'page_faq', 'page_impact',
+];
 
 export default async function SettingsPage() {
   const user = await requirePermission('settings.view');
@@ -29,15 +45,19 @@ export default async function SettingsPage() {
     .from(media).where(eq(media.rightsStatus, 'approved')).orderBy(desc(media.createdAt)).limit(60);
   const history = await listHistory('settings', 0);
 
-  const groups = [...new Set(rows.map((r) => r.group))];
+  const groups = [...new Set(rows.map((r) => r.group))]
+    .sort((a, b) => {
+      const ia = GROUP_ORDER.indexOf(a), ib = GROUP_ORDER.indexOf(b);
+      return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+    });
 
   return (
     <div className="space-y-5">
       <div>
         <h1 className="serif text-[25px] font-semibold">Site settings</h1>
         <p className="text-[13.5px] text-[#5a6474] mt-1 max-w-[70ch]">
-          Text and details that appear across the public site. A change here shows up everywhere
-          that detail is used.
+          Every piece of wording on the public site, from the hero headline to the small
+          labels on buttons. A change here shows up everywhere that detail is used.
         </p>
       </div>
 
