@@ -1,20 +1,14 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getAwards, getChrome, getHeroSlides, getHighlights, getImpact, getOffers, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
-import { esc, safeUrl, slot, header, footer, wovenBand, countUp, offerHref, bookingBar, BOOKING_ANCHOR, phones, locationsMap, filmGallery, icon } from '@/lib/site-html';
+import { getAwards, getChrome, getDining, getHeroSlides, getHighlights, getImpact, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
+import { esc, safeUrl, slot, header, footer, wovenBand, countUp, bookingBar, BOOKING_ANCHOR, phones, locationsMap, filmGallery, icon } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
   title: 'Speke Group Hotels, Resorts & Apartments in Kampala, Uganda',
 };
 
-const OFFER_TABS = [
-  { key: 'accommodation', label: 'Accommodation', grid: 'g-4' },
-  { key: 'dining', label: 'Dining', grid: 'g-4' },
-  { key: 'events', label: 'Events', grid: 'g-3' },
-  { key: 'spa', label: 'Spa', grid: 'g-3' },
-];
 
 /** Today and tomorrow in Kampala, for the booking bar's date fields. */
 function bookingDates() {
@@ -25,9 +19,9 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, offers, spas, occasions, honours, films, green, panels] = await Promise.all([
-    getChrome(), getOffers(), getWellness(), getHighlights('occasions'), getAwards(), getVideos(), getImpact(),
-    getHeroSlides(),
+  const [chrome, spas, occasions, honours, films, green, panels, kitchens] = await Promise.all([
+    getChrome(), getWellness(), getHighlights('occasions'), getAwards(), getVideos(), getImpact(),
+    getHeroSlides(), getDining('restaurant'),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
@@ -77,7 +71,7 @@ export default async function HomePage() {
 
   const portfolio = allProperties.map((p) => `
         <a class="card" href="${safeUrl(p.websiteUrl, `https://spekegroup.com/${esc(p.slug)}/`)}" data-reveal data-filter-item="portfolio" data-tags="${esc(p.kind)}">
-          <div class="media" style="aspect-ratio:1/1">
+          <div class="media" style="aspect-ratio:4/3">
             <div class="badge">${esc(p.categoryLabel)}</div>
             ${slot(p.imageUrl || PROPERTY_IMAGES[p.slug], p.imageAlt || p.name, 'width:100%;height:100%')}
           </div>
@@ -98,8 +92,8 @@ export default async function HomePage() {
     .filter((p) => spas.some((w) => w.propertyId === p.id))
     .map((p) => `<option value="p${p.id}">${esc(p.name)}</option>`).join('');
   const wellnessCards = spas.map((w) => `
-        <div class="card wellness-card" data-reveal data-filter-item="wellness" data-tags="${w.propertyId ? `p${w.propertyId}` : 'group'}">
-          <div class="media" style="aspect-ratio:4/3">
+        <div class="wellness-card" data-reveal data-filter-item="wellness" data-tags="${w.propertyId ? `p${w.propertyId}` : 'group'}">
+          <div class="media" style="aspect-ratio:16/9">
             <div class="badge">${esc(KIND_LABEL[w.kind] ?? w.kind)}</div>
             ${slot(w.imageUrl, w.imageAlt || w.name, 'width:100%;height:100%')}
           </div>
@@ -119,17 +113,31 @@ export default async function HomePage() {
     Weddings: '/images/v-kabira-ballroom.webp',
   };
   const eventCards = occasions.slice(0, 2).map((o) => `
-        <a class="card" href="/events${o.name === 'Weddings' ? '#occasions' : '#venues'}" data-reveal>
-          <div class="media" style="aspect-ratio:16/10">
+        <a class="event-card" href="/events${o.name === 'Weddings' ? '#occasions' : '#venues'}" data-reveal>
+          <div class="event-photo">
             ${slot(o.imageUrl || OCCASION_IMAGES[o.name], o.imageAlt || `${o.name} at Speke Group`, 'width:100%;height:100%')}
           </div>
-          <div class="body">
+          <div class="event-body">
             <div class="eyebrow">Events &amp; Meetings</div>
-            <div class="title">${esc(o.name)}</div>
-            <div class="desc">${esc(o.description)}</div>
+            <div class="event-title">${esc(o.name)}</div>
+            <p class="event-desc">${esc(o.description)}</p>
             <span class="link-arrow">FIND OUT MORE <i>&rarr;</i></span>
           </div>
         </a>`).join('');
+
+  /* Food is given a shape of its own — an arched photograph rather than the
+     square cards used everywhere else — so the kitchens read as a different
+     kind of thing from a property or a venue. */
+  const foodCards = kitchens.map((r, i) => {
+    const at = allProperties.find((p) => p.id === r.propertyId);
+    return `
+        <a class="food-card${i < 2 ? ' is-on' : ''}" href="/experiences#restaurants"${i < 2 ? ' data-reveal' : ''}>
+          <div class="food-photo">${slot(r.imageUrl, r.imageAlt || r.name, 'width:100%;height:100%')}</div>
+          <div class="food-name">${esc(r.name)}</div>
+          ${r.cuisine ? `<div class="food-cuisine">${esc(r.cuisine)}</div>` : ''}
+          <div class="food-where">${esc(at?.name ?? 'Across the Group')}</div>
+        </a>`;
+  }).join('');
 
   const awardCards = honours.map((a) => {
     const at = allProperties.find((p) => p.id === a.propertyId);
@@ -166,23 +174,6 @@ export default async function HomePage() {
         </a>`;
   }).join('');
 
-  const tabs = OFFER_TABS.filter((t) => offers.some((o) => o.category === t.key));
-  const offerPanels = tabs.map((t, i) => {
-    const first = i === 0;
-    const tiles = offers.filter((o) => o.category === t.key).map((o) => `
-          <a class="tile offer-tile" href="${safeUrl(offerHref(o, allProperties))}"${first ? ' data-reveal' : ''}>
-            <div class="eyebrow" style="font-size:10px;letter-spacing:.14em;color:#b8935a;font-weight:700;text-transform:uppercase;margin-bottom:7px">${esc(o.propertyLabel)}</div>
-            <div class="serif" style="font-size:18px;font-weight:600;color:#3a2020;margin-bottom:8px">${esc(o.name)}</div>
-            <div style="font-size:12.8px;line-height:1.6;color:#5a4a3a">${esc(o.description)}</div>
-            <span class="link-arrow offer-go">VIEW OFFER <i>&rarr;</i></span>
-          </a>`).join('');
-    return `
-    <div data-tab-panel="offers" data-tab-key="${t.key}"${first ? '' : ' hidden'}>
-      <div style="gap:20px"${first ? ' data-stagger="0.06"' : ''} class="${t.grid}">${tiles}
-      </div>
-    </div>`;
-  }).join('');
-
   const html = `
   ${header({ active: 'home', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
@@ -216,7 +207,7 @@ export default async function HomePage() {
   <div id="our-group" style="padding:54px var(--gut) 44px;text-align:center" data-reveal>
     <div class="eyebrow-line" style="justify-content:center">Our Group</div>
     <h2 class="h-sec" style="max-width:820px;margin:0 auto">${esc(setting(s, 'group_title', 'Thirteen Places to Stay, Meet and Celebrate'))}</h2>
-    <p style="font-size:15px;color:#5a4a3a;line-height:1.8;max-width:760px;margin:16px auto 0">${esc(setting(s, 'group_body', 'Discover Speke Group’s collection of hotels, apartments and resorts — where warm Ugandan hospitality meets comfort and style. Whether you’re planning a relaxing escape, a business stay, a new place to call home or a memorable celebration, find your perfect destination with us.'))}</p>
+    <p data-reveal data-reveal-delay="0.16" style="font-size:15px;color:#5a4a3a;line-height:1.8;max-width:760px;margin:16px auto 0">${esc(setting(s, 'group_body', 'Discover Speke Group’s collection of hotels, apartments and resorts — where warm Ugandan hospitality meets comfort and style. Whether you’re planning a relaxing escape, a business stay, a new place to call home or a memorable celebration, find your perfect destination with us.'))}</p>
   </div>
 
   <!-- ================= OUR STORY + STATS ================= -->
@@ -225,7 +216,7 @@ export default async function HomePage() {
       <div class="story-copy">
         <div class="eyebrow-line">${esc(setting(s, 'home_story_eyebrow', "Our Story"))}</div>
         <h2 class="h-sec" style="margin-bottom:12px">${esc(setting(s, 'story_title', 'A Collection Built on Ugandan Hospitality'))}</h2>
-        <p style="font-size:14px;line-height:1.75;color:#5a4a3a;margin:0 0 16px">${esc(setting(s, 'story_body'))}</p>
+        <p data-reveal data-reveal-delay="0.16" style="font-size:14px;line-height:1.75;color:#5a4a3a;margin:0 0 16px">${esc(setting(s, 'story_body'))}</p>
         <a class="link-arrow" href="/about">READ OUR FULL STORY <i>&rarr;</i></a>
       </div>
       <div class="story-stats">
@@ -266,15 +257,35 @@ export default async function HomePage() {
     <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
   </div>
 
-  <!-- ================= AWARDS ================= -->
-  ${honours.length ? `
-  <div class="awards-band">
-    <div style="text-align:center;max-width:680px;margin:0 auto 28px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center;color:#d4af6a">${esc(setting(s, 'home_awards_eyebrow', "Recognition"))}</div>
-      <h2 class="serif" style="font-size:30px;font-weight:600;color:#fff;margin:0">${esc(setting(s, 'awards_title', 'Recognised Beyond Our Borders'))}</h2>
-      <p style="font-size:14px;color:#e9dccb;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'awards_body'))}</p>
+  <!-- ================= MEETINGS BANNER ================= -->
+  <div class="meet-band">
+    ${slot(setting(s, 'home_meetings_image', '/images/meetings-bg.webp'), 'Conference hall', 'width:100%;height:100%')}
+    <div class="scrim-side"></div>
+    <div class="meet-copy" data-reveal>
+      <div class="eyebrow-line" style="color:#d4af6a">Events &amp; Meetings</div>
+      <h2 class="serif meet-title">${esc(setting(s, 'events_title', 'Redefining Meeting Spaces for Your Events'))}</h2>
+      <p class="meet-body" data-reveal data-reveal-delay="0.16">Our facilities welcome thousands of visitors attending major national and international conventions, meetings, concerts and competitions.</p>
+      <a class="btn btn-solid" href="/events"><span>EXPLORE MEETINGS &amp; EVENTS</span></a>
     </div>
-    <div class="${honours.length === 2 ? 'g-2' : 'g-3'}" style="gap:22px" data-stagger="0.08">${awardCards}
+  </div>
+
+  <div style="padding:44px var(--gut) 10px">
+    <div class="event-row">${eventCards}
+    </div>
+  </div>
+
+  <!-- ================= FOOD & BEVERAGE ================= -->
+  ${foodCards ? `
+  <div id="food" style="padding:52px var(--gut)">
+    <div style="text-align:center;max-width:700px;margin:0 auto 34px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'food_eyebrow', 'Food & Beverage'))}</div>
+      <h2 class="h-sec">${esc(setting(s, 'food_title', 'Cooked to Order, Served with Care'))}</h2>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'food_body'))}</p>
+    </div>
+    <div class="food-row" data-food-rotator data-stagger="0.08">${foodCards}
+    </div>
+    <div style="text-align:center;margin-top:28px" data-reveal>
+      <a class="btn btn-ghost" href="/experiences#restaurants"><span>SEE EVERY RESTAURANT &amp; BAR</span></a>
     </div>
   </div>` : ''}
 
@@ -283,7 +294,7 @@ export default async function HomePage() {
     <div style="text-align:center;margin-bottom:26px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'home_wellness_eyebrow', "Experience"))}</div>
       <h2 class="h-sec">${esc(setting(s, 'wellness_title', 'Spa & Wellness'))}</h2>
-      <p style="font-size:14px;color:#5a4a3a;max-width:660px;margin:12px auto 0;line-height:1.7">${esc(setting(s, 'wellness_body', 'Massages, facials and steam baths, hair and beauty salons, gyms and pools — choose a location to see what is on offer there.'))}</p>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;max-width:660px;margin:12px auto 0;line-height:1.7">${esc(setting(s, 'wellness_body', 'Massages, facials and steam baths, hair and beauty salons, gyms and pools — choose a location to see what is on offer there.'))}</p>
     </div>
 
     <div class="wellness-pick" data-reveal>
@@ -293,26 +304,18 @@ export default async function HomePage() {
       </select>
     </div>
 
-    <div class="g-3${spas.length < 3 ? ' g-centered' : ''}" style="gap:22px" data-stagger="0.08" data-filter-empty="wellness">${wellnessCards}
+    <div class="sg-carousel is-two" data-carousel>
+      <div class="carousel-track" data-stagger="0.08" tabindex="0" role="group" aria-label="Experiences, scrollable">${wellnessCards}
+      </div>
+      <button class="carousel-arrow prev" type="button" aria-label="Previous experiences">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg>
+      </button>
+      <button class="carousel-arrow next" type="button" aria-label="More experiences">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg>
+      </button>
     </div>
+    <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
     <p class="wellness-none" data-filter-none="wellness" hidden>We have nothing listed here yet. <a href="/contact">Ask our team</a> and we will point you to the nearest spa or salon.</p>
-  </div>
-
-  <!-- ================= MEETINGS BANNER ================= -->
-  <div class="hero-tile band" style="height:260px">
-    ${slot(setting(s, 'home_meetings_image', '/images/meetings-bg.webp'), 'Conference hall', 'width:100%;height:100%')}
-    <div class="scrim-side"></div>
-    <div style="position:absolute;left:var(--gut);top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;pointer-events:none" data-reveal>
-      <div class="eyebrow-line" style="color:#d4af6a">Events &amp; Meetings</div>
-      <h2 class="serif" style="color:#fff;font-size:34px;font-weight:600;margin:0 0 12px">${esc(setting(s, 'events_title', 'Redefining Meeting Spaces for Your Events'))}</h2>
-      <p style="color:#efe4d2;font-size:14px;max-width:470px;line-height:1.65;margin:0 0 20px">Our facilities welcome thousands of visitors attending major national and international conventions, meetings, concerts and competitions, making them the premier conferencing venues in Uganda.</p>
-      <a class="btn btn-solid" href="/events" style="pointer-events:auto;width:max-content"><span>EXPLORE MEETINGS &amp; EVENTS</span></a>
-    </div>
-  </div>
-
-  <div style="padding:44px var(--gut) 10px">
-    <div class="g-2" style="gap:24px">${eventCards}
-    </div>
   </div>
 
   <!-- ================= SUSTAINABILITY ================= -->
@@ -321,7 +324,7 @@ export default async function HomePage() {
       <div>
         <div class="eyebrow-line">${esc(setting(s, 'home_impact_eyebrow', "Sustainability"))}</div>
         <h2 class="h-sec" style="margin-bottom:10px">${esc(setting(s, 'impact_home_title', 'A Warm Welcome. A Thought for Tomorrow.'))}</h2>
-        <p style="font-size:14px;line-height:1.75;color:#5a4a3a;margin:0;max-width:760px">${esc(setting(s, 'impact_home_body'))}</p>
+        <p data-reveal data-reveal-delay="0.16" style="font-size:14px;line-height:1.75;color:#5a4a3a;margin:0;max-width:760px">${esc(setting(s, 'impact_home_body'))}</p>
       </div>
       <a class="btn btn-ghost" href="/impact"><span>${esc(setting(s, 'home_impact_cta', "SEE WHAT WE DO"))}</span></a>
     </div>
@@ -329,42 +332,30 @@ export default async function HomePage() {
     </div>` : ''}
   </div>
 
+  <!-- ================= AWARDS ================= -->
+  ${honours.length ? `
+  <div class="awards-band">
+    <div style="text-align:center;max-width:680px;margin:0 auto 28px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center;color:#d4af6a">${esc(setting(s, 'home_awards_eyebrow', "Recognition"))}</div>
+      <h2 class="serif" style="font-size:30px;font-weight:600;color:#fff;margin:0">${esc(setting(s, 'awards_title', 'Recognised Beyond Our Borders'))}</h2>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#e9dccb;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'awards_body'))}</p>
+    </div>
+    <div class="${honours.length === 2 ? 'g-2' : 'g-3'}" style="gap:22px" data-stagger="0.08">${awardCards}
+    </div>
+  </div>` : ''}
+
   <!-- ================= FILMS ================= -->
   ${filmGallery(films, { eyebrow: 'Films', title: setting(s, 'home_films_title', 'See Us for Yourself'), body: setting(s, 'home_films_body', 'Short films from across the Group.') })}
 
-  <!-- ================= PACKAGES & OFFERS ================= -->
-  <div style="padding:50px var(--gut)">
-    <div style="text-align:center;margin-bottom:28px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'home_offers_eyebrow', "Our Specials"))}</div>
-      <h2 class="h-sec">${esc(setting(s, 'home_offers_title', "Enjoy Packages & Offers"))}</h2>
-    </div>
-    <div data-tabs="offers" style="display:flex;justify-content:center;gap:9px;margin-bottom:28px" data-reveal>
-      ${tabs.map((t, i) => `<button class="chip${i === 0 ? ' active' : ''}" data-tab="${t.key}">${t.label}</button>`).join('\n      ')}
-    </div>
-${offerPanels}
-  </div>
-
-  <!-- ================= CAREERS + NEWS ================= -->
-  <div style="border-top:1px solid rgba(111,32,51,0.12);border-bottom:1px solid rgba(111,32,51,0.12)" class="g-2">
-    <div style="align-items:center" data-reveal class="g-split-a">
-      <div style="padding:34px 42px">
-        <h3 class="serif" style="font-size:23px;font-weight:600;margin:0 0 10px;color:#3a2020">Careers at Speke Group</h3>
-        <p style="font-size:13.5px;line-height:1.62;color:#5a4a3a;margin:0 0 16px">A place to grow your career while creating exceptional experiences. Join our team and be part of our legacy.</p>
-        <a class="link-arrow" href="https://spekegroup.com/contact/">VIEW CAREERS <i>&rarr;</i></a>
-      </div>
-      <div class="hero-tile" style="height:200px">${slot(setting(s, 'home_careers_image', '/images/careers-photo.webp'), 'Speke Group team', 'width:100%;height:200px')}</div>
-    </div>
-    <div style="align-items:center;border-left:1px solid rgba(111,32,51,0.12)" data-reveal data-reveal-delay="0.1" class="g-split-a">
-      <div style="padding:34px 42px">
-        <h3 class="serif" style="font-size:23px;font-weight:600;margin:0 0 10px;color:#3a2020">Group News &amp; Updates</h3>
-        <p style="font-size:13.5px;line-height:1.62;color:#5a4a3a;margin:0 0 16px">Stay informed with the latest announcements, achievements and stories from across Speke Group.</p>
-        <a class="link-arrow" href="/news">READ LATEST NEWS <i>&rarr;</i></a>
-      </div>
-      <div class="hero-tile" style="height:200px">${slot(setting(s, 'home_news_image', '/images/news-photo.webp'), 'Resort at sunset', 'width:100%;height:200px')}</div>
-    </div>
-  </div>
-
-  ${locationsMap(allProperties, { title: setting(s, 'map_title', 'Find Us Across Kampala'), body: setting(s, 'map_body') })}
+  ${locationsMap(allProperties, {
+    title: setting(s, 'map_title', 'Find Us Across Kampala'),
+    body: setting(s, 'map_body'),
+    airport: setting(s, 'airport_lat') && setting(s, 'airport_lng') ? {
+      name: setting(s, 'airport_name', 'Entebbe International Airport'),
+      latitude: Number(setting(s, 'airport_lat')),
+      longitude: Number(setting(s, 'airport_lng')),
+    } : null,
+  })}
 
   ${footer(s)}
 `;

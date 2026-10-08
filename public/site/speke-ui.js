@@ -792,7 +792,9 @@
     if (!rotator || rotator.dataset.sgWired === '1') return;
     rotator.dataset.sgWired = '1';
     var slides = rotator.querySelectorAll('.hero-slide');
-    if (slides.length < 2) return;
+    if (!slides.length) return;
+    /* One panel still types itself out; it simply never moves on. */
+    var single = slides.length < 2;
     var dots = document.querySelector('[data-hero-dots]');
     var at = 0;
     var timer = null;
@@ -865,10 +867,10 @@
         d.classList.toggle('active', i === at);
       });
     }
-    function start() { if (!reduced && !timer) timer = window.setInterval(function () { show(at + 1); }, HOLD); }
+    function start() { if (!reduced && !single && !timer) timer = window.setInterval(function () { show(at + 1); }, HOLD); }
     function stop() { if (timer) { window.clearInterval(timer); timer = null; } }
 
-    if (dots && !dots.children.length) {
+    if (dots && !single && !dots.children.length) {
       for (var i = 0; i < slides.length; i++) {
         var b = document.createElement('button');
         b.type = 'button';
@@ -1016,6 +1018,69 @@
     Array.prototype.forEach.call(heads, function (h) { watcher.observe(h); });
   }
 
+
+  /* ---------- 9i. Food pairs ------------------------------ */
+  /* Two kitchens on show; every few seconds the pair changes. They lift and
+     fade rather than slide, so nothing moves sideways on the page. */
+  function initFoodRotator() {
+    var row = document.querySelector('[data-food-rotator]');
+    if (!row || row.dataset.sgWired === '1') return;
+    row.dataset.sgWired = '1';
+
+    var cards = Array.prototype.slice.call(row.children);
+    var PER = 2;
+    if (cards.length <= PER) return;          /* nothing to rotate through */
+
+    var at = 0;
+    var timer = null;
+    var HOLD = 5200;
+
+    function pair(start) {
+      var out = [];
+      for (var i = 0; i < PER; i++) out.push(cards[(start + i) % cards.length]);
+      return out;
+    }
+
+    function swap() {
+      var leaving = pair(at);
+      at = (at + PER) % cards.length;
+      var entering = pair(at);
+      if (entering[0] === leaving[0]) return;
+
+      leaving.forEach(function (card, i) {
+        card.style.animationDelay = (i * 70) + 'ms';
+        card.classList.add('is-leaving');
+      });
+
+      window.setTimeout(function () {
+        leaving.forEach(function (card) {
+          card.classList.remove('is-on', 'is-leaving');
+          card.style.animationDelay = '';
+        });
+        entering.forEach(function (card, i) {
+          card.style.animationDelay = (i * 70) + 'ms';
+          card.classList.add('is-on', 'is-entering');
+          window.setTimeout(function () {
+            card.classList.remove('is-entering');
+            card.style.animationDelay = '';
+          }, 520 + i * 70);
+        });
+      }, reduced ? 0 : 450);
+    }
+
+    function start() { if (!reduced && !timer) timer = window.setInterval(swap, HOLD); }
+    function stop() { if (timer) { window.clearInterval(timer); timer = null; } }
+
+    row.addEventListener('mouseenter', stop);
+    row.addEventListener('mouseleave', start);
+    row.addEventListener('focusin', stop);
+    row.addEventListener('focusout', start);
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop(); else start();
+    });
+    start();
+  }
+
   /* ---------- boot --------------------------------------- */
   function boot() {
     buildLoader();
@@ -1031,6 +1096,7 @@
     initBookingBar();
     initCarousel();
     initFilms();
+    initFoodRotator();
     initHeroRotator();
     initTypeHeadings();
     initLocations();
@@ -1057,6 +1123,7 @@
       initBookingBar();
       initCarousel();
       initFilms();
+      initFoodRotator();
       initHeroRotator();
       initTypeHeadings();
       initLocations();

@@ -264,6 +264,8 @@ export const COLLECTIONS: CollectionConfig[] = [
         { value: 'salon', label: 'Salon' },
         { value: 'gym', label: 'Gym' },
         { value: 'pool', label: 'Swimming pool' },
+        { value: 'equestrian', label: 'Horse riding' },
+        { value: 'marina', label: 'Marina & water' },
       ] },
       { name: 'location', label: 'Where to find it', type: 'text', placeholder: 'Ground floor, next to the pool' },
       { name: 'description', label: 'Description', type: 'textarea' },

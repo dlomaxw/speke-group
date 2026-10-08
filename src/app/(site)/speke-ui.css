@@ -311,7 +311,7 @@ a{color:var(--maroon);text-decoration:none}
 /* A row with fewer cards than columns sits in the middle of the page rather
    than hanging off the left with a hole beside it. */
 .g-2.g-centered,.g-3.g-centered,.g-4.g-centered{
-  grid-template-columns:repeat(auto-fit,minmax(260px,480px));
+  grid-template-columns:repeat(auto-fit,minmax(260px,440px));
   justify-content:center;
 }
 
@@ -620,17 +620,26 @@ a{color:var(--maroon);text-decoration:none}
 .award-where{font-size:11.5px;color:var(--gold-soft);margin-top:auto;padding-top:8px}
 
 /* The map is a grid of tiles with pins placed over it. */
-.map-wrap{display:grid;grid-template-columns:1.55fr 1fr;gap:26px;align-items:start}
+/* Map first, the addresses underneath in columns: beside the map, thirteen
+   rows made a column twice the height of the map itself. */
+.map-wrap{display:block}
+/* Two crops are rendered: a wide one for a desktop and a squarer one for a
+   phone, where the wide frame came out barely taller than a ribbon. Only one
+   is ever shown, and the hidden one's tiles are lazy so they never load. */
+.map-canvas.is-tall{display:none}
 .map-canvas{
+  max-width:960px;margin:0 auto;
   position:relative;overflow:hidden;border-radius:14px;
-  border:1px solid rgba(58,32,32,.07);background:var(--cream-3);
+  border:1px solid rgba(58,32,32,.07);background:#17313c;
   box-shadow:0 1px 2px rgba(30,20,24,.05),0 12px 30px -16px rgba(30,20,24,.24);
 }
 .map-tiles{
   position:absolute;display:grid;
-  /* The street map is busy and colourful; softening it lets the pins read. */
-  filter:saturate(.52) brightness(1.07) contrast(.94);
+  /* Aerial imagery is dark and busy; lifting it a little lets the pins read. */
+  filter:saturate(.88) brightness(1.06) contrast(.96);
 }
+/* The place names ride over the imagery. */
+.map-tiles.is-labels{filter:none;opacity:.85;pointer-events:none}
 .map-tile{width:100%;height:100%;display:block;object-fit:cover}
 .map-pin{
   position:absolute;z-index:2;transform:translate(-50%,-50%);
@@ -651,9 +660,9 @@ a{color:var(--maroon);text-decoration:none}
   z-index:4;padding:3px 11px 3px 3px;
 }
 .map-pin-no{
-  width:22px;height:22px;flex:none;border-radius:50%;
+  width:19px;height:19px;flex:none;border-radius:50%;
   background:var(--gold);color:#3a2020;
-  font-size:11.5px;font-weight:700;
+  font-size:10.5px;font-weight:700;
   display:flex;align-items:center;justify-content:center;
 }
 /* The names would collide in the city cluster, so they wait for a hover;
@@ -662,27 +671,45 @@ a{color:var(--maroon);text-decoration:none}
 .map-pin:hover .map-pin-name,
 .map-pin:focus-visible .map-pin-name,
 .map-pin.is-lit .map-pin-name{display:inline}
-.map-list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+/* Thirteen addresses, laid out in columns under the map. */
+.map-list{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
+  gap:0 26px;margin-top:22px;border-top:1px solid var(--line);
+}
 .map-row{
-  display:grid;grid-template-columns:26px 1fr auto;gap:12px;align-items:center;
-  padding:11px 4px;border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;
+  padding:7px 4px;border-bottom:1px solid var(--line);
   transition:background .25s var(--ease),padding-left .25s var(--ease-out);
 }
 .map-row:hover,
 .map-row.is-lit{background:rgba(111,32,51,.05);padding-left:9px}
 .map-row-no{
-  width:22px;height:22px;border-radius:50%;
-  background:var(--maroon);color:#fff;font-size:11px;font-weight:700;
+  width:20px;height:20px;border-radius:50%;
+  background:var(--maroon);color:#fff;font-size:10px;font-weight:700;
   display:flex;align-items:center;justify-content:center;
 }
-.map-row-name{display:block;font-size:13.5px;font-weight:600;color:var(--maroon-ink)}
-.map-row-area{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
-.map-row-go{font-size:10px;letter-spacing:.12em;font-weight:700;color:var(--gold-pale)}
+.map-row-name{display:block;font-size:12.5px;font-weight:600;color:var(--maroon-ink);line-height:1.3}
+.map-row-area{display:block;font-size:10.5px;color:var(--muted);margin-top:1px}
+.map-row-go{font-size:9px;letter-spacing:.1em;font-weight:700;color:var(--gold-pale)}
+.map-row-trip{display:block;font-size:10.5px;color:var(--maroon);opacity:.78;margin-top:2px}
+/* The airport is a landmark, not one of ours: gold, and it does not link. */
+.map-pin.is-airport{
+  background:var(--gold);border-color:#fff;cursor:default;
+  box-shadow:0 4px 14px rgba(30,14,18,.45);
+}
+.map-pin.is-airport .map-pin-no{background:var(--maroon-deep);color:#fff}
+.map-pin.is-airport .map-pin-name{display:inline;color:#3a2020;font-weight:700}
+.map-note{font-size:11px;color:var(--muted);margin:12px 0 0}
+.map-credit{margin-top:4px}
 .map-credit{font-size:11px;color:var(--muted);text-align:right;margin:10px 0 0}
 .map-credit a{color:var(--maroon);text-decoration:underline}
 
 @media (max-width:1000px){
-  .map-wrap{grid-template-columns:1fr}
+  .map-list{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+}
+@media (max-width:760px){
+  .map-canvas.is-wide{display:none}
+  .map-canvas.is-tall{display:block}
 }
 
 /* ===========================================================
@@ -804,6 +831,162 @@ a{color:var(--maroon);text-decoration:none}
 .green-where{font-size:11.5px;color:var(--muted)}
 
 /* ===========================================================
+   10l0. MEETINGS BAND
+   The band grows with its copy. A fixed height clipped the eyebrow off the
+   top and the button off the bottom.
+   =========================================================== */
+.meet-band{
+  position:relative;overflow:hidden;isolation:isolate;
+  display:flex;align-items:center;min-height:210px;
+  background:#1a0d11;
+}
+.meet-band > image-slot{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.meet-band .scrim-side{z-index:1}
+.meet-copy{
+  position:relative;z-index:2;
+  padding:30px var(--gut);max-width:640px;
+}
+.meet-title{color:#fff;font-size:31px;font-weight:600;margin:0 0 10px;line-height:1.14}
+.meet-body{color:#efe4d2;font-size:13.5px;max-width:460px;line-height:1.66;margin:0 0 18px}
+
+@media (max-width:620px){
+  .meet-title{font-size:24px}
+  .meet-copy{padding:26px var(--gut)}
+}
+
+/* ===========================================================
+   10l. EVENT CARDS
+   A wide split — photograph one side, words the other — so weddings and
+   meetings do not read as two more property cards.
+   =========================================================== */
+/* A split card needs width to read; capped so it does not sprawl. */
+.event-row{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,700px));
+  gap:26px;justify-content:center;
+}
+.event-card{
+  display:grid;grid-template-columns:.82fr 1fr;
+  overflow:hidden;border-radius:4px 22px 4px 22px;
+  background:#fff;border:var(--card-border);box-shadow:var(--card-shadow);
+  transition:transform .45s var(--ease-out),box-shadow .45s var(--ease),border-color .4s var(--ease);
+}
+.event-card:hover{
+  transform:translateY(-5px);box-shadow:var(--card-shadow-hover);
+  border-color:rgba(201,162,39,.4);
+}
+.event-photo{position:relative;overflow:hidden;min-height:300px;background:var(--cream-3)}
+.event-photo image-slot{position:absolute;inset:0;width:100%;height:100%}
+.event-photo image-slot img{transition:transform 1.1s var(--ease-out)}
+.event-card:hover .event-photo image-slot img{transform:scale(1.06)}
+.event-body{padding:26px 30px;display:flex;flex-direction:column;justify-content:center}
+.event-title{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:23px;font-weight:600;color:var(--maroon-ink);margin:4px 0 8px;
+  transition:color .3s var(--ease);
+}
+.event-card:hover .event-title{color:var(--maroon)}
+.event-desc{font-size:13px;line-height:1.7;color:var(--body);margin:0 0 14px}
+
+@media (max-width:620px){
+  .event-card{grid-template-columns:1fr;border-radius:4px 18px 4px 18px}
+  .event-photo{min-height:0;aspect-ratio:16/10}
+  .event-body{padding:20px 20px 22px}
+}
+
+/* ===========================================================
+   10m. EXPERIENCE CARDS
+   The photograph takes a leaf shape, the card itself stays square-shouldered.
+   =========================================================== */
+.wellness-card{
+  display:flex;flex-direction:column;
+  background:#fff;border:var(--card-border);border-radius:var(--card-radius);
+  box-shadow:var(--card-shadow);overflow:hidden;
+  transition:transform .45s var(--ease-out),box-shadow .45s var(--ease),border-color .4s var(--ease);
+}
+.wellness-card:hover{
+  transform:translateY(-5px);box-shadow:var(--card-shadow-hover);
+  border-color:rgba(201,162,39,.4);
+}
+.wellness-card .media{
+  position:relative;overflow:hidden;margin:14px 14px 0;
+  border-radius:76px 10px 76px 10px;
+  background:var(--cream-3);
+}
+.wellness-card .media image-slot{display:block;width:100%;height:100%;transition:transform 1.05s var(--ease-out)}
+.wellness-card:hover .media image-slot{transform:scale(1.05)}
+.wellness-card .badge{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:2;
+  background:rgba(92,23,40,.92);color:#f4e2c6;
+  font-size:9.5px;letter-spacing:.13em;font-weight:700;text-transform:uppercase;
+  padding:5px 12px;border-radius:99px;opacity:1;
+}
+.wellness-card .body{padding:16px 20px 20px}
+.wellness-card .eyebrow{
+  font-size:10px;letter-spacing:.14em;color:var(--gold-pale);
+  font-weight:700;margin-bottom:6px;text-transform:uppercase;
+}
+.wellness-card .title{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:18px;font-weight:600;color:var(--maroon-ink);margin-bottom:7px;
+}
+.wellness-card .desc{font-size:13px;line-height:1.68;color:var(--body);margin-bottom:12px}
+
+@media (max-width:620px){
+  .wellness-card .media{border-radius:54px 10px 54px 10px;margin:10px 10px 0}
+}
+
+/* ===========================================================
+   10k. FOOD & BEVERAGE
+   Arched photographs, so the kitchens are not just more square cards.
+   =========================================================== */
+.food-row{
+  display:grid;grid-template-columns:repeat(2,minmax(0,300px));
+  gap:40px;align-items:start;justify-content:center;
+}
+/* Only a pair is on show. The others wait their turn. */
+.food-card{display:none;text-align:center}
+.food-card.is-on{display:block}
+.food-card.is-leaving{animation:food-out .38s var(--ease) forwards}
+.food-card.is-entering{animation:food-in .46s var(--ease-out) backwards}
+@keyframes food-out{to{opacity:0;transform:translateY(14px)}}
+@keyframes food-in{from{opacity:0;transform:translateY(-14px)}}
+.food-photo{
+  position:relative;overflow:hidden;
+  aspect-ratio:3/4;margin-bottom:16px;
+  border-radius:999px 999px 16px 16px;
+  border:1px solid rgba(58,32,32,.07);
+  box-shadow:var(--card-shadow);
+  transition:transform .5s var(--ease-out),box-shadow .5s var(--ease);
+}
+.food-photo image-slot{display:block;width:100%;height:100%}
+.food-photo image-slot img{transition:transform 1.1s var(--ease-out)}
+.food-card:hover .food-photo{transform:translateY(-6px);box-shadow:var(--card-shadow-hover)}
+.food-card:hover .food-photo image-slot img{transform:scale(1.07)}
+.food-name{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:18px;font-weight:600;color:var(--maroon-ink);
+  transition:color .3s var(--ease);
+}
+.food-card:hover .food-name{color:var(--maroon)}
+.food-cuisine{
+  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:var(--gold-pale);margin-top:6px;
+}
+.food-where{font-size:12px;color:var(--muted);margin-top:5px}
+
+@media (max-width:1000px){
+  .food-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+}
+@media (max-width:520px){
+  .food-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .food-name{font-size:15px}
+}
+/* Someone who asked for less motion keeps the first pair, still. */
+@media (prefers-reduced-motion:reduce){
+  .food-card.is-leaving,.food-card.is-entering{animation:none}
+}
+
+/* ===========================================================
    10h. FAQ
    =========================================================== */
 .faq-group{margin-bottom:34px}
@@ -870,18 +1053,29 @@ a{color:var(--maroon);text-decoration:none}
 .carousel-track{
   display:flex;gap:22px;
   overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;
-  padding:4px 2px 10px;margin:-4px -2px -10px;
+  /* A sliver of padding at the end: rounding can leave the final page a
+     pixel beyond the scrollable width, and snap then springs back to the
+     previous one. */
+  padding:4px 12px 10px 2px;margin:-4px -12px -10px -2px;
   scrollbar-width:none;-ms-overflow-style:none;
 }
 .carousel-track::-webkit-scrollbar{display:none}
 .carousel-track:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:4px}
+/* Four across on a wide screen: at three, each card ran to nearly 500px and
+   the photographs dominated the page. */
 .carousel-track > *{
-  flex:0 0 calc((100% - 44px) / 3);
+  flex:0 0 calc((100% - 66px) / 4);
   scroll-snap-align:start;
 }
-.carousel-track .card .body{padding:20px 22px 24px}
-.carousel-track .card .title{font-size:20px}
-.carousel-track .card .desc{font-size:13.5px;line-height:1.72}
+/* Two at a time, the rest a swipe or an arrow away. */
+.sg-carousel.is-two{max-width:1160px;margin:0 auto}
+.sg-carousel.is-two .carousel-track > *{flex:0 0 calc((100% - 22px) / 2)}
+.carousel-track .card .media{margin:12px 12px 0;border-radius:12px}
+.carousel-track .card .body{padding:14px 18px 18px}
+.carousel-track .card .title{font-size:17px}
+.carousel-track .card .desc{font-size:12.8px;line-height:1.66}
+/* The badge sits on the inset photograph, not the card's corner. */
+.carousel-track .card .badge{top:10px;left:10px}
 .carousel-arrow{
   position:absolute;top:50%;margin-top:-23px;z-index:3;
   width:46px;height:46px;border-radius:50%;cursor:pointer;
@@ -904,13 +1098,20 @@ a{color:var(--maroon);text-decoration:none}
 }
 .carousel-dots button.active{background:var(--maroon);width:20px;border-radius:4px}
 
+@media (max-width:1400px){
+  .carousel-track > *{flex:0 0 calc((100% - 44px) / 3)}
+}
 @media (max-width:1100px){
   .carousel-track > *{flex:0 0 calc((100% - 22px) / 2)}
   .carousel-arrow.prev{left:-8px}
   .carousel-arrow.next{right:-8px}
 }
+@media (max-width:1000px){
+  .sg-carousel.is-two .carousel-track > *{flex:0 0 76%}
+}
 @media (max-width:700px){
   .carousel-track > *{flex:0 0 82%}
+  .sg-carousel.is-two .carousel-track > *{flex:0 0 86%}
   .carousel-arrow{display:none}
 }
 
@@ -1030,7 +1231,25 @@ body.sg-bm-docked.sg-bm-open .bm-close{display:flex}
   /* the video is decoration behind the headline, never a click target */
   pointer-events:none;
 }
-.hero-video .scrim{z-index:1}
+/* A lighter wash than the one used over still photographs: the film is the
+   point of the hero, so the copy is kept readable with its own shadow
+   rather than by blacking out half the frame. */
+.hero-video .scrim{
+  z-index:1;
+  background:
+    linear-gradient(to top,
+      rgba(12,6,8,.70) 0%,
+      rgba(12,6,8,.34) 32%,
+      rgba(12,6,8,.10) 60%,
+      rgba(12,6,8,0) 84%),
+    linear-gradient(100deg,
+      rgba(12,6,8,.50) 0%,
+      rgba(12,6,8,.22) 40%,
+      rgba(12,6,8,0) 72%);
+}
+.hero-h{text-shadow:0 2px 18px rgba(8,4,6,.55)}
+.hero-p{text-shadow:0 1px 12px rgba(8,4,6,.6)}
+.hero-slide .eyebrow-line{text-shadow:0 1px 10px rgba(8,4,6,.6)}
 .hero-video .hero-copy{
   position:relative;z-index:2;
   width:100%;
@@ -1099,6 +1318,11 @@ body.sg-bm-docked.sg-bm-open .bm-close{display:flex}
   .hero-rotator{min-height:340px}
 }
 @media (max-width:560px){
+  .hero-video{min-height:86svh}
+  /* Tighter copy leaves more of the film uncovered. */
+  .hero-p{font-size:13.5px;line-height:1.6;margin-bottom:16px}
+  .hero-actions{gap:8px}
+  .hero-actions .btn{padding:11px 16px;font-size:10px}
   .hero-rotator{min-height:356px}
   /* Two buttons do not fit side by side at this width. */
   .hero-actions{flex-direction:column;align-items:flex-start}
@@ -1152,8 +1376,10 @@ body.sg-bm-docked.sg-bm-open .bm-close{display:flex}
 }
 
 @media (max-width:900px){
-  .hero-video{height:auto;min-height:0;align-items:stretch}
-  .hero-video .hero-copy{padding:150px var(--gut) 78px}
+  /* The film needs a window of its own on a phone: the copy sits at the
+     foot of the hero rather than filling it top to bottom. */
+  .hero-video{height:auto;min-height:88svh;align-items:flex-end}
+  .hero-video .hero-copy{padding:20px var(--gut) 48px}
   .scroll-cue{display:none}
   .video-toggle{bottom:22px}
 }

@@ -131,6 +131,9 @@ export const properties = sqliteTable('properties', {
   /** Where the pin sits on the locations map. */
   latitude: real('latitude'),
   longitude: real('longitude'),
+  /** Road distance and drive time from Entebbe International Airport. */
+  airportKm: real('airport_km'),
+  airportMinutes: integer('airport_minutes'),
   area: text('area', { length: 160 }),
   imageUrl: text('image_url'),
   imageAlt: text('image_alt', { length: 300 }),
@@ -202,7 +205,7 @@ export const experiences = sqliteTable('experiences', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, (t) => [uniqueIndex('experiences_slug_idx').on(t.slug)]);
 
-export const wellnessKindEnum = ['spa', 'salon', 'gym', 'pool'] as const;
+export const wellnessKindEnum = ['spa', 'salon', 'gym', 'pool', 'equestrian', 'marina'] as const;
 
 /** Spas, salons, gyms and pools, each attached to the property it sits in, so
  *  the homepage can answer "where do you have a spa?" by location. */

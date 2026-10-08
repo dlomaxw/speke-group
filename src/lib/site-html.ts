@@ -343,7 +343,11 @@ export function offerHref(
 type MapProperty = {
   id: number; name: string; slug: string; area: string | null;
   categoryLabel: string; latitude: number | null; longitude: number | null;
+  airportKm?: number | null; airportMinutes?: number | null;
 };
+
+/** The airport sits on the map alongside the properties. */
+type Airport = { name: string; latitude: number; longitude: number };
 
 /** Web Mercator: longitude/latitude to fractional tile coordinates. */
 const tileX = (lng: number, z: number) => ((lng + 180) / 360) * 2 ** z;
@@ -357,89 +361,114 @@ const tileY = (lat: number, z: number) => {
  * a numbered pin on each one. No map library and no third-party script: the
  * tiles are plain images, and each pin links out to directions.
  */
-export function locationsMap(properties: MapProperty[], opts: { title: string; body: string }): string {
+export function locationsMap(
+  properties: MapProperty[],
+  opts: { title: string; body: string; airport?: Airport | null },
+): string {
   const pinned = properties.filter((p) => p.latitude != null && p.longitude != null);
   if (!pinned.length) return '';
 
   const TILE = 256;
-  /* Zoom so the spread of properties fills roughly 700px of map. */
-  const lats = pinned.map((p) => p.latitude!);
-  const lngs = pinned.map((p) => p.longitude!);
-  const span = Math.max(
-    (tileY(Math.min(...lats), 0) - tileY(Math.max(...lats), 0)) * TILE,
-    ((tileX(Math.max(...lngs), 0) - tileX(Math.min(...lngs), 0)) * TILE) / 1.5,
-  );
-  const zoom = Math.max(10, Math.min(15, Math.floor(Math.log2(700 / Math.max(span, 0.0001)))));
-
-  const px = (p: MapProperty) => ({ x: tileX(p.longitude!, zoom) * TILE, y: tileY(p.latitude!, zoom) * TILE });
-  const points = pinned.map(px);
-  const minX = Math.min(...points.map((p) => p.x));
-  const maxX = Math.max(...points.map((p) => p.x));
-  const minY = Math.min(...points.map((p) => p.y));
-  const maxY = Math.max(...points.map((p) => p.y));
-
-  /* Crop close to the properties. The spread is tall and narrow, so a wide
-     frame would be mostly empty map either side. */
-  const RATIO = 1.28;
-  const cropH = (maxY - minY) * 1.1 + 64;
-  const cropW = Math.max((maxX - minX) * 1.1 + 64, cropH * RATIO);
-  const left = (minX + maxX) / 2 - cropW / 2;
-  const top = (minY + maxY) / 2 - cropH / 2;
-
-  /* Whole tiles covering that crop. */
-  const tx0 = Math.floor(left / TILE);
-  const tx1 = Math.ceil((left + cropW) / TILE);
-  const ty0 = Math.floor(top / TILE);
-  const ty1 = Math.ceil((top + cropH) / TILE);
-  const cols = tx1 - tx0;
-  const rows = ty1 - ty0;
-
-  const tiles: string[] = [];
-  for (let y = ty0; y < ty1; y++) {
-    for (let x = tx0; x < tx1; x++) {
-      tiles.push(`<img class="map-tile" src="https://tile.openstreetmap.org/${zoom}/${x}/${y}.png" alt="" aria-hidden="true" loading="lazy" decoding="async">`);
-    }
-  }
-  /* The tile sheet is sized and offset as a share of the crop, so it lines up
-     with the pins at any width the layout gives us. */
-  const sheet = [
-    `grid-template-columns:repeat(${cols},1fr)`,
-    `width:${((cols * TILE) / cropW) * 100}%`,
-    `height:${((rows * TILE) / cropH) * 100}%`,
-    `left:${((tx0 * TILE - left) / cropW) * 100}%`,
-    `top:${((ty0 * TILE - top) / cropH) * 100}%`,
-  ].join(';');
+  const px = (p: { latitude: number | null; longitude: number | null }, zoom: number) =>
+    ({ x: tileX(p.longitude!, zoom) * TILE, y: tileY(p.latitude!, zoom) * TILE });
 
   const directions = (p: MapProperty) =>
     `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(`${p.name}, Kampala, Uganda`)}`;
 
-  /* Properties sharing a point — the three at Munyonyo — are spread into a
-     small fan so each one can be seen and clicked. */
-  const atPoint = new Map<string, number[]>();
-  points.forEach((pt, i) => {
-    const key = `${Math.round(pt.x)}:${Math.round(pt.y)}`;
-    atPoint.set(key, [...(atPoint.get(key) ?? []), i]);
-  });
-  const nudge = (i: number) => {
-    const key = `${Math.round(points[i].x)}:${Math.round(points[i].y)}`;
-    const group = atPoint.get(key) ?? [i];
-    if (group.length < 2) return { dx: 0, dy: 0 };
-    const seat = group.indexOf(i);
-    const angle = (seat / group.length) * Math.PI * 2 - Math.PI / 2;
-    return { dx: Math.cos(angle) * 17, dy: Math.sin(angle) * 17 };
-  };
+  /**
+   * One rendering of the map. A wide frame suits a desktop; a phone is given
+   * a squarer one, because the same wide crop across a 343px column comes out
+   * barely taller than a strip of ribbon.
+   */
+  function canvas(ratio: number, fill: number, extraClass: string): string {
+    const spread = opts.airport ? [...pinned, opts.airport as MapProperty] : pinned;
+    const span = Math.max(
+      (tileY(Math.min(...spread.map((p) => p.latitude!)), 0) - tileY(Math.max(...spread.map((p) => p.latitude!)), 0)) * TILE,
+      ((tileX(Math.max(...spread.map((p) => p.longitude!)), 0) - tileX(Math.min(...spread.map((p) => p.longitude!)), 0)) * TILE) / ratio,
+    );
+    const zoom = Math.max(10, Math.min(15, Math.floor(Math.log2(fill / Math.max(span, 0.0001)))));
 
-  const pins = pinned.map((p, i) => {
-    const point = points[i];
-    const { dx, dy } = nudge(i);
-    const x = (((point.x + dx - left) / cropW) * 100).toFixed(3);
-    const y = (((point.y + dy - top) / cropH) * 100).toFixed(3);
-    return `
+    const points = pinned.map((p) => px(p, zoom));
+    const airportPoint = opts.airport ? px(opts.airport, zoom) : null;
+    const framed = airportPoint ? [...points, airportPoint] : points;
+    const minX = Math.min(...framed.map((p) => p.x));
+    const maxX = Math.max(...framed.map((p) => p.x));
+    const minY = Math.min(...framed.map((p) => p.y));
+    const maxY = Math.max(...framed.map((p) => p.y));
+
+    const cropH = (maxY - minY) * 1.06 + 48;
+    const cropW = Math.max((maxX - minX) * 1.06 + 48, cropH * ratio);
+    const left = (minX + maxX) / 2 - cropW / 2;
+    const top = (minY + maxY) / 2 - cropH / 2;
+
+    const tx0 = Math.floor(left / TILE), tx1 = Math.ceil((left + cropW) / TILE);
+    const ty0 = Math.floor(top / TILE), ty1 = Math.ceil((top + cropH) / TILE);
+    const cols = tx1 - tx0, rows = ty1 - ty0;
+
+    /* Satellite imagery, with a transparent layer of place names over it —
+       aerial photography with no labels is hard to orient against. */
+    const IMAGERY = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile';
+    const PLACES = 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile';
+    const tiles: string[] = [];
+    const labels: string[] = [];
+    for (let y = ty0; y < ty1; y++) {
+      for (let x = tx0; x < tx1; x++) {
+        tiles.push(`<img class="map-tile" src="${IMAGERY}/${zoom}/${y}/${x}" alt="" aria-hidden="true" loading="lazy" decoding="async">`);
+        labels.push(`<img class="map-tile" src="${PLACES}/${zoom}/${y}/${x}" alt="" aria-hidden="true" loading="lazy" decoding="async">`);
+      }
+    }
+    const sheet = [
+      `grid-template-columns:repeat(${cols},1fr)`,
+      `width:${((cols * TILE) / cropW) * 100}%`,
+      `height:${((rows * TILE) / cropH) * 100}%`,
+      `left:${((tx0 * TILE - left) / cropW) * 100}%`,
+      `top:${((ty0 * TILE - top) / cropH) * 100}%`,
+    ].join(';');
+
+    /* Properties sharing a point — the three at Munyonyo — fan out so each
+       one can be seen and clicked. */
+    const atPoint = new Map<string, number[]>();
+    points.forEach((pt, i) => {
+      const key = `${Math.round(pt.x)}:${Math.round(pt.y)}`;
+      atPoint.set(key, [...(atPoint.get(key) ?? []), i]);
+    });
+    const nudge = (i: number) => {
+      const key = `${Math.round(points[i].x)}:${Math.round(points[i].y)}`;
+      const group = atPoint.get(key) ?? [i];
+      if (group.length < 2) return { dx: 0, dy: 0 };
+      const angle = (group.indexOf(i) / group.length) * Math.PI * 2 - Math.PI / 2;
+      return { dx: Math.cos(angle) * 17, dy: Math.sin(angle) * 17 };
+    };
+
+    const pins = pinned.map((p, i) => {
+      const { dx, dy } = nudge(i);
+      const x = (((points[i].x + dx - left) / cropW) * 100).toFixed(3);
+      const y = (((points[i].y + dy - top) / cropH) * 100).toFixed(3);
+      return `
         <a class="map-pin" href="${safeUrl(directions(p), '#')}" data-pin="${i + 1}" style="left:${x}%;top:${y}%" aria-label="Directions to ${esc(p.name)}">
           <span class="map-pin-no">${i + 1}</span>
           <span class="map-pin-name">${esc(p.name)}</span>
         </a>`;
-  }).join('');
+    }).join('');
+
+    const airportPin = opts.airport && airportPoint ? `
+        <span class="map-pin is-airport" style="left:${(((airportPoint.x - left) / cropW) * 100).toFixed(3)}%;top:${(((airportPoint.y - top) / cropH) * 100).toFixed(3)}%">
+          <span class="map-pin-no">${icon('plane', 13)}</span>
+          <span class="map-pin-name">${esc(opts.airport.name)}</span>
+        </span>` : '';
+
+    return `
+      <div class="map-canvas ${extraClass}" style="aspect-ratio:${cropW} / ${cropH}">
+        <div class="map-tiles" style="${sheet}">${tiles.join('')}
+        </div>
+        <div class="map-tiles is-labels" style="${sheet}">${labels.join('')}
+        </div>
+        ${pins}${airportPin}
+      </div>`;
+  }
+
+  const fromAirport = (p: MapProperty) =>
+    p.airportKm ? `<span class="map-row-trip">${p.airportKm} km from the airport${p.airportMinutes ? ` · ${p.airportMinutes} min` : ''}</span>` : '';
 
   const list = pinned.map((p, i) => `
         <a class="map-row" href="${safeUrl(directions(p), '#')}" data-pin-row="${i + 1}">
@@ -447,27 +476,26 @@ export function locationsMap(properties: MapProperty[], opts: { title: string; b
           <span>
             <span class="map-row-name">${esc(p.name)}</span>
             <span class="map-row-area">${esc(p.area || p.categoryLabel)}</span>
+            ${fromAirport(p)}
           </span>
           <span class="map-row-go">DIRECTIONS &#8599;</span>
         </a>`).join('');
 
   return `
-  <div id="locations" style="padding:52px var(--gut)">
-    <div style="text-align:center;max-width:680px;margin:0 auto 30px" data-reveal>
+  <div id="locations" style="padding:44px var(--gut)">
+    <div style="text-align:center;max-width:680px;margin:0 auto 24px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">Our Locations</div>
       <h2 class="h-sec">${esc(opts.title)}</h2>
-      <p style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(opts.body)}</p>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(opts.body)}</p>
     </div>
     <div class="map-wrap" data-reveal>
-      <div class="map-canvas" style="aspect-ratio:${cropW} / ${cropH}">
-        <div class="map-tiles" style="${sheet}">${tiles.join('')}
-        </div>
-        ${pins}
-      </div>
+      ${canvas(2.1, 560, 'is-wide')}
+      ${canvas(0.92, 380, 'is-tall')}
       <div class="map-list">${list}
       </div>
     </div>
-    <p class="map-credit">Map data &copy; <a href="https://www.openstreetmap.org/copyright" rel="nofollow">OpenStreetMap</a> contributors</p>
+    <p class="map-note">${opts.airport ? `Distances are by road from ${esc(opts.airport.name)}, measured without traffic.` : ''}</p>
+    <p class="map-credit">Imagery &copy; <a href="https://www.esri.com/" rel="nofollow">Esri</a>, Maxar, Earthstar Geographics and the GIS user community</p>
   </div>`;
 }
 
@@ -497,7 +525,7 @@ export function filmGallery(films: Film[], opts: { eyebrow: string; title: strin
           </button>
           <figcaption class="film-caption">
             <div class="film-title">${esc(f.title)}</div>
-            <p class="film-desc">${esc(f.description)}</p>
+            <p class="film-desc" data-reveal data-reveal-delay="0.2">${esc(f.description)}</p>
           </figcaption>
         </figure>`).join('');
 
@@ -506,7 +534,7 @@ export function filmGallery(films: Film[], opts: { eyebrow: string; title: strin
     <div style="text-align:center;max-width:680px;margin:0 auto 28px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">${esc(opts.eyebrow)}</div>
       <h2 class="h-sec">${esc(opts.title)}</h2>
-      <p style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(opts.body)}</p>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(opts.body)}</p>
     </div>
     <div class="${rows.length === 2 ? 'g-2' : 'g-3'}" style="gap:22px" data-stagger="0.08">${cards}
     </div>
@@ -543,6 +571,7 @@ const ICON_PATHS: Record<string, string> = {
   sourcing: '<path d="M4 7h16l-1.2 12.2a2 2 0 0 1-2 1.8H7.2a2 2 0 0 1-2-1.8Z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/>',
   community: '<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a5 5 0 0 1 10 0v1"/><circle cx="17" cy="9" r="2.5"/><path d="M15 20v-1a4 4 0 0 1 6-3.4"/>',
   pin: '<path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/>',
+  plane: '<path d="M10.5 19.5 12 21l1.5-1.5V15l7 2v-2l-7-4.5V5a1.5 1.5 0 0 0-3 0v5.5L3.5 15v2l7-2v4.5Z"/>',
   calendar: '<rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M3.5 10h17"/><path d="M8 3v4"/><path d="M16 3v4"/>',
   guests: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20v-.8A5.2 5.2 0 0 1 10.2 14h3.6A5.2 5.2 0 0 1 19 19.2V20"/>',
   phone: '<path d="M6.5 3.5h3l1.5 4-2 1.5a12 12 0 0 0 6 6l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.5 5.7 2 2 0 0 1 6.5 3.5Z"/>',
