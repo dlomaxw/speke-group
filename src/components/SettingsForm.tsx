@@ -76,7 +76,7 @@ export default function SettingsForm({
                     <textarea id={id} name={name} className="field" rows={3}
                               defaultValue={item.value} disabled={!canEdit} />
                   ) : item.valueType === 'image' || item.valueType === 'video' ? (
-                    <MediaField name={name} defaultValue={item.value} options={mediaOptions} />
+                    <MediaField name={name} defaultValue={item.value} options={mediaOptions} folder="site" />
                   ) : (
                     <input
                       id={id} name={name} className="field"

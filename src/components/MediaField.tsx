@@ -1,22 +1,42 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState, useTransition } from 'react';
+import { uploadToField } from '@/app/admin/actions';
 
 /**
  * An image or video field. The value is always a URL, so an editor can
  * either pick something already uploaded or paste a link from elsewhere.
  */
 export default function MediaField({
-  name, defaultValue, options,
+  name, defaultValue, options, folder = 'general',
 }: {
   name: string;
   defaultValue: string;
   options: { url: string; filename: string; alt: string | null }[];
+  folder?: string;
 }) {
   const [value, setValue] = useState(defaultValue);
   const [browsing, setBrowsing] = useState(false);
+  const [note, setNote] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null);
+  const [busy, startUpload] = useTransition();
+  const picker = useRef<HTMLInputElement>(null);
 
   const isVideo = /\.(mp4|webm)(\?|$)/i.test(value);
+
+  function choose(file: File) {
+    setNote(null);
+    const body = new FormData();
+    body.set('file', file);
+    body.set('folder', folder);
+    startUpload(async () => {
+      const res = await uploadToField(body);
+      if (res.error) { setNote({ kind: 'error', text: res.error }); return; }
+      if (res.url) setValue(res.url);
+      setNote(res.pending
+        ? { kind: 'ok', text: 'Uploaded and in use here. A manager still needs to confirm its usage rights under Images & video.' }
+        : { kind: 'ok', text: 'Uploaded.' });
+    });
+  }
 
   return (
     <div className="space-y-2">
@@ -30,6 +50,12 @@ export default function MediaField({
           placeholder="https://… or pick from the library"
           aria-label="Media URL"
         />
+        <button
+          type="button" className="btn-ghost whitespace-nowrap" disabled={busy}
+          onClick={() => picker.current?.click()}
+        >
+          {busy ? 'Uploading…' : 'Upload'}
+        </button>
         <button type="button" className="btn-ghost whitespace-nowrap" onClick={() => setBrowsing((v) => !v)}>
           {browsing ? 'Close' : 'Library'}
         </button>
@@ -39,6 +65,23 @@ export default function MediaField({
           </button>
         )}
       </div>
+
+      {/* Kept out of the form's own submission: the file goes up on its own. */}
+      <input
+        ref={picker} type="file" className="hidden"
+        accept="image/*,video/mp4,video/webm"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) choose(file);
+          e.target.value = '';
+        }}
+      />
+
+      {note && (
+        <p className={`text-[12.5px] ${note.kind === 'error' ? 'text-[#b3261e]' : 'text-[#1e6b34]'}`}>
+          {note.text}
+        </p>
+      )}
 
       {value && (
         <div className="rounded-lg border border-[#e6e9ee] bg-[#f9fafb] p-2 w-fit">
@@ -56,7 +99,7 @@ export default function MediaField({
         <div className="rounded-lg border border-[#e6e9ee] bg-white p-3 max-h-[280px] overflow-y-auto">
           {options.length === 0 ? (
             <p className="text-[13px] text-[#7a8494]">
-              Nothing uploaded yet. Add files under Images &amp; video.
+              Nothing approved yet. Use Upload above, or add files under Images &amp; video.
             </p>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">

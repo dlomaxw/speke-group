@@ -96,6 +96,7 @@ export default function RecordForm({
                   name={field.name}
                   defaultValue={initial(field.name)}
                   options={mediaOptions}
+                  folder={collection}
                 />
               ) : (
                 <input

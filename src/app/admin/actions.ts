@@ -438,6 +438,46 @@ export async function uploadMedia(_prev: State, formData: FormData): Promise<Sta
   }
 }
 
+/**
+ * Upload straight from a photo field, so an editor does not have to leave the
+ * form, visit the library and come back. The file lands in the same library
+ * and the same rights queue; someone who can approve rights clears it on the
+ * spot, and anyone else is told it still needs confirming.
+ */
+export async function uploadToField(
+  formData: FormData,
+): Promise<{ url?: string; pending?: boolean; error?: string }> {
+  const user = await requireUser();
+  assertCan(user.role, 'media.upload');
+
+  const file = formData.get('file');
+  if (!(file instanceof File) || file.size === 0) return { error: 'Choose a file first.' };
+
+  try {
+    const folder = String(formData.get('folder') ?? 'general');
+    const result = await uploadFile(file, folder);
+    const approves = can(user.role, 'media.approve');
+    const db = await getDb();
+    await db.insert(media).values({
+      url: result.url,
+      pathname: result.pathname,
+      filename: file.name,
+      contentType: result.contentType,
+      bytes: result.bytes,
+      folder,
+      uploadedBy: user.id,
+      ...(approves
+        ? { rightsStatus: 'approved' as const, rightsReviewedBy: user.id, rightsReviewedAt: new Date() }
+        : {}),
+    });
+    await logActivity(user, 'created', 'media', undefined, file.name);
+    revalidatePath('/admin/media');
+    return { url: result.url, pending: !approves };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : 'Upload failed.' };
+  }
+}
+
 export async function reviewMediaRights(id: number, status: 'approved' | 'rejected', note: string) {
   const user = await requireUser();
   assertCan(user.role, 'media.approve');
