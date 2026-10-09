@@ -1893,3 +1893,51 @@ a.card.sg-opening::after,a.tile.sg-opening::after{
   .event-card.is-flipped .event-photo{order:1}
   .event-card.is-flipped .event-body{order:2}
 }
+
+/* ============================================================
+   LOCATION CARDS
+   Thirteen addresses used to sit under the map as thirteen rows. They are
+   cards now, two at a time, so the section ends where the eye expects it to.
+   ============================================================ */
+.sg-carousel.is-locations{margin-top:22px;padding-top:20px;border-top:1px solid rgba(111,32,51,.12)}
+.sg-carousel.is-locations .carousel-track > *{flex:0 0 calc((100% - 22px) / 2)}
+
+.map-card{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:16px 18px;background:#fff;
+  border:var(--card-border);border-radius:var(--card-radius);
+  box-shadow:var(--card-shadow);
+  transition:transform .4s var(--ease-out),box-shadow .4s var(--ease),border-color .35s var(--ease);
+}
+.map-card:hover,
+.map-card.is-lit{
+  transform:translateY(-3px);box-shadow:var(--card-shadow-hover);
+  border-color:rgba(201,162,39,.4);
+}
+.map-card .map-card-body{flex:1 1 auto;min-width:0}
+.map-card .map-row-name{font-size:14px}
+.map-card .map-row-area,
+.map-card .map-row-trip{font-size:11.5px}
+.map-card .map-row-go{flex:0 0 auto;align-self:center;white-space:nowrap}
+
+@media (max-width:860px){
+  .sg-carousel.is-locations .carousel-track > *{flex:0 0 86%}
+}
+
+/* ============================================================
+   FILMS
+   Three across on a desktop, as they always were. On a phone a column of
+   three posters was most of a screen each; they become one at a time with
+   the rest a swipe away.
+   ============================================================ */
+.sg-carousel.is-films .carousel-track > *{flex:0 0 calc((100% - 44px) / 3)}
+.sg-carousel.is-films.is-pair .carousel-track > *{flex:0 0 calc((100% - 22px) / 2)}
+/* Nothing to slide at this width, so the arrows and dots stay out of the way. */
+@media (min-width:861px){
+  .sg-carousel.is-films ~ .carousel-dots{display:none}
+  .sg-carousel.is-films .carousel-arrow{display:none}
+}
+@media (max-width:860px){
+  .sg-carousel.is-films .carousel-track > *,
+  .sg-carousel.is-films.is-pair .carousel-track > *{flex:0 0 86%}
+}

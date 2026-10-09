@@ -332,7 +332,7 @@ export default async function HomePage() {
       </select>
     </div>
 
-    <div class="sg-carousel is-three" data-carousel>
+    <div class="sg-carousel is-three" data-carousel data-autoplay="5000">
       <div class="carousel-track" data-stagger="0.08" tabindex="0" role="group" aria-label="Experiences, scrollable">${wellnessCards}
       </div>
       <button class="carousel-arrow prev" type="button" aria-label="Previous experiences">

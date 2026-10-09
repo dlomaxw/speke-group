@@ -753,6 +753,53 @@
       wrap.addEventListener('sg:filtered', paint);
       paint();
       window.setTimeout(paint, 400);
+
+      /* ----- moving on by itself -----
+         data-autoplay="<ms>" advances a page at a time and wraps round at the
+         end. It yields to the visitor: any hover, focus, touch or scroll of
+         their own stops it for good, because a carousel that snatches itself
+         back is worse than one that never moved. It also respects a reduced
+         motion preference and pauses while the tab is hidden. */
+      var every = Number(wrap.getAttribute('data-autoplay') || 0);
+      if (!every || reduced) return;
+
+      var timer = null;
+      var surrendered = false;
+
+      function advance() {
+        if (surrendered || document.hidden || !wrap.isConnected) return;
+        /* Not while it is off screen — nobody is watching, and scrolling the
+           track moves the page's scroll anchor on some browsers. */
+        var box = wrap.getBoundingClientRect();
+        if (box.bottom < 0 || box.top > window.innerHeight) return;
+        var max = track.scrollWidth - track.clientWidth - 2;
+        var to = track.scrollLeft >= max ? 0 : track.scrollLeft + step();
+        track.scrollTo({ left: to, behavior: 'smooth' });
+      }
+      function start() {
+        if (timer || surrendered) return;
+        timer = window.setInterval(advance, every);
+      }
+      function stop() {
+        if (!timer) return;
+        window.clearInterval(timer);
+        timer = null;
+      }
+      function surrender() {
+        surrendered = true;
+        stop();
+      }
+
+      wrap.addEventListener('mouseenter', stop);
+      wrap.addEventListener('mouseleave', start);
+      wrap.addEventListener('focusin', surrender);
+      wrap.addEventListener('pointerdown', surrender);
+      track.addEventListener('wheel', surrender, { passive: true });
+      track.addEventListener('touchstart', surrender, { passive: true });
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) stop(); else start();
+      });
+      start();
     });
   }
 

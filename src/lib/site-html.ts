@@ -486,10 +486,14 @@ export function locationsMap(
   const fromAirport = (p: MapProperty) =>
     p.airportKm ? `<span class="map-row-trip">${p.airportKm} km from the airport${p.airportMinutes ? ` · ${p.airportMinutes} min` : ''}</span>` : '';
 
+  /* Thirteen rows at once was a wall of text under the map. They are cards in
+     a carousel now, two at a time, moving on by themselves until a visitor
+     takes hold of it. The data-pin-row hook is unchanged, so hovering a card
+     still lights its pin. */
   const list = pinned.map((p, i) => `
-        <a class="map-row" href="${safeUrl(directions(p), '#')}" data-pin-row="${i + 1}">
+        <a class="map-card" href="${safeUrl(directions(p), '#')}" data-pin-row="${i + 1}">
           <span class="map-row-no">${i + 1}</span>
-          <span>
+          <span class="map-card-body">
             <span class="map-row-name">${esc(p.name)}</span>
             <span class="map-row-area">${esc(p.area || p.categoryLabel)}</span>
             ${fromAirport(p)}
@@ -507,8 +511,17 @@ export function locationsMap(
     <div class="map-wrap" data-reveal>
       ${canvas(2.1, 560, 'is-wide')}
       ${canvas(0.92, 380, 'is-tall')}
-      <div class="map-list">${list}
+      <div class="sg-carousel is-locations" data-carousel data-autoplay="4200">
+        <div class="carousel-track map-list" tabindex="0" role="group" aria-label="Our locations, scrollable">${list}
+        </div>
+        <button class="carousel-arrow prev" type="button" aria-label="Previous locations">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg>
+        </button>
+        <button class="carousel-arrow next" type="button" aria-label="More locations">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg>
+        </button>
       </div>
+      <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
     </div>
     <p class="map-note">${opts.airport ? `Distances are by road from ${esc(opts.airport.name)}, measured without traffic.` : ''}</p>
     <p class="map-credit">Imagery &copy; <a href="https://www.esri.com/" rel="nofollow">Esri</a>, Maxar, Earthstar Geographics and the GIS user community</p>
@@ -552,8 +565,17 @@ export function filmGallery(films: Film[], opts: { eyebrow: string; title: strin
       <h2 class="h-sec">${esc(opts.title)}</h2>
       <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(opts.body)}</p>
     </div>
-    <div class="${rows.length === 2 ? 'g-2' : 'g-3'}" style="gap:22px" data-stagger="0.08">${cards}
+    <div class="sg-carousel is-films${rows.length === 2 ? ' is-pair' : ''}" data-carousel>
+      <div class="carousel-track" data-stagger="0.08" tabindex="0" role="group" aria-label="Films, scrollable">${cards}
+      </div>
+      <button class="carousel-arrow prev" type="button" aria-label="Previous films">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg>
+      </button>
+      <button class="carousel-arrow next" type="button" aria-label="More films">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4l8 8-8 8"/></svg>
+      </button>
     </div>
+    <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
   </div>`;
 }
 
