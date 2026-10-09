@@ -57,7 +57,7 @@ export default async function NewsPage() {
         </div>`).join('');
 
   const html = `
-  ${header({ active: 'news', cta: { label: 'PRESS ENQUIRIES', href: '/contact' }, hotels, resorts, apartments })}
+  ${header({ active: 'news', settings: s, cta: { label: 'PRESS ENQUIRIES', href: '/contact' }, hotels, resorts, apartments })}
 
   <!-- ================= PAGE HEAD ================= -->
   <div style="padding:46px var(--gut) 26px" data-reveal>

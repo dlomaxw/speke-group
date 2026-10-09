@@ -1,0 +1,1 @@
+ALTER TABLE `wellness` ADD `link_url` text;

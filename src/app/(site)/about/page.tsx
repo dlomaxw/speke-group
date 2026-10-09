@@ -33,7 +33,7 @@ export default async function AboutPage() {
         </div>`).join('');
 
   const html = `
-  ${header({ active: 'about', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
+  ${header({ active: 'about', settings: s, cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
   <!-- ================= HERO ================= -->
   <div class="hero-tile band" style="height:420px">

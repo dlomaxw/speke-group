@@ -26,11 +26,12 @@ const GROUP_LABELS: Record<string, { title: string; blurb: string }> = {
   page_contact: { title: 'Contact page sections', blurb: 'Headings on the contact page.' },
   page_faq: { title: 'FAQ page sections', blurb: 'Headings on the questions page.' },
   page_impact: { title: 'Sustainability page sections', blurb: 'Headings on the Our Impact page.' },
+  navigation: { title: 'Menu & footer', blurb: 'The top-level menu names, the footer column headings, and the links in the footer’s Information column — one per line, written as "Label | /where-it-goes".' },
 };
 
 /* The groups a reader works through first, then everything else. */
 const GROUP_ORDER = [
-  'general', 'contact', 'homepage', 'about', 'events', 'experiences', 'impact',
+  'general', 'navigation', 'contact', 'homepage', 'about', 'events', 'experiences', 'impact',
   'page_home', 'page_about', 'page_events', 'page_experiences', 'page_news',
   'page_contact', 'page_faq', 'page_impact',
 ];

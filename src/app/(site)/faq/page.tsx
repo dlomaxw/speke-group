@@ -47,6 +47,7 @@ export default async function FaqPage() {
 
   const html = `
   ${header({
+    settings: s,
     active: 'contact',
     cta: { label: 'CALL RESERVATIONS', href: firstPhone ? telHref(firstPhone) : '/contact' },
     hotels, resorts, apartments,

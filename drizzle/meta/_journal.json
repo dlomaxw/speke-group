@@ -78,6 +78,27 @@
       "when": 1791479064619,
       "tag": "0010_stormy_shocker",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1791525441358,
+      "tag": "0011_military_menace",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1791526760497,
+      "tag": "0012_warm_mauler",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "6",
+      "when": 1791529398442,
+      "tag": "0013_typical_darkhawk",
+      "breakpoints": true
     }
   ]
 }

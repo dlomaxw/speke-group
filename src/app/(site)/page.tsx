@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getAwards, getChrome, getDining, getHeroSlides, getHighlights, getImpact, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
+import { getAwards, getChrome, getDining, getExperiences, getHeroSlides, getHighlights, getImpact, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
 import { esc, safeUrl, slot, header, footer, wovenBand, countUp, bookingBar, BOOKING_ANCHOR, phones, locationsMap, filmGallery, icon } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
@@ -19,9 +19,9 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, spas, occasions, honours, films, green, panels, kitchens] = await Promise.all([
+  const [chrome, spas, occasions, honours, films, green, panels, kitchens, leisure] = await Promise.all([
     getChrome(), getWellness(), getHighlights('occasions'), getAwards(), getVideos(), getImpact(),
-    getHeroSlides(), getDining('restaurant'),
+    getHeroSlides(), getDining('restaurant'), getExperiences(),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
@@ -85,15 +85,20 @@ export default async function HomePage() {
 
   /* Wellness: the cards, plus the locations that actually have a facility, so
      the selector only ever offers somewhere with something to show. */
-  const KIND_LABEL: Record<string, string> = { spa: 'Spa', salon: 'Salon', gym: 'Gym', pool: 'Swimming pool' };
+  const KIND_LABEL: Record<string, string> = {
+    spa: 'Spa', salon: 'Salon', gym: 'Gym', pool: 'Swimming pool',
+    equestrian: 'Equestrian', marina: 'Marina', kids: 'For children', squash: 'Squash', courts: 'Courts & grounds',
+  };
   const propertyName = (id: number | null) =>
     allProperties.find((p) => p.id === id)?.name ?? 'Across the Group';
   const wellnessPlaces = allProperties
     .filter((p) => spas.some((w) => w.propertyId === p.id))
     .map((p) => `<option value="p${p.id}">${esc(p.name)}</option>`).join('');
-  const wellnessCards = spas.map((w) => `
-        <div class="wellness-card" data-reveal data-filter-item="wellness" data-tags="${w.propertyId ? `p${w.propertyId}` : 'group'}">
-          <div class="media" style="aspect-ratio:16/9">
+  const wellnessCards = spas.map((w) => {
+    const site = safeUrl(w.linkUrl || allProperties.find((p) => p.id === w.propertyId)?.websiteUrl, '');
+    return `
+        <${site ? 'a' : 'div'} class="wellness-card"${site ? ` href="${site}" target="_blank" rel="noopener"` : ''} data-reveal data-filter-item="wellness" data-tags="${w.propertyId ? `p${w.propertyId}` : 'group'}">
+          <div class="media" style="aspect-ratio:16/10" data-zoom>
             <div class="badge">${esc(KIND_LABEL[w.kind] ?? w.kind)}</div>
             ${slot(w.imageUrl, w.imageAlt || w.name, 'width:100%;height:100%')}
           </div>
@@ -105,11 +110,34 @@ export default async function HomePage() {
               .map((h) => `<span>${esc(h)}</span>`).join('')}</div>` : ''}
             ${w.location ? `<div class="wellness-where">${esc(w.location)}</div>` : ''}
           </div>
-        </div>`).join('');
+        </${site ? 'a' : 'div'}>`;
+  }).join('');
+
+  /* Leisure on the homepage: two of the things there are to do, chosen in the
+     dashboard by slug so the team can swap them without touching the page. */
+  const leisurePicked = splitHighlights(setting(s, 'home_leisure_slugs', 'marina-experience · equestrian'))
+    .map((slug) => leisure.find((l) => l.slug === slug))
+    .filter((l): l is (typeof leisure)[number] => Boolean(l));
+  const leisureShown = (leisurePicked.length ? leisurePicked : leisure).slice(0, 2);
+
+  const leisureCards = leisureShown.map((l) => `
+        <a class="event-card is-flipped" href="${safeUrl(l.linkUrl, '/experiences')}"${l.linkUrl ? ' target="_blank" rel="noopener"' : ''} data-reveal>
+          <div class="event-photo" data-zoom>
+            ${slot(l.imageUrl, l.imageAlt || l.name, 'width:100%;height:100%')}
+          </div>
+          <div class="event-body">
+            <div class="eyebrow">Leisure</div>
+            <div class="event-title">${esc(l.name)}</div>
+            <p class="event-desc">${esc(l.description)}</p>
+            ${l.highlights ? `<div class="wellness-tags" style="margin-bottom:14px">${splitHighlights(l.highlights)
+              .map((h) => `<span>${esc(h)}</span>`).join('')}</div>` : ''}
+            <span class="link-arrow">FIND OUT MORE <i>&rarr;</i></span>
+          </div>
+        </a>`).join('');
 
   /* Two ways in to Events & Meetings: a meeting, and a celebration. */
   const OCCASION_IMAGES: Record<string, string> = {
-    Meetings: '/images/v-victoria.webp',
+    Meetings: '/images/v-victoria-ballroom.webp',
     Weddings: '/images/v-kabira-ballroom.webp',
   };
   const eventCards = occasions.slice(0, 2).map((o) => `
@@ -131,8 +159,8 @@ export default async function HomePage() {
   const foodCards = kitchens.map((r, i) => {
     const at = allProperties.find((p) => p.id === r.propertyId);
     return `
-        <a class="food-card${i < 2 ? ' is-on' : ''}" href="/experiences#restaurants"${i < 2 ? ' data-reveal' : ''}>
-          <div class="food-photo">${slot(r.imageUrl, r.imageAlt || r.name, 'width:100%;height:100%')}</div>
+        <a class="food-card${i < 2 ? ' is-on' : ''}" href="${safeUrl(r.linkUrl || at?.websiteUrl, '/experiences#restaurants')}" target="_blank" rel="noopener"${i < 2 ? ' data-reveal' : ''}>
+          <div class="food-photo" data-zoom>${slot(r.imageUrl, r.imageAlt || r.name, 'width:100%;height:100%')}</div>
           <div class="food-name">${esc(r.name)}</div>
           ${r.cuisine ? `<div class="food-cuisine">${esc(r.cuisine)}</div>` : ''}
           <div class="food-where">${esc(at?.name ?? 'Across the Group')}</div>
@@ -175,7 +203,7 @@ export default async function HomePage() {
   }).join('');
 
   const html = `
-  ${header({ active: 'home', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
+  ${header({ active: 'home', settings: s, cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
   <!-- ================= HERO (video) ================= -->
   <div class="hero-video">
@@ -304,7 +332,7 @@ export default async function HomePage() {
       </select>
     </div>
 
-    <div class="sg-carousel is-two" data-carousel>
+    <div class="sg-carousel is-three" data-carousel>
       <div class="carousel-track" data-stagger="0.08" tabindex="0" role="group" aria-label="Experiences, scrollable">${wellnessCards}
       </div>
       <button class="carousel-arrow prev" type="button" aria-label="Previous experiences">
@@ -317,6 +345,21 @@ export default async function HomePage() {
     <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
     <p class="wellness-none" data-filter-none="wellness" hidden>We have nothing listed here yet. <a href="/contact">Ask our team</a> and we will point you to the nearest spa or salon.</p>
   </div>
+
+  <!-- ================= LEISURE ================= -->
+  ${leisureCards ? `
+  <div id="leisure" style="padding:52px var(--gut) 10px">
+    <div style="text-align:center;max-width:660px;margin:0 auto 26px" data-reveal>
+      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'home_leisure_eyebrow', 'Leisure'))}</div>
+      <h2 class="h-sec">${esc(setting(s, 'home_leisure_title', 'Things to Do Between Meetings'))}</h2>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'home_leisure_body', 'A marina on Lake Victoria, horses and ponies in the paddock, and a lakeside that fills with music on a Sunday.'))}</p>
+    </div>
+    <div class="event-row">${leisureCards}
+    </div>
+    <div style="text-align:center;margin-top:26px" data-reveal>
+      <a class="btn btn-ghost" href="/experiences"><span>SEE EVERYTHING THERE IS TO DO</span></a>
+    </div>
+  </div>` : ''}
 
   <!-- ================= SUSTAINABILITY ================= -->
   <div id="sustainability" style="padding:50px var(--gut)">

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
 import { getChrome, getDining, getExperiences, setting, splitHighlights } from '@/lib/site-data';
-import { esc, slot, header, footer, phones, bookingBar, BOOKING_ANCHOR, icon } from '@/lib/site-html';
+import { esc, safeUrl, slot, header, footer, phones, bookingBar, BOOKING_ANCHOR, icon } from '@/lib/site-html';
 import { DINING_IMAGES, EXPERIENCE_ANCHORS, EXPERIENCE_IMAGES } from '@/lib/default-images';
 
 export const metadata: Metadata = {
@@ -32,9 +32,22 @@ export default async function ExperiencesPage() {
   const reservations = [lakeGrill?.phone, lakeGrill?.email || setting(s, 'contact_dining_email')]
     .filter(Boolean).map(esc).join(' &middot; ');
 
-  const restaurantCards = restaurants.map((d) => `
-        <div class="card" data-reveal>
-          <div class="media" style="height:168px">
+  /* Each card opens the page that describes it on the property's own site;
+     without one, the property's home page. */
+  const siteOf = (propertyId: number | null) =>
+    allProperties.find((p) => p.id === propertyId)?.websiteUrl ?? null;
+  const outward = (link: string | null, propertyId: number | null) =>
+    safeUrl(link || siteOf(propertyId), '');
+  /* A card with nowhere to go stays a card rather than becoming a dead link. */
+  const openTag = (href: string, cls: string, extra = '') =>
+    href ? `<a class="${cls}" href="${href}" target="_blank" rel="noopener"${extra}>` : `<div class="${cls}"${extra}>`;
+  const closeTag = (href: string) => (href ? '</a>' : '</div>');
+
+  const restaurantCards = restaurants.map((d) => {
+    const href = outward(d.linkUrl, d.propertyId);
+    return `
+        ${openTag(href, 'card', ' data-reveal')}
+          <div class="media" style="height:168px" data-zoom>
             <div class="badge">${esc(d.cuisine)}</div>
             ${slot(d.imageUrl || DINING_IMAGES[d.slug], d.imageAlt || d.name, 'width:100%;height:168px')}
           </div>
@@ -43,11 +56,14 @@ export default async function ExperiencesPage() {
             <div class="title">${esc(d.name)}</div>
             <div class="desc">${esc(d.description)}</div>
           </div>
-        </div>`).join('');
+        ${closeTag(href)}`;
+  }).join('');
 
-  const barCards = bars.map((b) => `
-        <div class="card" data-reveal>
-          <div class="media" style="height:150px">
+  const barCards = bars.map((b) => {
+    const href = outward(b.linkUrl, b.propertyId);
+    return `
+        ${openTag(href, 'card', ' data-reveal')}
+          <div class="media" style="height:150px" data-zoom>
             <div class="badge">Bar</div>
             ${slot(b.imageUrl || DINING_IMAGES[b.slug], b.imageAlt || b.name, 'width:100%;height:150px')}
           </div>
@@ -55,11 +71,15 @@ export default async function ExperiencesPage() {
             <div class="title">${esc(b.name)}</div>
             <div class="desc" style="margin-bottom:0">${esc(b.description)}</div>
           </div>
-        </div>`).join('');
+        ${closeTag(href)}`;
+  }).join('');
 
-  const leisureCards = leisure.map((l) => `
-        <div class="card" id="${esc(EXPERIENCE_ANCHORS[l.slug] || l.slug)}" data-reveal>
-          <div class="media" style="height:160px">
+  const leisureCards = leisure.map((l) => {
+    const href = outward(l.linkUrl, l.propertyId);
+    const id = ` id="${esc(EXPERIENCE_ANCHORS[l.slug] || l.slug)}" data-reveal`;
+    return `
+        ${openTag(href, 'card', id)}
+          <div class="media" style="height:160px" data-zoom>
             ${slot(l.imageUrl || EXPERIENCE_IMAGES[l.slug], l.imageAlt || l.name, 'width:100%;height:160px')}
           </div>
           <div class="body">
@@ -67,10 +87,11 @@ export default async function ExperiencesPage() {
             <div class="desc">${esc(l.description)}</div>
             <div style="font-size:12.2px;line-height:1.9;color:#7a6a5a">${esc(splitHighlights(l.highlights).join(' · '))}</div>
           </div>
-        </div>`).join('');
+        ${closeTag(href)}`;
+  }).join('');
 
   const html = `
-  ${header({ active: 'experiences', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
+  ${header({ active: 'experiences', settings: s, cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
   <!-- ================= HERO ================= -->
   <div class="hero-tile band" style="height:400px">

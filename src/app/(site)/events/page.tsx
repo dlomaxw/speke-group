@@ -25,14 +25,25 @@ export default async function EventsPage() {
   const email = setting(s, 'contact_email');
   const phoneLine = phones(s).map((p) => esc(p.replace(/[()]/g, ''))).join(' &nbsp;&middot;&nbsp; ');
 
-  /* Only offer locations that have a venue to show. */
-  const venuePlaces = allProperties
-    .filter((p) => venues.some((v) => v.propertyId === p.id))
+  const meetingVenues = venues.filter((v) => v.kind !== 'wedding');
+  const weddingVenues = venues.filter((v) => v.kind === 'wedding');
+
+  /* Only offer locations that have a venue to show, per list. */
+  const placesFor = (rows: typeof venues) => allProperties
+    .filter((p) => rows.some((v) => v.propertyId === p.id))
     .map((p) => `<option value="p${p.id}">${esc(p.name)}</option>`).join('');
 
-  const venueCards = venues.map((v) => `
-        <div class="card" data-reveal data-filter-item="venues" data-tags="${esc(v.sizeTag)} ${v.propertyId ? `p${v.propertyId}` : 'group'}">
-          <div class="media" style="height:178px">
+  /* "View Venue" goes to the page the owning property publishes for that room;
+     failing that, to the property's own website, and only then to our form. */
+  const venueHref = (v: (typeof venues)[number]) =>
+    safeUrl(v.venueUrl || allProperties.find((p) => p.id === v.propertyId)?.websiteUrl, '/contact');
+
+  /* The whole card is the link. Its photograph is marked data-zoom, which the
+     stylesheet gives a zoom cursor and the script opens full size instead of
+     following the link. */
+  const venueCards = (rows: typeof venues, group: string) => rows.map((v) => `
+        <a class="card" href="${venueHref(v)}" target="_blank" rel="noopener" data-reveal data-filter-item="${esc(group)}" data-tags="${esc(v.sizeTag)} ${v.propertyId ? `p${v.propertyId}` : 'group'}">
+          <div class="media" style="height:178px" data-zoom>
             <div class="badge">${esc(v.location)}</div>
             ${slot(v.imageUrl || VENUE_IMAGES[v.slug], v.imageAlt || v.name, 'width:100%;height:178px')}
           </div>
@@ -41,11 +52,25 @@ export default async function EventsPage() {
             <div class="title">${esc(v.name)}</div>
             <div style="display:flex;gap:18px;font-size:12.5px;color:#5a4a3a;margin-bottom:12px">
               <div><span style="color:#b8935a;font-weight:700">Capacity</span><br>${esc(v.capacity)}</div>
-              <div><span style="color:#b8935a;font-weight:700">Venue Size</span><br>${esc(v.venueSize)}</div>
+              ${v.venueSize ? `<div><span style="color:#b8935a;font-weight:700">Venue Size</span><br>${esc(v.venueSize)}</div>` : ''}
             </div>
-            <a class="link-arrow" href="/contact">VIEW VENUE <i>&rarr;</i></a>
+            <span class="link-arrow">VIEW VENUE <i>&rarr;</i></span>
           </div>
-        </div>`).join('');
+        </a>`).join('');
+
+  /* The chips only earn their place when the rooms actually span the brackets. */
+  const CHIPS: { tag: string; label: string }[] = [
+    { tag: 's10', label: '10 &ndash; 35 Guests' },
+    { tag: 's50', label: '50 &ndash; 100 Guests' },
+    { tag: 's120', label: '120 &ndash; 400 Guests' },
+    { tag: 's1000', label: 'Over 400 Guests' },
+  ];
+  const chipsFor = (rows: typeof venues, group: string) => `
+        <div data-filter-group="${esc(group)}" style="display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end">
+        <button class="chip active" data-filter="all">All Venues</button>
+        ${CHIPS.filter((c) => rows.some((v) => v.sizeTag === c.tag))
+          .map((c) => `<button class="chip" data-filter="${c.tag}">${c.label}</button>`).join('')}
+        </div>`;
 
   const occasionTiles = occasions.map((o) => `
         <div class="tile" data-reveal>
@@ -55,7 +80,7 @@ export default async function EventsPage() {
         </div>`).join('');
 
   const html = `
-  ${header({ active: 'events', cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
+  ${header({ active: 'events', settings: s, cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
 
   <!-- ================= HERO ================= -->
   <div class="hero-tile band" style="height:400px">
@@ -85,7 +110,7 @@ export default async function EventsPage() {
     <div class="stat" style="text-align:center"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Guest Rooms On Site</div></div>
   </div>
 
-  <!-- ================= VENUES ================= -->
+  <!-- ================= MEETING VENUES ================= -->
   <div id="venues" style="padding:48px var(--gut) 20px">
     <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:16px" data-reveal>
       <div>
@@ -97,23 +122,42 @@ export default async function EventsPage() {
         <div class="venue-place">
           <label class="fl" for="venue-place">Location</label>
           <select id="venue-place" data-filter-select="venues">
-            <option value="all">All our locations</option>${venuePlaces}
+            <option value="all">All our locations</option>${placesFor(meetingVenues)}
           </select>
         </div>
-        <div data-filter-group="venues" style="display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end">
-        <button class="chip active" data-filter="all">All Venues</button>
-        <button class="chip" data-filter="s10">10 &ndash; 35 Guests</button>
-        <button class="chip" data-filter="s50">50 &ndash; 100 Guests</button>
-        <button class="chip" data-filter="s120">120 &ndash; 400 Guests</button>
-        <button class="chip" data-filter="s1000">1000 &ndash; 1400 Guests</button>
-        </div>
+        ${chipsFor(meetingVenues, 'venues')}
       </div>
     </div>
 
-    <div style="gap:22px" data-stagger="0.06" class="g-3">${venueCards}
+    <div style="gap:22px" data-stagger="0.06" class="g-3">${venueCards(meetingVenues, 'venues')}
     </div>
     <p class="wellness-none" data-filter-none="venues" hidden>No venue at that location takes a party of this size. <a href="/contact">Tell us what you need</a> and we will find the right room.</p>
   </div>
+
+  <!-- ================= WEDDING VENUES ================= -->
+  ${weddingVenues.length ? `
+  <div id="weddings" style="background:var(--cream-2);padding:48px var(--gut) 50px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:16px" data-reveal>
+      <div>
+        <div class="eyebrow-line">${esc(setting(s, 'events_weddings_eyebrow', "Celebrate"))}</div>
+        <h2 class="h-sec">${esc(setting(s, 'events_weddings_title', "Wedding Venues"))}</h2>
+        <p style="font-size:13.5px;color:#5a4a3a;margin:10px 0 0;max-width:560px;line-height:1.65">${esc(setting(s, 'events_weddings_body', 'From lakeside lawns and gardens under the palms to a ballroom for over a thousand guests — each venue can be set for the day you have in mind.'))}</p>
+      </div>
+      <div class="venue-filters">
+        <div class="venue-place">
+          <label class="fl" for="wedding-place">Location</label>
+          <select id="wedding-place" data-filter-select="weddings">
+            <option value="all">All our locations</option>${placesFor(weddingVenues)}
+          </select>
+        </div>
+        ${chipsFor(weddingVenues, 'weddings')}
+      </div>
+    </div>
+
+    <div style="gap:22px" data-stagger="0.06" class="g-3">${venueCards(weddingVenues, 'weddings')}
+    </div>
+    <p class="wellness-none" data-filter-none="weddings" hidden>No venue at that location takes a party of this size. <a href="/contact">Tell us about your day</a> and we will find the right setting.</p>
+  </div>` : ''}
 
   <!-- ================= FILMS ================= -->
   ${filmGallery(films, { eyebrow: 'Films', title: setting(s, 'films_title', 'See the Venue for Yourself'), body: setting(s, 'films_body') })}

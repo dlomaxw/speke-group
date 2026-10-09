@@ -60,6 +60,7 @@ export default async function ImpactPage() {
 
   const html = `
   ${header({
+    settings: s,
     active: 'about',
     cta: { label: 'CALL RESERVATIONS', href: firstPhone ? telHref(firstPhone) : '/contact' },
     hotels, resorts, apartments,

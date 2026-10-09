@@ -9,7 +9,7 @@ import { getDb, usingD1 } from '../src/db';
 import { highlightBlocks } from '../src/db/schema';
 
 const PHOTOS = [
-  { name: 'Meetings', imageUrl: '/images/v-victoria.webp', imageAlt: 'The Victoria Ballroom set for a conference' },
+  { name: 'Meetings', imageUrl: '/images/v-victoria-ballroom.webp', imageAlt: 'The Victoria Ballroom set for a conference' },
   { name: 'Weddings', imageUrl: '/images/v-kabira-ballroom.webp', imageAlt: 'The Kabira Ballroom dressed for a celebration' },
 ];
 

@@ -51,8 +51,11 @@ export function header(opts: {
   hotels: NavProperty[];
   resorts: NavProperty[];
   apartments: NavProperty[];
+  /** Lets the dashboard rename the top-level menu items. */
+  settings?: SettingsMap;
 }): string {
-  const { active, cta, hotels, resorts, apartments } = opts;
+  const { active, cta, hotels, resorts, apartments, settings: s } = opts;
+  const nav = (key: string, fallback: string) => esc(s ? setting(s, key, fallback) : fallback);
   const home = active === 'home';
   const cls = (key: Active) => (active === key ? ' class="active"' : '');
   const links = (list: NavProperty[]) =>
@@ -63,7 +66,7 @@ export function header(opts: {
     <a href="/"><img class="logo" src="/brand/speke-logo.png" alt="Speke Group"></a>
     <nav class="sg-nav">
       <div class="item">
-        <a href="/about"${active === 'about' || home ? ' class="active"' : ''}>Our Group</a>
+        <a href="/about"${active === 'about' || home ? ' class="active"' : ''}>${nav('nav_about', 'Our Group')}</a>
         <div class="sg-drop">
           <a href="/about">About Us</a>
           <a href="/about#chairman">Our Chairman</a>
@@ -73,7 +76,7 @@ export function header(opts: {
         </div>
       </div>
       <div class="item">
-        <a href="${home ? '#portfolio' : '/#portfolio'}">Find &amp; Book</a>
+        <a href="${home ? '#portfolio' : '/#portfolio'}">${nav('nav_book', 'Find &amp; Book')}</a>
         <div class="sg-drop">
           <div class="grp">Hotels</div>${links(hotels)}
           <div class="grp">Resorts</div>${links(resorts)}
@@ -81,7 +84,7 @@ export function header(opts: {
         </div>
       </div>
       <div class="item">
-        <a href="/events"${cls('events')}>Events &amp; Meetings</a>
+        <a href="/events"${cls('events')}>${nav('nav_events', 'Events &amp; Meetings')}</a>
         <div class="sg-drop">
           <a href="/events#venues">Conferences</a>
           <a href="/events#occasions">Weddings</a>
@@ -89,7 +92,7 @@ export function header(opts: {
         </div>
       </div>
       <div class="item">
-        <a href="/experiences"${cls('experiences')}>Experiences</a>
+        <a href="/experiences"${cls('experiences')}>${nav('nav_experiences', 'Experiences')}</a>
         <div class="sg-drop">
           <a href="/experiences#restaurants">Dining</a>
           <a href="/experiences#spas">Spas &amp; Salons</a>
@@ -99,8 +102,8 @@ export function header(opts: {
           <a href="/experiences#lakeside">Lakeside</a>
         </div>
       </div>
-      <div class="item"><a href="/news"${cls('news')}>News</a></div>
-      <div class="item"><a href="/contact"${cls('contact')}>Contact</a></div>
+      <div class="item"><a href="/news"${cls('news')}>${nav('nav_news', 'News')}</a></div>
+      <div class="item"><a href="/contact"${cls('contact')}>${nav('nav_contact', 'Contact')}</a></div>
     </nav>
     ${cta.href === BOOKING_ANCHOR
       ? `<button class="btn btn-solid sg-bm-toggle" type="button" aria-expanded="false" aria-controls="sg-booking"><span>${esc(cta.label)}</span></button>`
@@ -191,10 +194,30 @@ export function phones(s: SettingsMap): string[] {
     .filter(Boolean);
 }
 
+/** The footer's Information column, written in the dashboard one link per
+ *  line as "Label | /where-it-goes". */
+const FOOTER_LINKS_DEFAULT = [
+  'About Us | /about',
+  'Our Impact | /impact',
+  'Questions & Answers | /faq',
+  'Events & Meetings | /events',
+  'Experiences | /experiences',
+  'Careers | https://spekegroup.com/contact/',
+  'Terms & Conditions | https://spekegroup.com/contact/',
+].join(String.fromCharCode(10));
+
 export function footer(s: SettingsMap): string {
   const email = setting(s, 'contact_email');
   const facebook = setting(s, 'social_facebook');
   const twitter = setting(s, 'social_twitter');
+
+  const infoLinks = setting(s, 'footer_information_links', FOOTER_LINKS_DEFAULT)
+    .split(/\r?\n/)
+    .map((line) => line.split('|').map((part) => part.trim()))
+    .filter(([label, href]) => label && href)
+    .map(([label, href]) => `
+          <a href="${safeUrl(href, '#')}">${esc(label)}</a>`)
+    .join('');
 
   return `
   <footer class="sg-footer">
@@ -206,15 +229,15 @@ export function footer(s: SettingsMap): string {
         <div style="font-size:12px;line-height:1.8;color:#c8a888;max-width:230px">${esc(setting(s, 'site_tagline', 'Hotels, resorts, serviced apartments and event venues across Uganda.'))}</div>
       </div>
       <div>
-        <div class="col-title">${icon('pin', 14)}Address</div>
+        <div class="col-title">${icon('pin', 14)}${esc(setting(s, 'footer_col_address', 'Address'))}</div>
         <div class="foot-lines">
           <div>${esc(setting(s, 'contact_address_1'))}</div>
           <div>${esc(setting(s, 'contact_address_2'))}</div>
-          <a class="foot-go" href="/#locations">Find us on the map &#8599;</a>
+          <a class="foot-go" href="/#locations">${esc(setting(s, 'footer_map_link', 'Find us on the map'))} &#8599;</a>
         </div>
       </div>
       <div>
-        <div class="col-title">${icon('phone', 14)}Contact</div>
+        <div class="col-title">${icon('phone', 14)}${esc(setting(s, 'footer_col_contact', 'Contact'))}</div>
         <div class="foot-lines foot-links">${phones(s)
           .map((p) => `
           <a href="${esc(telHref(p))}">${esc(p)}</a>`).join('')}${email ? `
@@ -222,19 +245,12 @@ export function footer(s: SettingsMap): string {
         </div>
       </div>
       <div>
-        <div class="col-title">Information</div>
-        <div class="foot-lines foot-links">
-          <a href="/about">About Us</a>
-          <a href="/impact">Our Impact</a>
-          <a href="/faq">Questions &amp; Answers</a>
-          <a href="/events">Events &amp; Meetings</a>
-          <a href="/experiences">Experiences</a>
-          <a href="https://spekegroup.com/contact/">Careers</a>
-          <a href="https://spekegroup.com/contact/">Terms &amp; Conditions</a>
+        <div class="col-title">${esc(setting(s, 'footer_col_information', 'Information'))}</div>
+        <div class="foot-lines foot-links">${infoLinks}
         </div>
       </div>
       <div>
-        <div class="col-title">Socials</div>
+        <div class="col-title">${esc(setting(s, 'footer_col_socials', 'Socials'))}</div>
         <div style="display:flex;gap:10px">${facebook ? `
           <a class="social" href="${safeUrl(facebook)}" aria-label="Speke Group on Facebook">${icon('facebook', 17)}</a>` : ''}${twitter ? `
           <a class="social" href="${safeUrl(twitter)}" aria-label="Speke Group on X">${icon('x', 17)}</a>` : ''}

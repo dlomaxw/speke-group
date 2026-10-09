@@ -284,7 +284,7 @@ a{color:var(--maroon);text-decoration:none}
   display:inline-flex;align-items:center;gap:7px;
 }
 .link-arrow i{font-style:normal;transition:transform .32s var(--ease-out);display:inline-block}
-.link-arrow:hover i{transform:translateX(6px)}
+.link-arrow:hover i,.card:hover .link-arrow i{transform:translateX(6px)}
 
 /* ===========================================================
    4b. ICONS
@@ -463,9 +463,12 @@ a{color:var(--maroon);text-decoration:none}
 .chip:hover{border-color:var(--gold-soft);color:var(--maroon)}
 .chip.active{background:var(--maroon);border-color:var(--maroon);color:#fff;box-shadow:0 8px 20px rgba(111,32,51,.26)}
 
-/* filtered-out cards collapse smoothly */
+/* Filtered-out cards collapse. This has to win against whatever display the
+   card itself sets — .wellness-card declares display:flex further down the
+   sheet, which silently beat this rule on equal specificity and left the
+   homepage location filter showing everything. */
 .filter-hide{
-  display:none;
+  display:none !important;
 }
 
 /* ===========================================================
@@ -1070,6 +1073,15 @@ a{color:var(--maroon);text-decoration:none}
 /* Two at a time, the rest a swipe or an arrow away. */
 .sg-carousel.is-two{max-width:1160px;margin:0 auto}
 .sg-carousel.is-two .carousel-track > *{flex:0 0 calc((100% - 22px) / 2)}
+/* Three at a time: two cards of these made the section a wall of photograph. */
+.sg-carousel.is-three{max-width:1160px;margin:0 auto}
+.sg-carousel.is-three .carousel-track > *{flex:0 0 calc((100% - 44px) / 3)}
+.sg-carousel.is-three .wellness-card .media{margin:10px 10px 0;border-radius:54px 8px 54px 8px}
+.sg-carousel.is-three .wellness-card .body{padding:14px 16px 17px}
+.sg-carousel.is-three .wellness-card .title{font-size:16.5px}
+.sg-carousel.is-three .wellness-card .desc{font-size:12.4px;line-height:1.62;margin-bottom:10px}
+.sg-carousel.is-three .wellness-card .wellness-tags span{font-size:10.5px;padding:3px 8px}
+.sg-carousel.is-three .wellness-card .wellness-where{font-size:11px}
 .carousel-track .card .media{margin:12px 12px 0;border-radius:12px}
 .carousel-track .card .body{padding:14px 18px 18px}
 .carousel-track .card .title{font-size:17px}
@@ -1108,10 +1120,12 @@ a{color:var(--maroon);text-decoration:none}
 }
 @media (max-width:1000px){
   .sg-carousel.is-two .carousel-track > *{flex:0 0 76%}
+  .sg-carousel.is-three .carousel-track > *{flex:0 0 calc((100% - 22px) / 2)}
 }
 @media (max-width:700px){
   .carousel-track > *{flex:0 0 82%}
   .sg-carousel.is-two .carousel-track > *{flex:0 0 86%}
+  .sg-carousel.is-three .carousel-track > *{flex:0 0 86%}
   .carousel-arrow{display:none}
 }
 
@@ -1815,4 +1829,67 @@ a.card.sg-opening::after,a.tile.sg-opening::after{
 .chairman-tagline{
   font-family:'Playfair Display',Georgia,serif;font-style:italic;
   font-size:clamp(16px,1.6vw,19px);color:#f2d9a0;margin:-6px 0 16px;
+}
+
+/* ============================================================
+   PHOTO LIGHTBOX
+   A card is a link to the property's own page; its photograph is the one
+   place that does something else, so it gets a cursor of its own and opens
+   the picture full size.
+   ============================================================ */
+.card .media[data-zoom],
+.food-card [data-zoom]{cursor:zoom-in}
+
+.sg-lightbox{
+  position:fixed;inset:0;z-index:9000;
+  display:flex;align-items:center;justify-content:center;
+  padding:40px 24px;
+  background:rgba(26,14,16,.88);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  opacity:0;transition:opacity .22s var(--ease);
+}
+.sg-lightbox.is-open{opacity:1}
+.sg-lightbox figure{
+  margin:0;max-width:min(1180px,100%);max-height:100%;
+  display:flex;flex-direction:column;align-items:center;gap:14px;
+  transform:scale(.97);transition:transform .28s var(--ease-out);
+  pointer-events:none; /* clicks fall through to the overlay, which closes */
+}
+.sg-lightbox.is-open figure{transform:none}
+.sg-lightbox img{
+  display:block;max-width:100%;max-height:78svh;
+  width:auto;height:auto;object-fit:contain;
+  border-radius:10px;box-shadow:0 40px 90px -30px rgba(0,0,0,.7);
+}
+.sg-lightbox figcaption{
+  color:#f3e9dc;font-size:12.5px;letter-spacing:.04em;text-align:center;
+  max-width:60ch;line-height:1.6;
+}
+.sg-lightbox-close{
+  position:absolute;top:18px;right:20px;
+  width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);
+  color:#fff;font-size:26px;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .25s var(--ease),border-color .25s var(--ease);
+}
+.sg-lightbox-close:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.5)}
+
+@media (max-width:760px){
+  .sg-lightbox{padding:64px 14px 24px}
+  .sg-lightbox img{max-height:70svh}
+}
+@media (prefers-reduced-motion:reduce){
+  .sg-lightbox,.sg-lightbox figure{transition:none}
+}
+
+/* The leisure pair mirrors the events pair — photograph on the other side, so
+   the two bands do not read as the same block twice. */
+.event-card.is-flipped{grid-template-columns:1fr .82fr}
+.event-card.is-flipped .event-photo{order:2}
+.event-card.is-flipped .event-body{order:1}
+@media (max-width:620px){
+  .event-card.is-flipped{grid-template-columns:1fr}
+  .event-card.is-flipped .event-photo{order:1}
+  .event-card.is-flipped .event-body{order:2}
 }

@@ -784,6 +784,85 @@
   }
 
 
+  /* ---------- 9e-bis. Photo lightbox --------------------- */
+  /* A card is a link, so a click anywhere on it opens the venue. The photo is
+     the exception: it opens the photograph itself, full size. One delegated
+     listener covers every card, including any the admin preview re-renders. */
+  function initLightbox() {
+    if (document.documentElement.dataset.sgLightbox === '1') return;
+    document.documentElement.dataset.sgLightbox = '1';
+
+    var overlay = null;
+
+    function close() {
+      if (!overlay) return;
+      overlay.classList.remove('is-open');
+      var dying = overlay;
+      overlay = null;
+      window.setTimeout(function () {
+        if (dying.parentNode) dying.parentNode.removeChild(dying);
+      }, reduced ? 0 : 220);
+      document.body.style.removeProperty('overflow');
+    }
+
+    function open(src, alt) {
+      close();
+      overlay = document.createElement('div');
+      overlay.className = 'sg-lightbox';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', alt || 'Photograph');
+
+      var figure = document.createElement('figure');
+      var img = document.createElement('img');
+      img.src = src;
+      img.alt = alt || '';
+      figure.appendChild(img);
+      if (alt) {
+        var caption = document.createElement('figcaption');
+        caption.textContent = alt;
+        figure.appendChild(caption);
+      }
+
+      var shut = document.createElement('button');
+      shut.type = 'button';
+      shut.className = 'sg-lightbox-close';
+      shut.setAttribute('aria-label', 'Close photograph');
+      shut.innerHTML = '&times;';
+
+      overlay.appendChild(shut);
+      overlay.appendChild(figure);
+      document.body.appendChild(overlay);
+      document.body.style.overflow = 'hidden';
+      /* one frame before the class, so the transition actually runs */
+      window.requestAnimationFrame(function () {
+        if (overlay) overlay.classList.add('is-open');
+      });
+      shut.focus();
+    }
+
+    document.addEventListener('click', function (event) {
+      if (overlay && (event.target === overlay || event.target.closest('.sg-lightbox-close'))) {
+        event.preventDefault();
+        close();
+        return;
+      }
+      var zone = event.target.closest ? event.target.closest('[data-zoom]') : null;
+      if (!zone) return;
+      var img = zone.querySelector('img');
+      if (!img || !img.getAttribute('src')) return;
+      /* beat the surrounding link */
+      event.preventDefault();
+      event.stopPropagation();
+      open(img.currentSrc || img.src, img.getAttribute('alt'));
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (overlay && (event.key === 'Escape' || event.key === 'Esc')) close();
+    });
+  }
+
+
   /* ---------- 9f. Hero rotator --------------------------- */
   /* The hero copy moves through the collection, a property at a time. The
      markup carries every panel, so without this the first one simply stays. */
@@ -1101,6 +1180,7 @@
     initTypeHeadings();
     initLocations();
     initWovenBand();
+    initLightbox();
     initEnquiryForm();
     initCardReveal();
 

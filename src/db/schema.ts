@@ -142,6 +142,8 @@ export const properties = sqliteTable('properties', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, (t) => [uniqueIndex('properties_slug_idx').on(t.slug)]);
 
+export const venueKindEnum = ['meeting', 'wedding'] as const;
+
 export const venues = sqliteTable('venues', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   slug: text('slug', { length: 120 }).notNull(),
@@ -153,9 +155,16 @@ export const venues = sqliteTable('venues', {
   venueSize: text('venue_size', { length: 80 }),
   /** Capacity bracket used by the filter chips, e.g. s10 / s50 / s120 / s1000. */
   sizeTag: text('size_tag', { length: 20 }).notNull().default('s10'),
+  /** Which list the room belongs to: the meeting venues or the wedding venues.
+   *  A room that does both is listed once in each, with the capacity and the
+   *  photograph the Group publishes for that use. */
+  kind: text('kind', { enum: venueKindEnum }).notNull().default('meeting'),
   description: text('description'),
   imageUrl: text('image_url'),
   imageAlt: text('image_alt', { length: 300 }),
+  /** Where "View Venue" goes: the page the owning property publishes for this
+   *  room. Empty falls back to the property's own website. */
+  venueUrl: text('venue_url'),
   sortOrder: integer('sort_order').notNull().default(0),
   status: text('status', { enum: statusEnum }).notNull().default('published'),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
@@ -186,6 +195,9 @@ export const restaurants = sqliteTable('restaurants', {
   dressCode: text('dress_code', { length: 120 }),
   phone: text('phone', { length: 60 }),
   email: text('email', { length: 160 }),
+  /** The page the owning property publishes for this restaurant or bar.
+   *  Empty falls back to the property's own website. */
+  linkUrl: text('link_url'),
   sortOrder: integer('sort_order').notNull().default(0),
   status: text('status', { enum: statusEnum }).notNull().default('published'),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
@@ -195,6 +207,10 @@ export const experiences = sqliteTable('experiences', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   slug: text('slug', { length: 120 }).notNull(),
   name: text('name', { length: 160 }).notNull(),
+  /** Owning property; empty means the experience runs across the Group. */
+  propertyId: integer('property_id').references(() => properties.id, { onDelete: 'set null' }),
+  /** Where the card goes — the page that describes this experience. */
+  linkUrl: text('link_url'),
   description: text('description'),
   /** Short bullet points shown under the description. */
   highlights: text('highlights'),
@@ -205,7 +221,7 @@ export const experiences = sqliteTable('experiences', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
 }, (t) => [uniqueIndex('experiences_slug_idx').on(t.slug)]);
 
-export const wellnessKindEnum = ['spa', 'salon', 'gym', 'pool', 'equestrian', 'marina'] as const;
+export const wellnessKindEnum = ['spa', 'salon', 'gym', 'pool', 'equestrian', 'marina', 'kids', 'squash', 'courts'] as const;
 
 /** Spas, salons, gyms and pools, each attached to the property it sits in, so
  *  the homepage can answer "where do you have a spa?" by location. */
@@ -225,6 +241,9 @@ export const wellness = sqliteTable('wellness', {
   phone: text('phone', { length: 60 }),
   imageUrl: text('image_url'),
   imageAlt: text('image_alt', { length: 300 }),
+  /** The page that describes it — a spa may have its own site. Empty falls
+   *  back to the owning property's website. */
+  linkUrl: text('link_url'),
   sortOrder: integer('sort_order').notNull().default(0),
   status: text('status', { enum: statusEnum }).notNull().default('published'),
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull().$defaultFn(() => new Date()),
