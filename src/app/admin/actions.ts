@@ -15,7 +15,7 @@ import {
 } from '@/lib/auth';
 import { assertCan, can } from '@/lib/rbac';
 import { getCollection, type CollectionConfig, type Field } from '@/lib/collections';
-import { uploadFile, deleteFile } from '@/lib/storage';
+import { deleteFile, presignUpload } from '@/lib/storage';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
 import { createEnrolment, checkCode, verifyAndConsume, mfaRequiredFor } from '@/lib/mfa';
 import { getAccess, covers, OUT_OF_SCOPE } from '@/lib/access';
@@ -408,73 +408,64 @@ export async function rejectChange(versionId: number, note: string): Promise<Sta
    Media
    ============================================================ */
 
-export async function uploadMedia(_prev: State, formData: FormData): Promise<State> {
+/**
+ * The two halves of a direct upload.
+ *
+ * The browser asks for somewhere to put the file, sends it to R2 itself, then
+ * tells us it landed. Nothing but the filename and a content type passes
+ * through the application, so a full-resolution photograph is no heavier on
+ * this route than a thumbnail — which is the point: going through a server
+ * action capped uploads at 1MB and broke on any real photograph.
+ */
+export async function beginFieldUpload(input: {
+  filename: string; contentType: string; bytes: number; folder?: string;
+}): Promise<{ uploadUrl?: string; url?: string; pathname?: string; error?: string }> {
   const user = await requireUser();
-  assertCan(user.role, 'media.upload');
-
-  const file = formData.get('file');
-  if (!(file instanceof File) || file.size === 0) return { error: 'Choose a file first.' };
-
+  if (!can(user.role, 'media.upload')) return { error: 'You do not have permission to upload media.' };
   try {
-    const folder = String(formData.get('folder') ?? 'general');
-    const result = await uploadFile(file, folder);
-    const db = await getDb();
-    await db.insert(media).values({
-      url: result.url,
-      pathname: result.pathname,
-      filename: file.name,
-      contentType: result.contentType,
-      bytes: result.bytes,
-      alt: String(formData.get('alt') ?? '') || null,
-      credit: String(formData.get('credit') ?? '') || null,
-      folder,
-      uploadedBy: user.id,
-    });
-    await logActivity(user, 'created', 'media', undefined, file.name);
-    revalidatePath('/admin/media');
-    return { ok: `Uploaded ${file.name}. A manager needs to approve its usage rights before it can go on the site.` };
+    return await presignUpload(input);
   } catch (e) {
-    return { error: e instanceof Error ? e.message : 'Upload failed.' };
+    return { error: e instanceof Error ? e.message : 'Could not start the upload.' };
   }
 }
 
-/**
- * Upload straight from a photo field, so an editor does not have to leave the
- * form, visit the library and come back. The file lands in the same library
- * and the same rights queue; someone who can approve rights clears it on the
- * spot, and anyone else is told it still needs confirming.
- */
-export async function uploadToField(
-  formData: FormData,
-): Promise<{ url?: string; pending?: boolean; error?: string }> {
+/** Records a file the browser has already put in the bucket. */
+export async function finishFieldUpload(input: {
+  url: string; pathname: string; filename: string; contentType: string; bytes: number;
+  folder?: string; alt?: string; credit?: string;
+}): Promise<{ url?: string; pending?: boolean; error?: string }> {
   const user = await requireUser();
-  assertCan(user.role, 'media.upload');
+  if (!can(user.role, 'media.upload')) return { error: 'You do not have permission to upload media.' };
 
-  const file = formData.get('file');
-  if (!(file instanceof File) || file.size === 0) return { error: 'Choose a file first.' };
+  /* A caller could name any key; only the one we signed for is accepted, and
+     that is the folder we were given with a name we generated. */
+  const folder = (input.folder ?? 'general').replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'general';
+  if (!input.pathname.startsWith(`${folder}/`) || input.pathname.includes('..')) {
+    return { error: 'That upload did not come from here.' };
+  }
 
   try {
-    const folder = String(formData.get('folder') ?? 'general');
-    const result = await uploadFile(file, folder);
     const approves = can(user.role, 'media.approve');
     const db = await getDb();
     await db.insert(media).values({
-      url: result.url,
-      pathname: result.pathname,
-      filename: file.name,
-      contentType: result.contentType,
-      bytes: result.bytes,
+      url: input.url,
+      pathname: input.pathname,
+      filename: input.filename,
+      contentType: input.contentType,
+      bytes: input.bytes,
+      alt: input.alt?.trim() || null,
+      credit: input.credit?.trim() || null,
       folder,
       uploadedBy: user.id,
       ...(approves
         ? { rightsStatus: 'approved' as const, rightsReviewedBy: user.id, rightsReviewedAt: new Date() }
         : {}),
     });
-    await logActivity(user, 'created', 'media', undefined, file.name);
+    await logActivity(user, 'created', 'media', undefined, input.filename);
     revalidatePath('/admin/media');
-    return { url: result.url, pending: !approves };
+    return { url: input.url, pending: !approves };
   } catch (e) {
-    return { error: e instanceof Error ? e.message : 'Upload failed.' };
+    return { error: e instanceof Error ? e.message : 'Could not record the upload.' };
   }
 }
 

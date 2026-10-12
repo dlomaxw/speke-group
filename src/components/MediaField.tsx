@@ -1,7 +1,20 @@
 'use client';
 
 import { useRef, useState, useTransition } from 'react';
-import { uploadToField } from '@/app/admin/actions';
+import { beginFieldUpload, finishFieldUpload } from '@/app/admin/actions';
+
+/** What the bucket accepts; the same figure as MAX_UPLOAD_BYTES on the server. */
+const MAX_UPLOAD = 100 * 1024 * 1024;
+
+/* Every file gets a random suffix, so a URL never changes meaning and can
+   be cached hard. R2 only records this if the browser sends it. */
+const UPLOAD_CACHE = 'public, max-age=31536000, immutable';
+
+function readable(bytes: number): string {
+  return bytes >= 1024 * 1024
+    ? `${(bytes / 1024 / 1024).toFixed(1)}MB`
+    : `${Math.round(bytes / 1024)}KB`;
+}
 
 /**
  * An image or video field. The value is always a URL, so an editor can
@@ -23,18 +36,53 @@ export default function MediaField({
 
   const isVideo = /\.(mp4|webm)(\?|$)/i.test(value);
 
+  /**
+   * The file goes straight from here into the bucket, at whatever resolution
+   * it was chosen at. It never passes through the application, which is what
+   * lets a full-size photograph through: sending one as a server action hit
+   * the 1MB request ceiling and failed with nothing to show for it.
+   */
   function choose(file: File) {
     setNote(null);
-    const body = new FormData();
-    body.set('file', file);
-    body.set('folder', folder);
     startUpload(async () => {
-      const res = await uploadToField(body);
-      if (res.error) { setNote({ kind: 'error', text: res.error }); return; }
-      if (res.url) setValue(res.url);
-      setNote(res.pending
-        ? { kind: 'ok', text: 'Uploaded and in use here. A manager still needs to confirm its usage rights under Images & video.' }
-        : { kind: 'ok', text: 'Uploaded.' });
+      if (file.size > MAX_UPLOAD) {
+        setNote({ kind: 'error', text: `That file is ${readable(file.size)}, and the limit is ${readable(MAX_UPLOAD)}.` });
+        return;
+      }
+
+      const contentType = file.type || 'application/octet-stream';
+      const begun = await beginFieldUpload({
+        filename: file.name, contentType, bytes: file.size, folder,
+      });
+      if (begun.error || !begun.uploadUrl) {
+        setNote({ kind: 'error', text: begun.error ?? 'Could not start the upload.' });
+        return;
+      }
+
+      let put: Response;
+      try {
+        put = await fetch(begun.uploadUrl, {
+          method: 'PUT', body: file, headers: { 'Content-Type': contentType, 'Cache-Control': UPLOAD_CACHE },
+        });
+      } catch {
+        /* Nearly always the bucket refusing the browser rather than the network. */
+        setNote({ kind: 'error', text: 'The upload could not reach storage. If this keeps happening the bucket may not allow uploads from this site yet.' });
+        return;
+      }
+      if (!put.ok) {
+        setNote({ kind: 'error', text: `Storage refused the file (${put.status}).` });
+        return;
+      }
+
+      const done = await finishFieldUpload({
+        url: begun.url!, pathname: begun.pathname!,
+        filename: file.name, contentType, bytes: file.size, folder,
+      });
+      if (done.error) { setNote({ kind: 'error', text: done.error }); return; }
+      if (done.url) setValue(done.url);
+      setNote(done.pending
+        ? { kind: 'ok', text: `Uploaded at full size (${readable(file.size)}). A manager still needs to confirm its usage rights under Images & video.` }
+        : { kind: 'ok', text: `Uploaded at full size (${readable(file.size)}).` });
     });
   }
 

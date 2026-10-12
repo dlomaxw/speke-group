@@ -1,5 +1,6 @@
 import 'server-only';
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomBytes } from 'node:crypto';
 
 const ACCEPTED = new Set([
@@ -70,6 +71,48 @@ export async function uploadFile(
     bytes: file.size,
     contentType: file.type,
   };
+}
+
+/**
+ * A one-off URL the browser can PUT a file to, straight into the bucket.
+ *
+ * Uploads used to travel through a server action, which put them through the
+ * Next.js request-body ceiling (1MB by default) and then Vercel's own (4.5MB).
+ * A full-resolution photograph clears both, and failed with a bare 500. Going
+ * direct to R2 means the file never passes through the application at all, so
+ * what can be uploaded is bounded by MAX_UPLOAD_BYTES and nothing else.
+ *
+ * The URL is good for five minutes and for exactly this key and type. The
+ * caller records the media row afterwards, once the PUT has succeeded.
+ */
+export async function presignUpload(input: {
+  filename: string; contentType: string; bytes: number; folder?: string;
+}): Promise<{ uploadUrl: string; url: string; pathname: string }> {
+  if (!ACCEPTED.has(input.contentType)) {
+    throw new Error(`That file type is not allowed (${input.contentType || 'unknown'}).`);
+  }
+  if (input.bytes > MAX_UPLOAD_BYTES) {
+    throw new Error(`That file is ${(input.bytes / 1048576).toFixed(1)} MB. The limit is 100 MB.`);
+  }
+
+  const s3 = client();
+  const bucket = process.env.R2_BUCKET;
+  const base = process.env.R2_PUBLIC_BASE;
+  if (!s3 || !bucket || !base) {
+    throw new Error('Media storage is not configured. Ask IT to set the R2 keys.');
+  }
+
+  const cleanFolder = (input.folder ?? 'general').replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'general';
+  const key = `${cleanFolder}/${safeName(input.filename)}`;
+
+  const uploadUrl = await getSignedUrl(s3, new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ContentType: input.contentType,
+    CacheControl: 'public, max-age=31536000, immutable',
+  }), { expiresIn: 300 });
+
+  return { uploadUrl, url: `${base.replace(/\/$/, '')}/${key}`, pathname: key };
 }
 
 export async function deleteFile(pathname: string) {

@@ -22,6 +22,21 @@ const nextConfig: NextConfig = {
 
   poweredByHeader: false,
 
+  experimental: {
+    serverActions: {
+      /**
+       * Photo uploads from the dashboard travel as a server action, and the
+       * default ceiling is 1MB — which almost every photograph off a camera
+       * or a phone exceeds, failing the POST before our code sees it. The
+       * browser shrinks images before sending (see MediaField), so this is
+       * headroom rather than the usual case. It stops below Vercel's own
+       * 4.5MB limit on a request body, because above that the request would
+       * fail at the platform instead, where we cannot explain it.
+       */
+      bodySizeLimit: '4mb',
+    },
+  },
+
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.r2.dev' },

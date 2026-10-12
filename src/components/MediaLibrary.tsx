@@ -1,7 +1,7 @@
 'use client';
 
-import { useActionState, useState, useTransition } from 'react';
-import { uploadMedia, deleteMedia, reviewMediaRights } from '@/app/admin/actions';
+import { useState, useTransition } from 'react';
+import { beginFieldUpload, finishFieldUpload, deleteMedia, reviewMediaRights } from '@/app/admin/actions';
 
 type FileRow = {
   id: number; url: string; filename: string;
@@ -18,6 +18,10 @@ const RIGHTS_STYLE = {
 
 const FOLDERS = ['general', 'properties', 'venues', 'dining', 'experiences', 'news', 'hero'];
 
+/* Every file gets a random suffix, so a URL never changes meaning and can
+   be cached hard. R2 only records this if the browser sends it. */
+const UPLOAD_CACHE = 'public, max-age=31536000, immutable';
+
 function size(bytes: number | null) {
   if (!bytes) return '';
   return bytes > 1048576
@@ -28,14 +32,65 @@ function size(bytes: number | null) {
 export default function MediaLibrary({
   files, canUpload, canDelete, canApprove,
 }: { files: FileRow[]; canUpload: boolean; canDelete: boolean; canApprove: boolean }) {
-  const [state, formAction, pending] = useActionState(uploadMedia, {});
+  const [state, setState] = useState<{ ok?: string; error?: string }>({});
+  const [pending, startUpload] = useTransition();
   const [removing, start] = useTransition();
+
+  /**
+   * The file goes straight into the bucket from the browser, so it can be a
+   * full-resolution photograph. Sending it through a server action put it
+   * under the 1MB request ceiling, which is what this form used to do while
+   * promising 100 MB.
+   */
+  function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const file = data.get('file');
+    if (!(file instanceof File) || file.size === 0) {
+      setState({ error: 'Choose a file first.' });
+      return;
+    }
+    const folder = String(data.get('folder') ?? 'general');
+    const alt = String(data.get('alt') ?? '');
+    const credit = String(data.get('credit') ?? '');
+    const contentType = file.type || 'application/octet-stream';
+
+    setState({});
+    startUpload(async () => {
+      const begun = await beginFieldUpload({ filename: file.name, contentType, bytes: file.size, folder });
+      if (begun.error || !begun.uploadUrl) {
+        setState({ error: begun.error ?? 'Could not start the upload.' });
+        return;
+      }
+      try {
+        const put = await fetch(begun.uploadUrl, {
+          method: 'PUT', body: file, headers: { 'Content-Type': contentType, 'Cache-Control': UPLOAD_CACHE },
+        });
+        if (!put.ok) { setState({ error: `Storage refused the file (${put.status}).` }); return; }
+      } catch {
+        setState({ error: 'The upload could not reach storage. If this keeps happening the bucket may not allow uploads from this site yet.' });
+        return;
+      }
+      const done = await finishFieldUpload({
+        url: begun.url!, pathname: begun.pathname!,
+        filename: file.name, contentType, bytes: file.size, folder, alt, credit,
+      });
+      if (done.error) { setState({ error: done.error }); return; }
+      setState({
+        ok: done.pending
+          ? `Uploaded ${file.name} at full size. A manager needs to approve its usage rights before it can go on the site.`
+          : `Uploaded ${file.name} at full size.`,
+      });
+      form.reset();
+    });
+  }
   const [copied, setCopied] = useState<number | null>(null);
 
   return (
     <div className="space-y-5">
       {canUpload && (
-        <form action={formAction} className="card-surface p-5 grid sm:grid-cols-[1fr_auto_auto] gap-3 items-end">
+        <form onSubmit={submit} className="card-surface p-5 grid sm:grid-cols-[1fr_auto_auto] gap-3 items-end">
           <div>
             <label htmlFor="file" className="block text-[13px] font-semibold mb-1.5">Choose a file</label>
             <input
