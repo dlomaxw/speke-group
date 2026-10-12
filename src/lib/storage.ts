@@ -17,7 +17,17 @@ function client() {
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
   if (!endpoint || !accessKeyId || !secretAccessKey) return null;
-  return new S3Client({ region: 'auto', endpoint, credentials: { accessKeyId, secretAccessKey } });
+  return new S3Client({
+    region: 'auto', endpoint, credentials: { accessKeyId, secretAccessKey },
+    /*
+     * The SDK otherwise adds a CRC32 of the body to every request, and when a
+     * URL is signed ahead of time there is no body yet — so it signs in the
+     * checksum of nothing (x-amz-checksum-crc32=AAAAAA==) and the browser
+     * sends the real file against it. R2 happens to ignore the mismatch
+     * today; this stops us depending on that.
+     */
+    requestChecksumCalculation: 'WHEN_REQUIRED',
+  });
 }
 
 export function storageConfigured() {

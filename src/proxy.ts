@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { mediaUploadOrigins } from '@/lib/media-origins';
 
 /**
  * Content Security Policy with a fresh nonce per request. Next.js reads the
@@ -13,6 +14,14 @@ export function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const dev = process.env.NODE_ENV === 'development';
 
+  /*
+   * Staff upload photographs straight into the bucket from the browser, so
+   * those pages have to be allowed to reach it. The public site never does,
+   * and keeps connect-src to itself.
+   */
+  const admin = request.nextUrl.pathname.startsWith('/admin');
+  const uploadTargets = admin ? mediaUploadOrigins() : [];
+
   const csp = [
     `default-src 'self'`,
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${dev ? ` 'unsafe-eval'` : ''}`,
@@ -20,7 +29,7 @@ export function proxy(request: NextRequest) {
     `font-src 'self' https://fonts.gstatic.com data:`,
     `img-src 'self' data: blob: https:`,
     `media-src 'self' blob: https:`,
-    `connect-src 'self'${dev ? ' ws: wss:' : ''}`,
+    `connect-src 'self'${uploadTargets.length ? ` ${uploadTargets.join(' ')}` : ''}${dev ? ' ws: wss:' : ''}`,
     `frame-src 'self'`,
     `frame-ancestors 'self'`,
     `form-action 'self'`,
