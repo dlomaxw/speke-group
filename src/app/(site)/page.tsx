@@ -121,7 +121,7 @@ export default async function HomePage() {
   const leisureShown = (leisurePicked.length ? leisurePicked : leisure).slice(0, 2);
 
   const leisureCards = leisureShown.map((l) => `
-        <a class="event-card is-flipped" href="${safeUrl(l.linkUrl, '/experiences')}"${l.linkUrl ? ' target="_blank" rel="noopener"' : ''} data-reveal>
+        <a class="event-card is-flipped" href="${safeUrl(l.linkUrl, '/experiences')}"${l.linkUrl ? ' target="_blank" rel="noopener"' : ''}>
           <div class="event-photo" data-zoom>
             ${slot(l.imageUrl, l.imageAlt || l.name, 'width:100%;height:100%')}
           </div>
@@ -354,7 +354,7 @@ export default async function HomePage() {
       <h2 class="h-sec">${esc(setting(s, 'home_leisure_title', 'Things to Do Between Meetings'))}</h2>
       <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'home_leisure_body', 'A marina on Lake Victoria, horses and ponies in the paddock, and a lakeside that fills with music on a Sunday.'))}</p>
     </div>
-    <div class="event-row">${leisureCards}
+    <div class="event-row" data-reveal>${leisureCards}
     </div>
     <div style="text-align:center;margin-top:26px" data-reveal>
       <a class="btn btn-ghost" href="/experiences"><span>SEE EVERYTHING THERE IS TO DO</span></a>
