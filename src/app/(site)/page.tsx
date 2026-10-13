@@ -70,7 +70,7 @@ export default async function HomePage() {
       }))].join('');
 
   const portfolio = allProperties.map((p) => `
-        <a class="card" href="${safeUrl(p.websiteUrl, `https://spekegroup.com/${esc(p.slug)}/`)}" data-reveal data-filter-item="portfolio" data-tags="${esc(p.kind)}">
+        <a class="card" href="${safeUrl(p.websiteUrl, `https://spekegroup.com/${esc(p.slug)}/`)}" data-filter-item="portfolio" data-tags="${esc(p.kind)}">
           <div class="media" style="aspect-ratio:4/3">
             <div class="badge">${esc(p.categoryLabel)}</div>
             ${slot(p.imageUrl || PROPERTY_IMAGES[p.slug], p.imageAlt || p.name, 'width:100%;height:100%')}
@@ -272,8 +272,8 @@ export default async function HomePage() {
       </div>
     </div>
 
-    <div class="sg-carousel" data-carousel>
-      <div class="carousel-track" data-stagger="0.06" tabindex="0" role="group" aria-label="Our collection, scrollable">${portfolio}
+    <div class="sg-carousel" data-carousel data-reveal>
+      <div class="carousel-track" tabindex="0" role="group" aria-label="Our collection, scrollable">${portfolio}
       </div>
       <button class="carousel-arrow prev" type="button" aria-label="Previous properties">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4 7 12l8 8"/></svg>

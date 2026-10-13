@@ -1934,3 +1934,21 @@ a.card.sg-opening::after,a.tile.sg-opening::after{
   .sg-carousel.is-films .carousel-track > *,
   .sg-carousel.is-films.is-pair .carousel-track > *{flex:0 0 86%}
 }
+
+/* ============================================================
+   OUR COLLECTION
+   Matched to chatrium.com's own collection row. Two things there are worth
+   copying and both are quieter than what we had:
+
+   The row arrives as one block. Their cards carry no reveal of their own and
+   no stagger at all — the whole holder fades up together, so the section
+   reads as a single movement rather than a ripple running left to right.
+   That is handled in the markup: data-reveal sits on the carousel now.
+
+   On hover only the photograph moves, and gently — 1.05 rather than our
+   1.07, on their easing, which starts slower and finishes faster.
+   ============================================================ */
+#portfolio .card .media image-slot{
+  transition:transform .5s cubic-bezier(.7,0,.2,1);
+}
+#portfolio .card:hover .media image-slot{transform:scale(1.05)}
