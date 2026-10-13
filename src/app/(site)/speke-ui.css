@@ -1289,16 +1289,7 @@ body.sg-bm-docked.sg-bm-open .bm-close{display:flex}
 }
 .hero-p{color:#f2e9db;font-size:15px;line-height:1.66;max-width:520px;margin:0 0 24px}
 .hero-actions{display:flex;gap:12px;flex-wrap:wrap;pointer-events:auto}
-/* The caret that follows the headline as it types. */
-.hero-caret{
-  display:inline-block;width:2px;height:.82em;margin-left:4px;
-  background:var(--gold);vertical-align:-.06em;
-  animation:hero-blink 1s steps(1) infinite;
-}
-@keyframes hero-blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-/* The same caret on a dark headline reads better in maroon. */
-.head-caret{background:var(--maroon);height:.78em}
-/* The paragraph and buttons wait for the headline to finish. Guarded on
+/* The paragraph and buttons come in a beat after the headline. Guarded on
    .sg-js so they are simply visible when the script never runs. */
 .sg-js .hero-slide .hero-p,
 .sg-js .hero-slide .hero-actions{
@@ -1310,7 +1301,6 @@ body.sg-bm-docked.sg-bm-open .bm-close{display:flex}
 .sg-js .hero-slide.is-typed .hero-actions{transition-delay:.1s}
 
 @media (prefers-reduced-motion:reduce){
-  .hero-caret{display:none}
   .sg-js .hero-slide .hero-p,
   .sg-js .hero-slide .hero-actions{opacity:1;transform:none;transition:none}
 }
