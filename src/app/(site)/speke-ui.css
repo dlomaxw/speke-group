@@ -882,8 +882,10 @@ a{color:var(--maroon);text-decoration:none}
 }
 .event-photo{position:relative;overflow:hidden;min-height:300px;background:var(--cream-3)}
 .event-photo image-slot{position:absolute;inset:0;width:100%;height:100%}
-.event-photo image-slot img{transition:transform 1.1s var(--ease-out)}
-.event-card:hover .event-photo image-slot img{transform:scale(1.06)}
+/* The photograph on the same easing as the collection's: slow away, quick
+   home. 1.1s at 1.06 read as a slow creep beside it. */
+.event-photo image-slot img{transition:transform .5s cubic-bezier(.7,0,.2,1)}
+.event-card:hover .event-photo image-slot img{transform:scale(1.05)}
 .event-body{padding:26px 30px;display:flex;flex-direction:column;justify-content:center}
 .event-title{
   font-family:'Playfair Display',Georgia,serif;

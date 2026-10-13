@@ -141,7 +141,7 @@ export default async function HomePage() {
     Weddings: '/images/v-kabira-ballroom.webp',
   };
   const eventCards = occasions.slice(0, 2).map((o) => `
-        <a class="event-card" href="/events${o.name === 'Weddings' ? '#occasions' : '#venues'}" data-reveal>
+        <a class="event-card" href="/events${o.name === 'Weddings' ? '#occasions' : '#venues'}">
           <div class="event-photo">
             ${slot(o.imageUrl || OCCASION_IMAGES[o.name], o.imageAlt || `${o.name} at Speke Group`, 'width:100%;height:100%')}
           </div>
@@ -298,7 +298,7 @@ export default async function HomePage() {
   </div>
 
   <div style="padding:44px var(--gut) 10px">
-    <div class="event-row">${eventCards}
+    <div class="event-row" data-reveal>${eventCards}
     </div>
   </div>
 
