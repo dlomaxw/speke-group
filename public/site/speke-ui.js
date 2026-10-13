@@ -79,19 +79,25 @@
         node.classList.add('revealed');
         io.unobserve(node);
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+      /* GSAP's "top 90%": fire the moment the element's top crosses 90% of
+         the viewport height, whatever proportion of it is showing. */
+    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
 
     for (var j = 0; j < items.length; j++) io.observe(items[j]);
   }
 
-  /* stagger children of any [data-stagger] container */
+  /* Stagger the children of any [data-stagger] container.
+     Capped, because a row of a dozen cards at 0.08s each left the last one
+     waiting most of a second before it even began — a cascade, where the
+     reference site has them arrive as a group. */
+  var STAGGER_CAP = 0.36;
   function applyStagger() {
     var groups = document.querySelectorAll('[data-stagger]');
     for (var g = 0; g < groups.length; g++) {
       var step = parseFloat(groups[g].getAttribute('data-stagger')) || 0.07;
       var kids = groups[g].querySelectorAll(':scope > [data-reveal]');
       for (var k = 0; k < kids.length; k++) {
-        kids[k].setAttribute('data-reveal-delay', (k * step).toFixed(3));
+        kids[k].setAttribute('data-reveal-delay', Math.min(k * step, STAGGER_CAP).toFixed(3));
       }
     }
   }
@@ -169,8 +175,16 @@
       items[i].classList.toggle('filter-hide', !show);
       if (show) {
         shown++;
-        items[i].style.transitionDelay = '0s';
-        items[i].classList.add('revealed');
+        /* A card the filter brings back must not be left invisible waiting
+           for a scroll that already happened — but only if it is on screen
+           now. Anything further down stays hidden for its own reveal, which
+           is what this used to trample: every filtered card was revealed at
+           load, so none of them ever animated in. */
+        var box = items[i].getBoundingClientRect();
+        if (box.top < window.innerHeight && box.bottom > 0) {
+          items[i].style.transitionDelay = '0s';
+          items[i].classList.add('revealed');
+        }
       }
     }
     var none = document.querySelector('[data-filter-none="' + name + '"]');
