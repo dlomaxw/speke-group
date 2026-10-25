@@ -1969,3 +1969,28 @@ a.card.sg-opening::after,a.tile.sg-opening::after{
   border-color:rgba(201,162,39,.4);
 }
 .tile.is-link .link-arrow{margin-top:auto;padding-top:14px}
+
+/* The blocks sit beside the sustainability note with the button under them.
+   The picture is decoration — it carries no information the sentence does not
+   already give — so it has an empty alt and is hidden from a screen reader. */
+.impact-aside{
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+  flex:none;width:200px;
+}
+/* image-slot is built for photographs: a 3:2 frame with a cream fill and the
+   picture cropped to cover it. This one is a cut-out on transparency, so it
+   keeps its own shape and nothing sits behind it. */
+.impact-aside image-slot{
+  display:block;width:100%;height:auto;
+  aspect-ratio:auto;background:none;overflow:visible;
+}
+.impact-aside image-slot img{
+  position:static;display:block;width:100%;height:auto;object-fit:contain;
+}
+.impact-aside .btn{width:100%;justify-content:center;white-space:nowrap}
+
+@media (max-width:900px){
+  .impact-aside{flex-direction:row;width:auto;align-items:center;gap:18px}
+  .impact-aside image-slot{width:110px;flex:none}
+  .impact-aside .btn{width:auto;flex:1 1 auto}
+}

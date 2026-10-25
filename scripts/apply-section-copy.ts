@@ -11,6 +11,9 @@ import { getDb, usingD1 } from '../src/db';
 import { settings } from '../src/db/schema';
 
 const COPY: { key: string; value: string; label: string; group: string; valueType: string; sortOrder: number; helpText?: string }[] = [
+  { key: "impact_home_image", value: "/images/sustainability-blocks.webp",
+    label: "Sustainability picture", group: "page_home", valueType: "image", sortOrder: 90,
+    helpText: "Shown beside the sustainability note. A cut-out on a transparent background sits best here." },
   /* Conferences and weddings have pages of their own now. */
   { key: "conferences_eyebrow", value: "Conferences",
     label: "Conferences eyebrow", group: "page_events", valueType: "text", sortOrder: 80 },

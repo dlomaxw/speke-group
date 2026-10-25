@@ -290,9 +290,12 @@ export default async function HomePage() {
       <div>
         <div class="eyebrow-line">${esc(setting(s, 'home_impact_eyebrow', "Sustainability"))}</div>
         <h2 class="h-sec" style="margin-bottom:10px">${esc(setting(s, 'impact_home_title', 'A Warm Welcome. A Thought for Tomorrow.'))}</h2>
-        <p data-reveal data-reveal-delay="0.16" style="font-size:14px;line-height:1.75;color:#5a4a3a;margin:0;max-width:760px">${esc(setting(s, 'impact_home_body'))}</p>
+        <p data-reveal data-reveal-delay="0.16" style="font-size:12.5px;line-height:1.75;color:#5a4a3a;margin:0;max-width:760px">${esc(setting(s, 'impact_home_body'))}</p>
       </div>
-      <a class="btn btn-ghost" href="/impact"><span>${esc(setting(s, 'home_impact_cta', "SEE WHAT WE DO"))}</span></a>
+      <div class="impact-aside">
+        ${slot(setting(s, 'impact_home_image', '/images/sustainability-blocks.webp'), '', '')}
+        <a class="btn btn-ghost" href="/impact"><span>${esc(setting(s, 'home_impact_cta', "SEE WHAT WE DO"))}</span></a>
+      </div>
     </div>
     ${greenCards ? `<div class="g-3" style="gap:18px;margin-top:20px" data-stagger="0.07">${greenCards}
     </div>` : ''}
