@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getAwards, getChrome, getDining, getHeroSlides, getHighlights, getImpact, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
+import { getAwards, getChrome, getHeroSlides, getHighlights, getImpact, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
 import { esc, safeUrl, slot, header, footer, wovenBand, countUp, bookingBar, BOOKING_ANCHOR, phones, locationsMap, filmGallery, icon } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
@@ -19,9 +19,9 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, spas, occasions, honours, films, green, panels, kitchens] = await Promise.all([
+  const [chrome, spas, occasions, honours, films, green, panels] = await Promise.all([
     getChrome(), getWellness(), getHighlights('occasions'), getAwards(), getVideos(), getImpact(),
-    getHeroSlides(), getDining('restaurant'),
+    getHeroSlides(),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
@@ -127,20 +127,6 @@ export default async function HomePage() {
             <span class="link-arrow">FIND OUT MORE <i>&rarr;</i></span>
           </div>
         </a>`).join('');
-
-  /* Food is given a shape of its own — an arched photograph rather than the
-     square cards used everywhere else — so the kitchens read as a different
-     kind of thing from a property or a venue. */
-  const foodCards = kitchens.map((r, i) => {
-    const at = allProperties.find((p) => p.id === r.propertyId);
-    return `
-        <a class="food-card${i < 2 ? ' is-on' : ''}" href="${safeUrl(r.linkUrl || at?.websiteUrl, '/experiences#restaurants')}" target="_blank" rel="noopener"${i < 2 ? ' data-reveal' : ''}>
-          <div class="food-photo" data-zoom>${slot(r.imageUrl, r.imageAlt || r.name, 'width:100%;height:100%')}</div>
-          <div class="food-name">${esc(r.name)}</div>
-          ${r.cuisine ? `<div class="food-cuisine">${esc(r.cuisine)}</div>` : ''}
-          <div class="food-where">${esc(at?.name ?? 'Across the Group')}</div>
-        </a>`;
-  }).join('');
 
   const awardCards = honours.map((a) => {
     const at = allProperties.find((p) => p.id === a.propertyId);
@@ -276,21 +262,6 @@ export default async function HomePage() {
     <div class="event-row" data-reveal>${eventCards}
     </div>
   </div>
-
-  <!-- ================= FOOD & BEVERAGE ================= -->
-  ${foodCards ? `
-  <div id="food" style="padding:52px var(--gut)">
-    <div style="text-align:center;max-width:700px;margin:0 auto 34px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'food_eyebrow', 'Food & Beverage'))}</div>
-      <h2 class="h-sec">${esc(setting(s, 'food_title', 'Cooked to Order, Served with Care'))}</h2>
-      <p data-reveal data-reveal-delay="0.16" style="font-size:12.5px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'food_body'))}</p>
-    </div>
-    <div class="food-row" data-food-rotator data-stagger="0.08">${foodCards}
-    </div>
-    <div style="text-align:center;margin-top:28px" data-reveal>
-      <a class="btn btn-ghost" href="/experiences#restaurants"><span>SEE EVERY RESTAURANT &amp; BAR</span></a>
-    </div>
-  </div>` : ''}
 
   <!-- ================= WELLNESS ================= -->
   <div id="wellness" style="background:var(--cream-2);padding:50px var(--gut)">

@@ -86,9 +86,9 @@ export function header(opts: {
       <div class="item">
         <a href="/events"${cls('events')}>${nav('nav_events', 'Events &amp; Meetings')}</a>
         <div class="sg-drop">
-          <a href="/events#venues">Conferences</a>
-          <a href="/events#occasions">Weddings</a>
-          <a href="/events#venues">Meeting Venues</a>
+          <a href="/conferences">Conferences &amp; Meetings</a>
+          <a href="/weddings">Weddings &amp; Celebrations</a>
+          <a href="/events#occasions">Occasions We Host</a>
         </div>
       </div>
       <div class="item">
@@ -645,4 +645,105 @@ export function subjectIcon(name: string, fallback?: string | null, size = 26): 
   const found = ICON_BY_SUBJECT[key];
   if (found) return icon(found, size);
   return fallback ? `<span class="sg-icon-glyph">${esc(fallback)}</span>` : '';
+}
+
+/* ------------------------------------------------------------------
+   Venue grid
+   ------------------------------------------------------------------ */
+
+type VenueRow = {
+  slug: string; name: string; propertyId: number | null; location: string;
+  capacity: string | null; venueSize: string | null; sizeTag: string;
+  imageUrl: string | null; imageAlt: string | null; venueUrl: string | null;
+};
+type VenueSite = { id: number; name: string; websiteUrl: string | null };
+
+/** The capacity chips, in the order a reader meets them. */
+const VENUE_CHIPS: { tag: string; label: string }[] = [
+  { tag: 's10', label: '10 &ndash; 35 Guests' },
+  { tag: 's50', label: '50 &ndash; 100 Guests' },
+  { tag: 's120', label: '120 &ndash; 400 Guests' },
+  { tag: 's1000', label: 'Over 400 Guests' },
+];
+
+/**
+ * A filterable wall of venues, with its own heading, location selector and
+ * capacity chips. The conference and wedding pages each render one; keeping it
+ * here means the card, the filters and the empty note stay identical between
+ * them rather than drifting apart in two copies.
+ *
+ * `group` names the filter set, so two grids on one page never fight.
+ */
+export function venueGrid(opts: {
+  id: string;
+  group: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  rows: VenueRow[];
+  sites: VenueSite[];
+  emptyNote: string;
+  fallbackImages?: Record<string, string>;
+  background?: string;
+}): string {
+  const { rows, sites, group } = opts;
+  if (!rows.length) return '';
+
+  /* Only offer a location that has something to show. */
+  const places = sites
+    .filter((p) => rows.some((v) => v.propertyId === p.id))
+    .map((p) => `<option value="p${p.id}">${esc(p.name)}</option>`).join('');
+
+  /* A chip nobody can satisfy is just a dead end. */
+  const chips = VENUE_CHIPS.filter((c) => rows.some((v) => v.sizeTag === c.tag))
+    .map((c) => `<button class="chip" data-filter="${c.tag}">${c.label}</button>`).join('');
+
+  /* "View Venue" goes to the page the owning property publishes for that room;
+     failing that, to the property's own website, and only then to our form. */
+  const href = (v: VenueRow) =>
+    safeUrl(v.venueUrl || sites.find((p) => p.id === v.propertyId)?.websiteUrl, '/contact');
+
+  const cards = rows.map((v) => `
+        <a class="card" href="${href(v)}" target="_blank" rel="noopener" data-reveal data-filter-item="${esc(group)}" data-tags="${esc(v.sizeTag)} ${v.propertyId ? `p${v.propertyId}` : 'group'}">
+          <div class="media" style="height:178px" data-zoom>
+            <div class="badge">${esc(v.location)}</div>
+            ${slot(v.imageUrl || opts.fallbackImages?.[v.slug], v.imageAlt || v.name, 'width:100%;height:178px')}
+          </div>
+          <div class="body">
+            <div class="eyebrow">${esc(v.location)}</div>
+            <div class="title">${esc(v.name)}</div>
+            <div style="display:flex;gap:18px;font-size:12.5px;color:#5a4a3a;margin-bottom:12px">
+              <div><span style="color:#b8935a;font-weight:700">Capacity</span><br>${esc(v.capacity)}</div>
+              ${v.venueSize ? `<div><span style="color:#b8935a;font-weight:700">Venue Size</span><br>${esc(v.venueSize)}</div>` : ''}
+            </div>
+            <span class="link-arrow">VIEW VENUE <i>&rarr;</i></span>
+          </div>
+        </a>`).join('');
+
+  return `
+  <div id="${esc(opts.id)}" style="${opts.background ? `background:${opts.background};` : ''}padding:48px var(--gut) 30px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px;flex-wrap:wrap;gap:16px" data-reveal>
+      <div>
+        <div class="eyebrow-line">${esc(opts.eyebrow)}</div>
+        <h2 class="h-sec">${esc(opts.title)}</h2>
+        <p style="font-size:12.5px;color:#5a4a3a;margin:10px 0 0;max-width:560px;line-height:1.65">${esc(opts.body)}</p>
+      </div>
+      <div class="venue-filters">
+        <div class="venue-place">
+          <label class="fl" for="${esc(group)}-place">Location</label>
+          <select id="${esc(group)}-place" data-filter-select="${esc(group)}">
+            <option value="all">All our locations</option>${places}
+          </select>
+        </div>
+        <div data-filter-group="${esc(group)}" style="display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end">
+          <button class="chip active" data-filter="all">All Venues</button>
+          ${chips}
+        </div>
+      </div>
+    </div>
+
+    <div style="gap:22px" data-stagger="0.06" class="g-3">${cards}
+    </div>
+    <p class="wellness-none" data-filter-none="${esc(group)}" hidden>${opts.emptyNote}</p>
+  </div>`;
 }

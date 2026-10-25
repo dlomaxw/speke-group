@@ -11,6 +11,25 @@ import { getDb, usingD1 } from '../src/db';
 import { settings } from '../src/db/schema';
 
 const COPY: { key: string; value: string; label: string; group: string; valueType: string; sortOrder: number; helpText?: string }[] = [
+  /* Conferences and weddings have pages of their own now. */
+  { key: "conferences_eyebrow", value: "Conferences",
+    label: "Conferences eyebrow", group: "page_events", valueType: "text", sortOrder: 80 },
+  { key: "conferences_title", value: "Room for Every Kind of Meeting",
+    label: "Conferences heading", group: "page_events", valueType: "text", sortOrder: 81 },
+  { key: "conferences_body", value: "From a boardroom for ten to a hall for three thousand, across the convention centre, the Commonwealth block and Kabira Country Club.",
+    label: "Conferences paragraph", group: "page_events", valueType: "textarea", sortOrder: 82 },
+  { key: "conferences_hero_image", value: "/images/meet-hero.webp",
+    label: "Conferences hero photo", group: "page_events", valueType: "image", sortOrder: 83 },
+  { key: "weddings_eyebrow", value: "Weddings",
+    label: "Weddings eyebrow", group: "page_events", valueType: "text", sortOrder: 84 },
+  { key: "weddings_title", value: "A Day on the Shores of Lake Victoria",
+    label: "Weddings heading", group: "page_events", valueType: "text", sortOrder: 85 },
+  { key: "weddings_body", value: "Lawns that run down to the water, gardens under the palms and ballrooms for over a thousand guests — each one set for the day you have in mind.",
+    label: "Weddings paragraph", group: "page_events", valueType: "textarea", sortOrder: 86 },
+  { key: "weddings_hero_image", value: "/images/v-kabira-ballroom.webp",
+    label: "Weddings hero photo", group: "page_events", valueType: "image", sortOrder: 87 },
+  { key: "events_venues_body", value: "Each of our venues is unique in its own way and can be set up to suit your particular needs and requirements.",
+    label: "Meeting venues paragraph", group: "page_events", valueType: "textarea", sortOrder: 88 },
   /* Our Story counts things; this one marks when the counting started, so it
      is a year printed as a year rather than a figure that counts up to 1996. */
   { key: "stat_since_year", value: "1996",
