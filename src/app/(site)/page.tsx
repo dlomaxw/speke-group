@@ -91,9 +91,6 @@ export default async function HomePage() {
   };
   const propertyName = (id: number | null) =>
     allProperties.find((p) => p.id === id)?.name ?? 'Across the Group';
-  const wellnessPlaces = allProperties
-    .filter((p) => spas.some((w) => w.propertyId === p.id))
-    .map((p) => `<option value="p${p.id}">${esc(p.name)}</option>`).join('');
   const wellnessCards = spas.map((w) => {
     const site = safeUrl(w.linkUrl || allProperties.find((p) => p.id === w.propertyId)?.websiteUrl, '');
     return `
@@ -235,7 +232,7 @@ export default async function HomePage() {
   <div id="our-group" style="padding:54px var(--gut) 44px;text-align:center" data-reveal>
     <div class="eyebrow-line" style="justify-content:center">Our Group</div>
     <h2 class="h-sec" style="max-width:820px;margin:0 auto">${esc(setting(s, 'group_title', 'Thirteen Places to Stay, Meet and Celebrate'))}</h2>
-    <p data-reveal data-reveal-delay="0.16" style="font-size:15px;color:#5a4a3a;line-height:1.8;max-width:760px;margin:16px auto 0">${esc(setting(s, 'group_body', 'Discover Speke Group’s collection of hotels, apartments and resorts — where warm Ugandan hospitality meets comfort and style. Whether you’re planning a relaxing escape, a business stay, a new place to call home or a memorable celebration, find your perfect destination with us.'))}</p>
+    <p data-reveal data-reveal-delay="0.16" style="font-size:12.5px;color:#5a4a3a;line-height:1.8;max-width:760px;margin:16px auto 0">${esc(setting(s, 'group_body', 'Discover Speke Group’s collection of hotels, apartments and resorts — where warm Ugandan hospitality meets comfort and style. Whether you’re planning a relaxing escape, a business stay, a new place to call home or a memorable celebration, find your perfect destination with us.'))}</p>
   </div>
 
   <!-- ================= OUR STORY + STATS ================= -->
@@ -251,7 +248,7 @@ export default async function HomePage() {
         <div class="stat"><div class="num">${countUp(setting(s, 'stat_properties', '13'))}</div><div class="lbl">Properties</div></div>
         <div class="stat"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Guest Rooms &amp; Apartments</div></div>
         <div class="stat"><div class="num">${countUp(setting(s, 'stat_conference_rooms', '45'))}</div><div class="lbl">Conference Rooms</div></div>
-        <div class="stat"><div class="num">${countUp(setting(s, 'stat_years', '25'), '+')}</div><div class="lbl">Years of Service</div></div>
+        <div class="stat"><div class="num">${countUp(setting(s, 'stat_years', '25'), '+')}</div><div class="lbl">Years of Service</div><div class="since">${esc(setting(s, 'stat_years_since', 'Since 1996'))}</div></div>
       </div>
     </div>
   </div>
@@ -308,7 +305,7 @@ export default async function HomePage() {
     <div style="text-align:center;max-width:700px;margin:0 auto 34px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'food_eyebrow', 'Food & Beverage'))}</div>
       <h2 class="h-sec">${esc(setting(s, 'food_title', 'Cooked to Order, Served with Care'))}</h2>
-      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'food_body'))}</p>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:12.5px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'food_body'))}</p>
     </div>
     <div class="food-row" data-food-rotator data-stagger="0.08">${foodCards}
     </div>
@@ -322,14 +319,7 @@ export default async function HomePage() {
     <div style="text-align:center;margin-bottom:26px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'home_wellness_eyebrow', "Experience"))}</div>
       <h2 class="h-sec">${esc(setting(s, 'wellness_title', 'Spa & Wellness'))}</h2>
-      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;max-width:660px;margin:12px auto 0;line-height:1.7">${esc(setting(s, 'wellness_body', 'Massages, facials and steam baths, hair and beauty salons, gyms and pools — choose a location to see what is on offer there.'))}</p>
-    </div>
-
-    <div class="wellness-pick" data-reveal>
-      <label class="fl" for="wellness-place">Choose a location</label>
-      <select id="wellness-place" data-filter-select="wellness">
-        <option value="all">All our locations</option>${wellnessPlaces}
-      </select>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:12.5px;color:#5a4a3a;max-width:660px;margin:12px auto 0;line-height:1.7">${esc(setting(s, 'wellness_body', 'Spas and salons, gyms and pools, beauty therapy and things for children to do, across the collection.'))}</p>
     </div>
 
     <div class="sg-carousel is-three" data-carousel data-autoplay="5000">
@@ -343,7 +333,6 @@ export default async function HomePage() {
       </button>
     </div>
     <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
-    <p class="wellness-none" data-filter-none="wellness" hidden>We have nothing listed here yet. <a href="/contact">Ask our team</a> and we will point you to the nearest spa or salon.</p>
   </div>
 
   <!-- ================= LEISURE ================= -->
@@ -352,7 +341,7 @@ export default async function HomePage() {
     <div style="text-align:center;max-width:660px;margin:0 auto 26px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'home_leisure_eyebrow', 'Leisure'))}</div>
       <h2 class="h-sec">${esc(setting(s, 'home_leisure_title', 'Things to Do Between Meetings'))}</h2>
-      <p data-reveal data-reveal-delay="0.16" style="font-size:14px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'home_leisure_body', 'A marina on Lake Victoria, horses and ponies in the paddock, and a lakeside that fills with music on a Sunday.'))}</p>
+      <p data-reveal data-reveal-delay="0.16" style="font-size:12.5px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'home_leisure_body', 'A marina on Lake Victoria, horses and ponies in the paddock, and a lakeside that fills with music on a Sunday.'))}</p>
     </div>
     <div class="event-row" data-reveal>${leisureCards}
     </div>
