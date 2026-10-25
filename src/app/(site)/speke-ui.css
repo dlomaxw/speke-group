@@ -339,10 +339,6 @@ a{color:var(--maroon);text-decoration:none}
   border-left:1px solid var(--line);
 }
 .story-stats .stat:nth-child(odd){border-left:0}
-.story-stats .since{
-  font-size:10px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--gold-pale);margin-top:4px;
-}
 
 @media (max-width:1180px){
   .story-card{grid-template-columns:1fr;gap:30px;padding:30px 28px}

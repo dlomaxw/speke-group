@@ -11,9 +11,12 @@ import { getDb, usingD1 } from '../src/db';
 import { settings } from '../src/db/schema';
 
 const COPY: { key: string; value: string; label: string; group: string; valueType: string; sortOrder: number; helpText?: string }[] = [
-  { key: "stat_years_since", value: "Since 1996",
-    label: "Years of service: since", group: "homepage", valueType: "text", sortOrder: 72,
-    helpText: "Shown under the years figure in Our Story." },
+  /* Our Story counts things; this one marks when the counting started, so it
+     is a year printed as a year rather than a figure that counts up to 1996. */
+  { key: "stat_since_year", value: "1996",
+    label: "Our Story: year founded", group: "homepage", valueType: "text", sortOrder: 72 },
+  { key: "stat_since_label", value: "Welcoming Guests Since",
+    label: "Our Story: year founded label", group: "homepage", valueType: "text", sortOrder: 73 },
   /* The two films headings were only ever fallbacks in the page. */
   { key: "home_films_title", value: "See Us for Yourself",
     label: "Films heading", group: "page_home", valueType: "text", sortOrder: 70 },

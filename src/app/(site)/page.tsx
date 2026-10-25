@@ -248,7 +248,7 @@ export default async function HomePage() {
         <div class="stat"><div class="num">${countUp(setting(s, 'stat_properties', '13'))}</div><div class="lbl">Properties</div></div>
         <div class="stat"><div class="num">${countUp(setting(s, 'stat_rooms', '900'), '+')}</div><div class="lbl">Guest Rooms &amp; Apartments</div></div>
         <div class="stat"><div class="num">${countUp(setting(s, 'stat_conference_rooms', '45'))}</div><div class="lbl">Conference Rooms</div></div>
-        <div class="stat"><div class="num">${countUp(setting(s, 'stat_years', '25'), '+')}</div><div class="lbl">Years of Service</div><div class="since">${esc(setting(s, 'stat_years_since', 'Since 1996'))}</div></div>
+        <div class="stat"><div class="num">${esc(setting(s, 'stat_since_year', '1996'))}</div><div class="lbl">${esc(setting(s, 'stat_since_label', 'Welcoming Guests Since'))}</div></div>
       </div>
     </div>
   </div>
