@@ -443,7 +443,7 @@ a{color:var(--maroon);text-decoration:none}
    =========================================================== */
 .eyebrow-line{
   display:inline-flex;align-items:center;gap:11px;
-  font-size:12.5px;letter-spacing:.24em;font-weight:700;
+  font-size:16px;letter-spacing:.2em;font-weight:700;
   color:var(--gold-pale);text-transform:uppercase;margin-bottom:12px;
 }
 .eyebrow-line::before{content:"";width:32px;height:1px;background:var(--gold-soft)}

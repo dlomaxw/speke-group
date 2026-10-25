@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
-import { getAwards, getChrome, getDining, getExperiences, getHeroSlides, getHighlights, getImpact, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
+import { getAwards, getChrome, getDining, getHeroSlides, getHighlights, getImpact, getVideos, getWellness, setting, splitHighlights } from '@/lib/site-data';
 import { esc, safeUrl, slot, header, footer, wovenBand, countUp, bookingBar, BOOKING_ANCHOR, phones, locationsMap, filmGallery, icon } from '@/lib/site-html';
 import { PROPERTY_IMAGES } from '@/lib/default-images';
 
@@ -19,9 +19,9 @@ function bookingDates() {
 }
 
 export default async function HomePage() {
-  const [chrome, spas, occasions, honours, films, green, panels, kitchens, leisure] = await Promise.all([
+  const [chrome, spas, occasions, honours, films, green, panels, kitchens] = await Promise.all([
     getChrome(), getWellness(), getHighlights('occasions'), getAwards(), getVideos(), getImpact(),
-    getHeroSlides(), getDining('restaurant'), getExperiences(),
+    getHeroSlides(), getDining('restaurant'),
   ]);
   const { settings: s, hotels, resorts, apartments, allProperties } = chrome;
 
@@ -109,28 +109,6 @@ export default async function HomePage() {
           </div>
         </${site ? 'a' : 'div'}>`;
   }).join('');
-
-  /* Leisure on the homepage: two of the things there are to do, chosen in the
-     dashboard by slug so the team can swap them without touching the page. */
-  const leisurePicked = splitHighlights(setting(s, 'home_leisure_slugs', 'marina-experience · equestrian'))
-    .map((slug) => leisure.find((l) => l.slug === slug))
-    .filter((l): l is (typeof leisure)[number] => Boolean(l));
-  const leisureShown = (leisurePicked.length ? leisurePicked : leisure).slice(0, 2);
-
-  const leisureCards = leisureShown.map((l) => `
-        <a class="event-card is-flipped" href="${safeUrl(l.linkUrl, '/experiences')}"${l.linkUrl ? ' target="_blank" rel="noopener"' : ''}>
-          <div class="event-photo" data-zoom>
-            ${slot(l.imageUrl, l.imageAlt || l.name, 'width:100%;height:100%')}
-          </div>
-          <div class="event-body">
-            <div class="eyebrow">Leisure</div>
-            <div class="event-title">${esc(l.name)}</div>
-            <p class="event-desc">${esc(l.description)}</p>
-            ${l.highlights ? `<div class="wellness-tags" style="margin-bottom:14px">${splitHighlights(l.highlights)
-              .map((h) => `<span>${esc(h)}</span>`).join('')}</div>` : ''}
-            <span class="link-arrow">FIND OUT MORE <i>&rarr;</i></span>
-          </div>
-        </a>`).join('');
 
   /* Two ways in to Events & Meetings: a meeting, and a celebration. */
   const OCCASION_IMAGES: Record<string, string> = {
@@ -334,21 +312,6 @@ export default async function HomePage() {
     </div>
     <div class="carousel-dots" data-carousel-dots aria-hidden="true"></div>
   </div>
-
-  <!-- ================= LEISURE ================= -->
-  ${leisureCards ? `
-  <div id="leisure" style="padding:52px var(--gut) 10px">
-    <div style="text-align:center;max-width:660px;margin:0 auto 26px" data-reveal>
-      <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'home_leisure_eyebrow', 'Leisure'))}</div>
-      <h2 class="h-sec">${esc(setting(s, 'home_leisure_title', 'Things to Do Between Meetings'))}</h2>
-      <p data-reveal data-reveal-delay="0.16" style="font-size:12.5px;color:#5a4a3a;margin:12px 0 0;line-height:1.72">${esc(setting(s, 'home_leisure_body', 'A marina on Lake Victoria, horses and ponies in the paddock, and a lakeside that fills with music on a Sunday.'))}</p>
-    </div>
-    <div class="event-row" data-reveal>${leisureCards}
-    </div>
-    <div style="text-align:center;margin-top:26px" data-reveal>
-      <a class="btn btn-ghost" href="/experiences"><span>SEE EVERYTHING THERE IS TO DO</span></a>
-    </div>
-  </div>` : ''}
 
   <!-- ================= SUSTAINABILITY ================= -->
   <div id="sustainability" style="padding:50px var(--gut)">
