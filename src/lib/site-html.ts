@@ -747,3 +747,35 @@ export function venueGrid(opts: {
     <p class="wellness-none" data-filter-none="${esc(group)}" hidden>${opts.emptyNote}</p>
   </div>`;
 }
+
+/* ------------------------------------------------------------------
+   Occasion tiles
+   ------------------------------------------------------------------ */
+
+type OccasionRow = {
+  name: string; description: string | null; icon: string | null; linkUrl: string | null;
+};
+
+/**
+ * The "Occasions we host" tiles. A tile with somewhere to go is a link and
+ * says so on hover; one without stays a plain tile rather than pretending to
+ * be clickable. Shared between the events hub and the weddings page so the two
+ * cannot drift.
+ */
+export function occasionTiles(rows: OccasionRow[]): string {
+  return rows.map((o) => {
+    const href = safeUrl(o.linkUrl, '');
+    /* Our own pages stay in the tab; someone else's opens beside it. */
+    const away = href && !href.startsWith('/');
+    const open = href
+      ? `<a class="tile is-link" href="${href}"${away ? ' target="_blank" rel="noopener"' : ''} data-reveal>`
+      : '<div class="tile" data-reveal>';
+    return `
+        ${open}
+          <div class="tile-icon">${subjectIcon(o.name, o.icon)}</div>
+          <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:10px">${esc(o.name)}</div>
+          <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a">${esc(o.description)}</div>
+          ${href ? '<span class="link-arrow" style="margin-top:14px">FIND OUT MORE <i>&rarr;</i></span>' : ''}
+        ${href ? '</a>' : '</div>'}`;
+  }).join('');
+}

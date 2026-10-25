@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Html from '@/components/site/Html';
 import { getChrome, getHighlights, getVenues, setting } from '@/lib/site-data';
 import {
-  esc, slot, header, footer, phones, telHref, subjectIcon, venueGrid,
+  esc, slot, header, footer, phones, telHref, occasionTiles, venueGrid,
 } from '@/lib/site-html';
 import { VENUE_IMAGES } from '@/lib/default-images';
 
@@ -23,12 +23,7 @@ export default async function WeddingsPage() {
 
   const weddingVenues = venues.filter((v) => v.kind === 'wedding');
 
-  const occasionTiles = occasions.map((o) => `
-        <div class="tile" data-reveal>
-          <div class="tile-icon">${subjectIcon(o.name, o.icon)}</div>
-          <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:10px">${esc(o.name)}</div>
-          <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a">${esc(o.description)}</div>
-        </div>`).join('');
+  const tiles = occasionTiles(occasions);
 
   const html = `
   ${header({ active: 'events', settings: s, cta: { label: 'CALL RESERVATIONS', href: firstPhone ? telHref(firstPhone) : '/contact' }, hotels, resorts, apartments })}
@@ -61,13 +56,13 @@ export default async function WeddingsPage() {
   })}
 
   <!-- ================= OCCASIONS ================= -->
-  ${occasionTiles ? `
+  ${tiles ? `
   <div id="occasions" style="background:var(--cream-2);padding:50px var(--gut)">
     <div style="text-align:center;margin-bottom:30px" data-reveal>
       <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'events_occasions_eyebrow', "What We Host"))}</div>
       <h2 class="h-sec">${esc(setting(s, 'events_occasions_title', "Occasions We Host"))}</h2>
     </div>
-    <div style="gap:22px" data-stagger="0.09" class="g-3">${occasionTiles}
+    <div style="gap:22px" data-stagger="0.09" class="g-3">${tiles}
     </div>
   </div>` : ''}
 

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { kampalaToday } from '@/lib/enquiry-rules';
 import Html from '@/components/site/Html';
 import { getChrome, getHighlights, getVenues, getVideos, setting } from '@/lib/site-data';
-import { esc, slot, header, footer, countUp, phones, bookingBar, BOOKING_ANCHOR, filmGallery, subjectIcon } from '@/lib/site-html';
+import { esc, slot, header, footer, countUp, phones, bookingBar, BOOKING_ANCHOR, filmGallery, occasionTiles } from '@/lib/site-html';
 
 export const metadata: Metadata = {
   title: 'Events & Meeting Venues | Speke Group of Hotels',
@@ -27,12 +27,7 @@ export default async function EventsPage() {
   const meetingCount = venues.filter((v) => v.kind !== 'wedding').length;
   const weddingCount = venues.filter((v) => v.kind === 'wedding').length;
 
-  const occasionTiles = occasions.map((o) => `
-        <div class="tile" data-reveal>
-          <div class="tile-icon">${subjectIcon(o.name, o.icon)}</div>
-          <div class="serif" style="font-size:21px;font-weight:600;color:#3a2020;margin-bottom:10px">${esc(o.name)}</div>
-          <div style="font-size:13.2px;line-height:1.7;color:#5a4a3a">${esc(o.description)}</div>
-        </div>`).join('');
+  const tiles = occasionTiles(occasions);
 
   const html = `
   ${header({ active: 'events', settings: s, cta: { label: 'BOOK NOW', href: BOOKING_ANCHOR }, hotels, resorts, apartments })}
@@ -102,7 +97,7 @@ export default async function EventsPage() {
       <div class="eyebrow-line" style="justify-content:center">${esc(setting(s, 'events_occasions_eyebrow', "What We Host"))}</div>
       <h2 class="h-sec">${esc(setting(s, 'events_occasions_title', "Occasions We Host"))}</h2>
     </div>
-    <div style="gap:22px" data-stagger="0.09" class="g-3">${occasionTiles}
+    <div style="gap:22px" data-stagger="0.09" class="g-3">${tiles}
     </div>
   </div>
 

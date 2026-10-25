@@ -1954,3 +1954,18 @@ a.card.sg-opening::after,a.tile.sg-opening::after{
   transition:transform .5s cubic-bezier(.7,0,.2,1);
 }
 #portfolio .card:hover .media image-slot{transform:scale(1.05)}
+
+/* An occasion tile that leads somewhere behaves like the cards do; one that
+   leads nowhere keeps still, so the cursor never promises a page that is not
+   there. */
+.tile.is-link{
+  display:flex;flex-direction:column;align-items:flex-start;
+  text-decoration:none;
+  transition:transform .46s var(--ease-out),box-shadow .46s var(--ease),border-color .4s var(--ease);
+}
+.tile.is-link:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--card-shadow-hover);
+  border-color:rgba(201,162,39,.4);
+}
+.tile.is-link .link-arrow{margin-top:auto;padding-top:14px}
