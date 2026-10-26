@@ -447,10 +447,14 @@ a{color:var(--maroon);text-decoration:none}
   color:var(--gold-pale);text-transform:uppercase;margin-bottom:12px;
 }
 .eyebrow-line::before{content:"";width:32px;height:1px;background:var(--gold-soft)}
-/* Section eyebrows match their heading's size (hero eyebrows keep the base size) */
+/* Section eyebrows match their heading's size (hero eyebrows keep the base
+   size). The steps below are .h-sec's own — 1024, 820, 560 — because on the
+   640-820 band the eyebrow was left at 26px over a 23px heading, which made
+   the label bigger than the thing it labels. */
 .eyebrow-line{font-size:30px;letter-spacing:.14em}
 @media (max-width:1024px){.eyebrow-line{font-size:26px}}
-@media (max-width:640px){.eyebrow-line{font-size:21px;letter-spacing:.12em}}
+@media (max-width:820px){.eyebrow-line{font-size:23px}}
+@media (max-width:560px){.eyebrow-line{font-size:21px;letter-spacing:.12em}}
 .hero-copy .eyebrow-line,.hero-slide .eyebrow-line,.eyebrow-line.chairman-role{font-size:16px;letter-spacing:.2em}
 
 .h-sec{
