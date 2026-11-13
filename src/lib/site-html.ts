@@ -266,27 +266,11 @@ export function footer(s: SettingsMap): string {
    Woven band (homepage, between the hero and the story)
    ------------------------------------------------------------------ */
 
-function weaveSvg(): string {
-  let paths = '';
-  for (let i = 0; i < 26; i++) {
-    const cx = 30 + i * 60;
-    const x0 = i * 60;
-    paths +=
-      `<path class="draw" style="--len:150" d="M${cx}.0 8 L${cx + 24} 29 L${cx}.0 50 L${cx - 24} 29 Z"/>` +
-      `<path class="draw" style="--len:92" d="M${cx}.0 17 L${cx + 14} 29 L${cx}.0 41 L${cx - 14} 29 Z"/>` +
-      `<circle class="solid" cx="${cx}.0" cy="29" r="2.6"/>` +
-      `<path class="draw" style="--len:44" d="M${x0} 29 L${x0 + 6} 22 M${x0} 29 L${x0 + 6} 36"/>`;
-  }
-  return `<svg viewBox="0 0 1560 58" preserveAspectRatio="none" aria-hidden="true">${paths}</svg>`;
-}
+/* The band is the supplied woven-band artwork, repeated across the width. */
 
 export function wovenBand(): string {
-  const svg = weaveSvg();
   return `
-  <div class="woven-band" aria-hidden="true">
-    <div class="weave">${svg}${svg}</div>
-    <div class="sheen"></div>
-  </div>`;
+  <div class="woven-band" aria-hidden="true"></div>`;
 }
 
 /* ------------------------------------------------------------------
